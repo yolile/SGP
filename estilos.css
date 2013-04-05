@@ -1,0 +1,137 @@
+*{
+    font-family: sans-serif;
+    font-size: 12px;
+    color: #798e94;
+}
+
+.formato1 {
+    width: 400px;
+    margin: auto;
+    background-color: #E2ECEE;
+}
+
+.formato2 {
+    width: 800px;
+    margin: auto;
+    background-color: #E2ECEE;
+}
+
+.formato3 {
+    width: 1000px;
+    height: 1000px;
+    margin: auto;
+    background-color: #E2ECEE;
+}
+
+
+
+.estilos{
+    border: 1px solid #CED5D7;
+    border-radius: 6px;
+    padding: 45px 45px 20px;
+    margin-top: 50px;
+    background-color: white;
+    box-shadow: 0px 5px 10px #B5C1C5, 0 0 0 10px #EEF5F7 inset;
+}
+
+
+
+.estilos label{
+    display: block;
+    font-weight: bold;
+}
+.estilos div{
+    margin-bottom: 15px;
+}
+.estilos input[type='text'], .contacto textarea{
+    padding: 7px 6px;
+    width: 294px;
+    border: 1px solid #CED5D7;
+    resize: none;
+    box-shadow:0 0 0 3px #EEF5F7;
+    margin: 5px 0;
+}
+.estilos input[type='text']:focus, .contacto textarea:focus{
+    outline: none;
+    box-shadow:0 0 0 3px #dde9ec;
+}
+
+.estilos input[type='password'], .contacto textarea{
+    padding: 7px 6px;
+    width: 294px;
+    border: 1px solid #CED5D7;
+    resize: none;
+    box-shadow:0 0 0 3px #EEF5F7;
+    margin: 5px 0;
+}
+
+.estilos input[type='password']:focus, .contacto textarea:focus{
+    outline: none;
+    box-shadow:0 0 0 3px #dde9ec;
+}
+
+.estilos input[type='submit']{
+    border: 1px solid #CED5D7;
+    box-shadow:0 0 0 3px #EEF5F7;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: bold;
+    text-shadow: 1px 1px 0px white;
+ 
+    background: #e4f1f6;
+    background: -moz-linear-gradient(top, #e4f1f6 0%, #cfe6ef 100%);
+    background: -webkit-linear-gradient(top, #e4f1f6 0%,#cfe6ef 100%);
+}
+.estilos input[type='submit']:hover{
+    background: #edfcff;
+    background: -moz-linear-gradient(top, #edfcff 0%, #cfe6ef 100%);
+    background: -webkit-linear-gradient(top, #edfcff 0%,#cfe6ef 100%);
+}
+.estilos input[type='submit']:active{
+    background: #cfe6ef;
+    background: -moz-linear-gradient(top, #cfe6ef 0%, #edfcff 100%);
+    background: -webkit-linear-gradient(top, #cfe6ef 0%,#edfcff 100%);
+}
+
+
+ /*Para el formato del menu*/
+* {
+font-family:sans-serif;
+list-style:none;
+text-decoration:none;
+margin:0;
+padding:0;
+}
+ 
+.nav > li {
+float:left;
+}
+ 
+.nav li a {
+background:#0c9ba0;
+color:#FFF;
+display:block;
+border:1px solid;
+padding:10px 12px;
+}
+ 
+.nav li a:hover {
+background:#0fbfc6;
+}
+.nav li ul {
+display:none;
+position:absolute;
+min-width:140px;
+}
+
+.nav li:hover > ul {
+display:block;
+}
+.nav li ul li {
+position:relative;
+}
+ 
+.nav li ul li ul {
+right:-140px;
+top:0;
+}
