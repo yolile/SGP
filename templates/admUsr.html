@@ -1,11 +1,8 @@
-<html>
-    <head>
-        <title>Usuarios</title>
-        <link rel='stylesheet' href='estilos.css'>
-    </head>
+{% extends "layout.html" %}
+{% block body %}
+<body class = formato2>
 
-    <body class=formato2>
-        <form class='estilos'>
+        <form class='estilos' >
 
   <H1><CENTER>USUARIOS</CENTER></H1>
 		
@@ -18,15 +15,20 @@
 
 	<TFOOT>
 	<TR>
-	<TD>aaa<TD>asd<TD>asdf<TD>4348534<TD><INPUT TYPE="RADIO" NAME="select" VALUE="0">
-	<TR>
-	<TD>bbb<TD>fgh<TD>asdfjg<TD>3548626<TD><INPUT TYPE="RADIO" NAME="select" VALUE="0">
-	<TR>
-	<TD>ccc<TD>klp<TD>asdfgj<TD>3763530<TD><INPUT TYPE="RADIO" NAME="select" VALUE="0">
-	<TR>
-	<TBODY>
 	
-</TABLE>
+	  {% for user in listUser %}
+		  <TD>	{{ user.username }}
+		  <TD>	{{ user.nombre }}
+		  <TD>	{{ user.apellido }}
+		  <TD>	{{ user.ci}}
+		  <TD><input type="radio" name="select" value= {{ user.idusuario }}>
+	<TR>
+
+  	{% endfor %}
+	<TR>
+
+	<TBODY>
+	</TABLE>	
 <BR>
 <BR>
 <TABLE BORDER WIDTH="30%">
@@ -36,22 +38,16 @@
 <input type='submit' value='Buscar'>
 </div>
 
-<div><center>
-<input type='submit' value='Crear'>
-<input type='submit' value='Modificar'>
-<input type='submit' value='Eliminar'>
-</center></div>
-<BR>
-<div><center>
-<input type='submit' value='Atras'>
-<input type='submit' value='Home'>
-</center></div>
 
-</TABLE>
+<div>
+ <a type='submit' href="{{ url_for('crearUsr') }}">Crear</a>
+ <a type='submit' href="{{ url_for('modUsr', idusuario=select) }}">Modificar</a>
+<input type='submit' value='Eliminar'>
+<input type='submit' value='Home'>
+</div>
+
 
         </form>
     </body>
-</html>
-
-
+{% endblock %}
 
