@@ -59,12 +59,12 @@ def crearUsr(username,passwrd,nombre,apellido,telefono,ci):
                                              telefono=telefono, 
                                              ci=ci)
 
-def eliminarUsr(iduser):
+def elimUsr(iduser):
     """Funcion que recibe el Id de un Usuario y elimina de la base de datos"""
     conn.execute(usuario_table.delete().where(usuario_table.c.idusuario==iduser)) 
     
     
-def modificarUsr(iduser,username,passwrd,nombre,apellido,telefono,ci):
+def modUsr(iduser,username,passwrd,nombre,apellido,telefono,ci):
     """Funcion que recibe los atributos de un usuario y lo modifica en la base de datos"""
     conn.execute(usuario_table.update().
                     where(usuario_table.c.idusuario==iduser).
