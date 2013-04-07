@@ -68,7 +68,8 @@ def crearUsr():
 def modUsr(idusuario=None):
     """Funcion que presenta el menu para modificar usuario."""  
     if request.method == 'GET':
-        usr = CtrlAdmUsr.usr(idusuario)
+        
+        usr = CtrlAdmUsr.usr(request.form['select'])
         return render_template('modUsr.html', usr=usr)
     if request.method == 'POST':
               

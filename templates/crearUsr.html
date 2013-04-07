@@ -1,19 +1,16 @@
-<html>
-    <head>
-        <title>Usuarios</title>
-        <link rel='stylesheet' href='estilos.css'>
-    </head>
-    <body class=formato1>
-        <form class='estilos'>
-            <div><label>Nombres:</label><input type='text' value=''></div>
-            <div><label>Apellidos:</label><input type='text' value=''></div>
-            <div><label>Username:</label><input type='text' value=''></div>
-            <div><label>Password</label><input type='password' value=''></div>
-            <div><label>Telefono:</label><input type='text' value=''></div>
-            <div><label>CI:</label><input type='text' value=''></div>
-            <div><center><input type='submit' value='Aceptar'>
+{% extends "layout.html" %}
+{% block body %}
+<body class=formato1>
+        <form class='estilos' action="{{ url_for('crearUsr') }}" method=post>
+            <div><label>Nombres:</label><input type='text' name=nombre></div>
+            <div><label>Apellidos:</label><input type='text' name=apellido></div>
+            <div><label>Username:</label><input type='text' name=username></div>
+            <div><label>Password</label><input type='password' name=passwrd></div>
+            <div><label>Telefono:</label><input type='text' name=telefono></div>
+            <div><label>CI:</label><input type='text' name=ci></div>
+            <div><center><input type='submit' value='Crear'>
             <input type='submit' value='Cancelar'></center></div>
 
         </form>
     </body>
-</html>
+{% endblock %}

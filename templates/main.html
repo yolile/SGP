@@ -1,9 +1,5 @@
-<!DOCTYPE HTML>
-<html>
-<head>
-    <title>SGP</title>
-    <link rel="stylesheet" href="estilos.css" />
-</head>
+{% extends "layout.html" %}
+{% block body %}
 <body class = formato3>
   
         <form class='estilos'>
@@ -11,7 +7,7 @@
 	<ul class="nav">
 	    <li><a href="">Modulo de Administracion</a>
 		 <ul>
-		      <li><a href="admUsr.html">Usuarios</a></li>
+		      <li><a href="{{ url_for('admUsr') }}">Usuario</a></li>
 		      <li><a href="">Roles</a></li>
 		      <li><a href="">Proyecto</a></li>
 
@@ -70,10 +66,10 @@
 		</ul>
 	    </li>
 	</ul>
-	            <li><a href=""><u>Log Out</a></li>
+	            <li><a href="{{ url_for('logout') }}"><u>Log Out</a></li>
 	<br>
 	<br>
-	<img src= SimpleGeniusPlanner.jpg width = 800px;
+	<img src= "SimpleGeniusPlanner.jpg" width = 800px;
     height= 600px>	
 
 	<br>
@@ -83,4 +79,4 @@
         </form>
 
 </body>
-</html>
+{% endblock %}
