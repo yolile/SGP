@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
 <body class=formato1>
-  {% if error %}<p class=error><strong>Error:</strong> {{ error }}{% endif %}
         <form class='estilos' action="{{ url_for('login') }}" method=post>
             <div><label>Username:</label><input type='text' name=username></div>
             <div><label>Password</label><input type='password' name=password></div>

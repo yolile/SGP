@@ -23,7 +23,16 @@
     background-color: #E2ECEE;
 }
 
+.flash { 
+	background: #CEE5F5; padding: 0.5em;
+    border: 1px solid #AACBE2; 
+	font-size: 14px;
+}
 
+.error { 
+	background: #F0D6D6; padding: 0.5em; 
+	font-size: 14px;
+}
 
 .estilos{
     border: 1px solid #CED5D7;
