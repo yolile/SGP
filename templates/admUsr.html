@@ -1,13 +1,30 @@
 {% extends "layout.html" %}
 {% block body %}
+<<<<<<< HEAD
 <body class = formato2>
 
-        <form class='estilos' >
+        
+ <body class = formato2>
+<form class='estilos' 
+ action=""{{ url_for('admUsr')}}"" method="post">
+<table width="100%" border="1">
+<tr>
+<th scope="col">Usuario</th>
+<th scope="col">Nombre</th>
+<th scope="col">Apellido</th>
+<th scope="col">CI</th>
+<th scope="col">OK</th>
+</tr>
 
-  <H1><CENTER>USUARIOS</CENTER></H1>
-		
-	
-	<TABLE BORDER WIDTH="100%">
+	  {% for user in listUser %}
+<tr>
+<td>{{ user.username }}</td>
+<td>{{ user.nombre }}</td>
+<td>{{ user.apellido }}</td>
+<td>{{ user.ci }}</td>
+<td><input name="select" type="radio" value={{ user.idusuario }} /></td>
+</tr>  	
+  	{% endfor %}
 
 	<COL SPAN="4" ALIGN="left">
 	<THEAD>
@@ -51,3 +68,67 @@
     </body>
 {% endblock %}
 
+=======
+
+ <body class = formato2>
+<form class='estilos' action=""{{ url_for('admUsr')}}"" method="post">
+<table width="100%" border="1">
+<tr>
+<th scope="col">Usuario</th>
+<th scope="col">Nombre</th>
+<th scope="col">Apellido</th>
+<th scope="col">CI</th>
+<th scope="col">OK</th>
+</tr>
+
+	  {% for user in listUser %}
+<tr>
+<td>{{ user.username }}</td>
+<td>{{ user.nombre }}</td>
+<td>{{ user.apellido }}</td>
+<td>{{ user.ci }}</td>
+<td><input name="select" type="radio" value={{ user.idusuario }} /></td>
+</tr>  	
+  	{% endfor %}
+
+</table>
+<br></br>
+<input type="submit" name="opcion" value="Crear" />
+<input type="submit" name="opcion" value="Modificar" />
+<input type="submit" name="opcion" value="Eliminar" />
+<input type="submit" name="opcion" value="Consultar" />
+<br></br>
+{#
+<input type="text" name="buscar"/>
+<select name="atributo">
+	<option value="nombre">Nombre</option>
+	<option value="apellido">Apellido</option>
+	<option value="username">Username</option>
+	<option value="ci">CI</option>
+</select>
+<input type="submit" name="opcion" value="Buscar" />
+#}
+</form>
+</body>
+{% endblock %}
+</table>
+<br></br>
+<input type="submit" name="opcion" value="Crear" />
+<input type="submit" name="opcion" value="Modificar" />
+<input type="submit" name="opcion" value="Eliminar" />
+<input type="submit" name="opcion" value="Consultar" />
+<br></br>
+{#
+<input type="text" name="buscar"/>
+<select name="atributo">
+	<option value="nombre">Nombre</option>
+	<option value="apellido">Apellido</option>
+	<option value="username">Username</option>
+	<option value="ci">CI</option>
+</select>
+<input type="submit" name="opcion" value="Buscar" />
+#}
+</form>
+</body>
+{% endblock %}
+>>>>>>> d2f57ad591c9e73bff54bebc8005bee8826545b4

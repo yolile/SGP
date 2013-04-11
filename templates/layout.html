@@ -14,5 +14,32 @@
   {% for message in get_flashed_messages() %}
     <div class=flash>{{ message }}</div>
   {% endfor %}
+<<<<<<< HEAD
+=======
+  {% if error %}
+  	<p class=error><strong>Error:</strong> {{ error }}
+  {% endif %}
+>>>>>>> d2f57ad591c9e73bff54bebc8005bee8826545b4
+  {% block body %}{% endblock %}
+</div>
+<!doctype html>
+<title>SGP</title>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='estilos.css') }}">
+<div class=page>
+{#
+  <div class=metanav>
+  {% if not session.logged_in %}
+    <a href="{{ url_for('login') }}">log in</a>
+  {% else %}
+    <a href="{{ url_for('logout') }}">log out</a>
+  {% endif %}
+  </div>
+#}
+  {% for message in get_flashed_messages() %}
+    <div class=flash>{{ message }}</div>
+  {% endfor %}
+  {% if error %}
+  	<p class=error><strong>Error:</strong> {{ error }}
+  {% endif %}
   {% block body %}{% endblock %}
 </div>
