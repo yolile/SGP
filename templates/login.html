@@ -1,14 +1,11 @@
-<html>
-    <head>
-        <title>SGP-Login</title>
-        <link rel='stylesheet' href='estilos.css'>
-    </head>
-    <body class=formato1>
-        <form class='estilos'>
-            <div><label>Username:</label><input type='text' value=''></div>
-            <div><label>Password</label><input type='password' value=''></div>
+{% extends "layout.html" %}
+{% block body %}
+<body class=formato1>
+        <form class='estilos' action="{{ url_for('login') }}" method=post>
+            <div><label>Username:</label><input type='text' name=username></div>
+            <div><label>Password</label><input type='password' name=password></div>
             <div><center><input type='submit' value='Ingresar'></center></div>
 
         </form>
-    </body>
-</html>
+</body>
+{% endblock %}

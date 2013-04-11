@@ -1,46 +1,36 @@
 from Usuario import Usuario, get_table 
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import mapper
-from sqlalchemy.sql import select
+from sqlalchemy.sql import select, delete
 
-"""Controlador de Administrador de Usuario."""  
-__author__ = 'Grupo 5'
-__date__ = '04-04-2013'
-__version__ = '1.0'
-__text__ = 'Este modulo contiene funciones que permiten el control de administracion de usuarios'
-__file__ = 'CtrlAdmUsr.py'      
-    
-engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgp')
+
+engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgptest')
 metadata = MetaData(bind=engine)
 usuario_table = get_table(metadata)
 mapper(Usuario, usuario_table)
-conn = engine.connect()
+conn = engine.connect() 
 
 def getUsuarioList():
-    """Funcion que retorna la lista de todos los usuarios en la base de datos."""
     s = select([usuario_table])
     result = s.execute()
     return result
 
-def validarUsuario(username, password):
-    """Funcion que retorna verdadero si el usuario y password son correctos."""
-    usuarioList = getUsuarioList()
-    for user in usuarioList:
-        if username == user.username:
-            if password == user.passwrd:
-                return True
-    return False
-
 def buscarUsuario(username):
-    """Funcion que retorna verdadero si el usuario se encuentra en la BD"""
     usuarioList = getUsuarioList()
     for user in usuarioList:
         if username == user.username:
             return True
     return False
 
+def validarUsuario(username, password):
+        usuarioList = getUsuarioList()
+        for user in usuarioList:
+            if username == user.username:
+                if password == user.passwrd:
+                    return True
+        return False
+
 def getMayorIdUsuario():
-    """Funcion que retorna el mayor idusuario en la tabla usuarios"""
     lista = getUsuarioList()
     idusuariomax =0
     for user in lista:
@@ -49,7 +39,6 @@ def getMayorIdUsuario():
     return idusuariomax   
 
 def crearUsr(username,passwrd,nombre,apellido,telefono,ci):
-    """Funcion que recibe los atributos de un usuario y lo periste en la base de datos."""
     idusuariomax=getMayorIdUsuario()
     result = usuario_table.insert().execute(idusuario=idusuariomax+1,
                                              username=username, 
@@ -59,13 +48,11 @@ def crearUsr(username,passwrd,nombre,apellido,telefono,ci):
                                              telefono=telefono, 
                                              ci=ci)
 
-def elimUsr(iduser):
-    """Funcion que recibe el Id de un Usuario y elimina de la base de datos"""
+def eliminarUsr(iduser):
     conn.execute(usuario_table.delete().where(usuario_table.c.idusuario==iduser)) 
     
     
-def modUsr(iduser,username,passwrd,nombre,apellido,telefono,ci):
-    """Funcion que recibe los atributos de un usuario y lo modifica en la base de datos"""
+def modificarUsr(iduser,username,passwrd,nombre,apellido,telefono,ci):
     conn.execute(usuario_table.update().
                     where(usuario_table.c.idusuario==iduser).
                     values(username=username,
@@ -110,10 +97,12 @@ def getCi(iduser):
     result = conn.execute(s)
     row = result.fetchone()
     return row['ci']
+   
 
-def usr(iduser):
-    """Funcion que recibe el Id de un Usuario y retorna el objeto usuario"""
-    lista = getUsuarioList()
-    for user in lista:
-        if iduser == user.idusuario:
-            return user
+# crearUsr('dinog','secretito','diana','noguera','333333','222222')
+# crearUsr('sheka','secretito','jesica','caceres','333333','222222')
+# crearUsr('blopa','secretito','pablo','marmol','333333','222222')
+# crearUsr('everruiz','secretito','ever','ruiz','333333','222222')
+# crearUsr('mjara','secretito','marcelo','jara','333333','222222')
+# modificarUsr(1,'dinog','secretote','diana','Noguera','333333','222222')
+
