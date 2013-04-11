@@ -28,4 +28,3 @@ class Usuario(object):
 
     def __repr__(self):
         return "<Usuario '%s' '%s' '%s' '%s' '%s' '%s' '%s'>" % self.idusuario, self.username, self.passwrd, self.nombre, self.apellido, self.telefono, self.ci 
-
