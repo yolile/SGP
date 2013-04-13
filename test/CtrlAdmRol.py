@@ -1,5 +1,6 @@
 from Rol import Rol, get_table 
-
+from RolPermiso import RolPermiso, get_table
+from Permiso import Permiso, get_table 
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import mapper
 from sqlalchemy.sql import select
@@ -11,20 +12,11 @@ usuario_table = get_table(metadata)
 mapper(Usuario, usuario_table)
 conn = engine.connect()
 
-def getUsuarioList():
-    """Funcion que retorna la lista de todos los usuarios en la base de datos."""
-    s = select([usuario_table])
+def getRolList():
+    """Funcion que retorna la lista de todos los roles en la base de datos."""
+    s = select([rol_table])
     result = s.execute()
     return result
-
-def validarUsuario(username, password):
-    """Funcion que retorna verdadero si el usuario y password son correctos."""
-    usuarioList = getUsuarioList()
-    for user in usuarioList:
-        if username == user.username:
-            if password == user.passwrd:
-                return True
-    return False
 
 def buscarUsuario(username):
     """Funcion que retorna verdadero si el usuario se encuentra en la BD"""
@@ -34,8 +26,8 @@ def buscarUsuario(username):
             return True
     return False
 
-def getMayorIdUsuario():
-    """Funcion que retorna el mayor idusuario en la tabla usuarios"""
+def getMayorIdRol():
+    """Funcion que retorna el mayor idRol en la tabla usuarios"""
     lista = getUsuarioList()
     idusuariomax =0
     for user in lista:
@@ -43,72 +35,31 @@ def getMayorIdUsuario():
             idusuariomax = user.idusuario
     return idusuariomax   
 
-def crearUsr(username,passwrd,nombre,apellido,telefono,ci):
-    """Funcion que recibe los atributos de un usuario y lo periste en la base de datos."""
-    idusuariomax=getMayorIdUsuario()
-    result = usuario_table.insert().execute(idusuario=idusuariomax+1,
-                                             username=username, 
-                                             passwrd=passwrd,
-                                             nombre=nombre, 
-                                             apellido=apellido, 
-                                             telefono=telefono, 
-                                             ci=ci)
-
-def elimUsr(iduser):
-    """Funcion que recibe el Id de un Usuario y elimina de la base de datos"""
-    conn.execute(usuario_table.delete().where(usuario_table.c.idusuario==iduser)) 
-    
-    
-def modUsr(iduser,username,passwrd,nombre,apellido,telefono,ci):
-    """Funcion que recibe los atributos de un usuario y lo modifica en la base de datos"""
-    conn.execute(usuario_table.update().
-                    where(usuario_table.c.idusuario==iduser).
-                    values(username=username,
-                           passwrd=passwrd,
-                           nombre=nombre,
-                           apellido=apellido,
-                           telefono=telefono,
-                           ci=ci)
-                ) 
-def getId(iduser):
-    s = select([usuario_table],usuario_table.c.idusuario==iduser)
+def getIdRol(idrol):
+    s = select([rol_table],rol_table.c.idrol==idrol)
     result = conn.execute(s)
     row = result.fetchone()
-    return row['idusuario']
-def getUsername(iduser):
-    s = select([usuario_table],usuario_table.c.idusuario==iduser)
-    result = conn.execute(s)
-    row = result.fetchone()
-    return row['username']
-def getPasswrd(iduser):
-    s = select([usuario_table],usuario_table.c.idusuario==iduser)
-    result = conn.execute(s)
-    row = result.fetchone()
-    return row['passwrd']
-def getNombre(iduser):
-    s = select([usuario_table],usuario_table.c.idusuario==iduser)
+    return row['idrol']
+def getNombreRol(idrol):
+    s = select([rol_table],rol_table.c.idrol==idrol)
     result = conn.execute(s)
     row = result.fetchone()
     return row['nombre']
-def getApellido(iduser):
-    s = select([usuario_table],usuario_table.c.idusuario==iduser)
+def getDescripcionRol(idrol):
+    s = select([rol_table],rol_table.c.idrol==idrol)
     result = conn.execute(s)
     row = result.fetchone()
-    return row['apellido']
-def getTelefono(iduser):
-    s = select([usuario_table],usuario_table.c.idusuario==iduser)
-    result = conn.execute(s)
-    row = result.fetchone()
-    return row['telefono']
-def getCi(iduser):
-    s = select([usuario_table],usuario_table.c.idusuario==iduser)
-    result = conn.execute(s)
-    row = result.fetchone()
-    return row['ci']
+    return row['descripcion']
 
-def usr(iduser):
-    """Funcion que recibe el Id de un Usuario y retorna el objeto usuario"""
-    lista = getUsuarioList()
-    for user in lista:
-        if iduser == user.idusuario:
-            return user
+def rol(idRol):
+    """Funcion que recibe el Id de un Rol y retorna el objeto rol"""
+    lista = getRolList()
+    for rol in lista:
+        if idRol == rol.idrol:
+            return rol
+def permiso(idPermiso):
+    """Funcion que recibe el Id de un Permiso y retorna el objeto Permiso"""
+    lista = getPermisoList()
+    for permiso in lista:
+        if idpermiso == permiso.idpermiso:
+            return permiso
