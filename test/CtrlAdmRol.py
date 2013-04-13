@@ -1,15 +1,9 @@
-from Usuario import Usuario, get_table 
-from RolUsuario import RolUsuario, get_table 
+from Rol import Rol, get_table 
+
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import mapper
 from sqlalchemy.sql import select
-
-"""Controlador de Administrador de Usuario."""  
-__author__ = 'Grupo 5'
-__date__ = '04-04-2013'
-__version__ = '1.0'
-__text__ = 'Este modulo contiene funciones que permiten el control de administracion de usuarios'
-__file__ = 'CtrlAdmUsr.py'      
+   
     
 engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgp')
 metadata = MetaData(bind=engine)
