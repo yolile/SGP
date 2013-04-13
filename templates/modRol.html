@@ -1,0 +1,32 @@
+   {% extends "layout.html" %}
+{% block body %}
+<body class=formato1>
+        <form class='estilos' action="{{ url_for('modRol') }}" method=post>
+            <div><input type='hidden' name='idrol value="{{ rol.idrol }}"></div>
+            <div><label>Nombres:</label><input type='text' name=nombre value="{{ rol.nombre }}"></div>
+            <div><label>Descripcion:</label><input type='text' name=descripcion value="{{ rol.descripcion }}"></div>
+            
+		
+		    <div><label>Permisos:<label></div>	
+		<div style="height:150px;width:200px;overflow:scroll;">	
+		<TABLE BORDER WIDTH="70%">
+		<COL SPAN="4" ALIGN="left">
+			<tr>
+			<th scope="col">Nombre</th>
+			<th scope="col">OK</th>
+			</tr>
+            	{% for rol in listPermiso %}
+						<tr>
+						<td>{{ permiso.nombre }}</td>
+						<td><INPUT TYPE="checkbox" NAME="select" VALUE="1"></td>
+						</tr>  	
+  				{% endfor %}
+			</table>
+			</div>
+               
+             <div><center><input type='submit' name="opcion" value='Modificar'>
+            <input type='submit' name="opcion" value='Cancelar'></center></div>
+                
+        </form>
+    </body>
+{% endblock %}
