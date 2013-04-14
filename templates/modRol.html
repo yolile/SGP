@@ -2,7 +2,7 @@
 {% block body %}
 <body class=formato1>
         <form class='estilos' action="{{ url_for('modRol') }}" method=post>
-            <div><input type='hidden' name='idrol value="{{ rol.idrol }}"></div>
+            <div><input type='hidden' name=idrol value="{{ rol.idrol }}"></div>
             <div><label>Nombres:</label><input type='text' name=nombre value="{{ rol.nombre }}"></div>
             <div><label>Descripcion:</label><input type='text' name=descripcion value="{{ rol.descripcion }}"></div>
             
@@ -15,10 +15,14 @@
 			<th scope="col">Nombre</th>
 			<th scope="col">OK</th>
 			</tr>
-            	{% for rol in listPermiso %}
+            	{% for permiso in listPermiso %}
 						<tr>
 						<td>{{ permiso.nombre }}</td>
-						<td><INPUT TYPE="checkbox" NAME="select" VALUE="1"></td>
+						{% if permiso.idpermiso in idpermisos %}
+							<td><INPUT TYPE="checkbox" NAME="idpermisos" checked="checked" VALUE={{ permiso.idpermiso }}></td>
+						{% else %}
+                        	<td><INPUT TYPE="checkbox" NAME="idpermisos" VALUE={{ permiso.idpermiso }}></td>
+                        {% endif %}
 						</tr>  	
   				{% endfor %}
 			</table>

@@ -121,33 +121,49 @@ def admRol():
         if request.form['opcion'] == "Crear":
             listPermiso = CtrlAdmRol.getPermisoList()   
             return render_template('crearRol.html',listPermiso = listPermiso)
-        """
         if request.form['opcion'] == "Modificar":
             rol = CtrlAdmRol.rol(int(request.form['select']))        
-            return render_template('modRol.html', rol=rol) 
+            idpermisos = CtrlAdmRol.idPermisoList(int(rol.idrol))   
+            listPermiso = CtrlAdmRol.getPermisoList()               
+            return render_template('modRol.html', rol=rol,
+                                                 idpermisos=idpermisos,
+                                                 listPermiso=listPermiso) 
         if request.form['opcion'] == "Eliminar":
             CtrlAdmRol.elimRol(int(request.form['select']))   
             listRol = CtrlAdmRol.getRolList()
             flash('Rol eliminado')
-            return render_template('admRol.html', listRol=listRol) 
+            return render_template('admRol.html', listRol=listRol)
+        
         if request.form['opcion'] == "Consultar":
             rol = CtrlAdmRol.rol(int(request.form['select']))        
-            return render_template('conRol.html', rol=rol)
-            """
+            idpermisos = CtrlAdmRol.idPermisoList(int(rol.idrol))   
+            listPermiso = CtrlAdmRol.getPermisoList()               
+            return render_template('conRol.html', rol=rol,
+                                                    idpermisos=idpermisos,
+                                                    listPermiso=listPermiso)
         
 @app.route('/crearRol', methods=['GET','POST'])
 def crearRol():
     """Funcion que presenta el menu para crear Rol."""  
     if request.method == 'POST':
-        if(request.form['opcion'] == "Crear"):        
-            """
+        if(request.form['opcion'] == "Crear"): 
             CtrlAdmRol.crearRol(request.form['nombre'],
                                 request.form['descripcion'],
                                 request.form.getlist('permisos') )
-            """
-            for idpermiso in request.form.getlist('permisos'):
-                flash('Rol creado'+str(idpermiso))
+            flash('Rol creado')
         return redirect(url_for('admRol'))          
-                      
+
+@app.route('/modRol', methods=['GET','POST'])    
+def modRol():
+    """Funcion que presenta el menu para modificar rol."""  
+    if request.method == 'POST':
+        if(request.form['opcion'] == "Modificar"):
+            CtrlAdmRol.modRol(int(request.form['idrol']), 
+                              request.form['nombre'],
+                              request.form['descripcion'], 
+                              request.form.getlist('idpermisos'))
+            flash('Rol modificado')
+        return redirect(url_for('admRol')) 
+ 
 if __name__=='__main__':
     app.run()

@@ -34,6 +34,12 @@ def getPermisoList():
     result = s.execute()
     return result
 
+def getRolPermisoList():
+    """Funcion que retorna la lista de todos los rolpermisos en la base de datos."""   
+    s = select([rolpermiso_table])
+    result = s.execute()
+    return result
+
 def getMayorIdRol():
     """Funcion que retorna el mayor idRol en la tabla roles"""
     lista = getRolList()
@@ -84,4 +90,27 @@ def crearRol(nombre,descripcion,idPermisoList):
         result = rolpermiso_table.insert().execute(idrol=idrolmax+1,
                                              idpermiso = int(idpermiso))
 
-      
+def idPermisoList(idRol):
+    """Funcion que recibe el Id de un Rol y retorna la lista de rolpermisos del rol"""
+    lista = getRolPermisoList()
+    idPermisoList=[]
+    for rolpermiso in lista:
+        if(rolpermiso.idrol == idRol):
+            idPermisoList.append(rolpermiso.idpermiso)
+    return idPermisoList
+
+def modRol(idrol,nombre,descripcion,idPermisoList):
+    """Funcion que recibe los atributos de un usuario y lo modifica en la base de datos"""
+    conn.execute(rol_table.update().
+                    where(rol_table.c.idrol==idrol).
+                    values(nombre=nombre,
+                           descripcion=descripcion)
+                )
+    conn.execute(rolpermiso_table.delete().where(rolpermiso_table.c.idrol==idrol))
+    for idpermiso in idPermisoList:
+        result = rolpermiso_table.insert().execute(idrol=idrol,
+                                             idpermiso = int(idpermiso))
+        
+def elimRol(idrol):
+    conn.execute(rolpermiso_table.delete().where(rolpermiso_table.c.idrol==idrol)) 
+    conn.execute(rol_table.delete().where(rol_table.c.idrol==idrol)) 
