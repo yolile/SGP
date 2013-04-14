@@ -7,6 +7,7 @@
 
 		
 		    <div><label>Permisos:<label></div>	
+    
 		<div style="height:150px;width:200px;overflow:scroll;">	
 		<TABLE BORDER WIDTH="70%">
 		<COL SPAN="4" ALIGN="left">
@@ -17,7 +18,7 @@
             	{% for permiso in listPermiso %}
 						<tr>
 						<td>{{ permiso.nombre }}</td>
-						<td><INPUT TYPE="checkbox" NAME="permisos" VALUE="{{ permiso.idPermiso }}"></td>
+						<td><INPUT TYPE="checkbox" NAME="permisos" VALUE={{ permiso.idpermiso }}></td>
 						</tr>  	
   				{% endfor %}
 			</table>
