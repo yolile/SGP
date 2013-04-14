@@ -4,9 +4,9 @@ from sqlalchemy.sql import select
 
 def get_table(metadata):
     rolpermiso_table = Table(
-                          'RolPermiso', metadata,
-                          Column('idRol', Integer, primary_key=True),
-                          Column('idPermiso', Integer, primary_key=True),
+                          'rolpermiso', metadata,
+                          Column('idrol', Integer, primary_key=True),
+                          Column('idpermiso', Integer, primary_key=True),
                           )
     return rolpermiso_table
 

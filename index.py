@@ -2,6 +2,7 @@ from __future__ import with_statement
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash, _app_ctx_stack
 import CtrlAdmUsr
+import CtrlAdmRol
 
 """Modulo de ejecucion principal de SGP"""  
 __author__ = 'Grupo 5'
@@ -69,12 +70,16 @@ def admUsr():
             return render_template('admUsr.html', listUser=listUser) 
         if request.form['opcion'] == "Consultar":
             usr = CtrlAdmUsr.usr(int(request.form['select']))        
-            return render_template('conUsr.html', usr=usr) 
+            return render_template('conUsr.html', usr=usr)
+        if request.form['opcion'] == "Asignar Roles":
+            return render_template('asigRoles.html')
         if request.form['opcion'] == "Buscar":
             listUser = CtrlAdmUsr.busUsr(request.form['buscar'],
                                          request.form['atributo'])
             flash('Usuarios con'+request.form['atributo']+" igual a "+request.form['buscar'])
-            return render_template('admUsr.html', listUser=listUser)    
+            return render_template('admUsr.html', listUser=listUser)
+        if request.form['opcion'] == "Home":
+            return render_template('main.html')    
        
 @app.route('/crearUsr', methods=['GET','POST'])
 def crearUsr():
@@ -110,11 +115,13 @@ def modUsr():
 def admRol():
     """Funcion que presenta el menu para administrar Roles."""  
     if request.method == 'GET':
-        listUser = CtrlAdmRol.getRolList()
-        return render_template('admRol.html', listRol=listRol)   
+        listRol = CtrlAdmRol.getRolList()
+        return render_template('admRol.html', listRol = listRol)   
     if request.method == 'POST':
         if request.form['opcion'] == "Crear":
-            return render_template('crearRol.html')
+            listPermiso = CtrlAdmRol.getPermisoList()   
+            return render_template('crearRol.html',listPermiso = listPermiso)
+        """
         if request.form['opcion'] == "Modificar":
             rol = CtrlAdmRol.rol(int(request.form['select']))        
             return render_template('modRol.html', rol=rol) 
@@ -126,16 +133,21 @@ def admRol():
         if request.form['opcion'] == "Consultar":
             rol = CtrlAdmRol.rol(int(request.form['select']))        
             return render_template('conRol.html', rol=rol)
+            """
         
 @app.route('/crearRol', methods=['GET','POST'])
 def crearRol():
     """Funcion que presenta el menu para crear Rol."""  
     if request.method == 'POST':
         if(request.form['opcion'] == "Crear"):        
-            CtrlAdmUsr.crearUsr(request.form['nombre'],
+            """
+            CtrlAdmRol.crearRol(request.form['nombre'],
                                 request.form['descripcion'],
-            flash('Rol creado')
-        return redirect(url_for('admRol'))         
-                          
+                                request.form.getlist('permisos') )
+            """
+            for idpermiso in request.form.getlist('permisos'):
+                flash('Rol creado'+str(idpermiso))
+        return redirect(url_for('admRol'))          
+                      
 if __name__=='__main__':
     app.run()

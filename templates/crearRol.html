@@ -3,8 +3,8 @@
 <body class=formato1>
         <form class='estilos' action="{{ url_for('crearRol') }}" method=post>
             <div><label>Nombres:</label><input type='text' name=nombre></div>
-            <div><label>Descripcion:</label><input type='text' name=descripcion></div>
-            
+            <div><label>Descripcion:</label><textarea rows='6'name=descripcion></textarea></div>
+
 		
 		    <div><label>Permisos:<label></div>	
 		<div style="height:150px;width:200px;overflow:scroll;">	
@@ -14,10 +14,10 @@
 			<th scope="col">Nombre</th>
 			<th scope="col">OK</th>
 			</tr>
-            	{% for permiso in lisPermiso %}
+            	{% for permiso in listPermiso %}
 						<tr>
 						<td>{{ permiso.nombre }}</td>
-						<td><INPUT TYPE="checkbox" NAME="select" VALUE="0"></td>
+						<td><INPUT TYPE="checkbox" NAME="permisos" VALUE="{{ permiso.idPermiso }}"></td>
 						</tr>  	
   				{% endfor %}
 			</table>

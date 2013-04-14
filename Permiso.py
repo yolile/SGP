@@ -7,11 +7,11 @@ def get_table(metadata):
                           'permiso', metadata,
                           Column('idpermiso', Integer, primary_key=True),
                           Column('nombre', String(160)),
-                          Column('descripcion', String(400)),
+                          Column('descripcion', String(400))
                           )
     return permiso_table
 
-class Rol(object):
+class Permiso(object):
     def __init__(self, idpermiso,nombre, descripcion):
         self.idpermiso = idpermiso
         self.nombre = nombre

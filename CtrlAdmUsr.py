@@ -1,5 +1,7 @@
-from Usuario import Usuario, get_table 
-from RolUsuario import RolUsuario, get_table 
+#from Usuario import Usuario, get_table 
+import Usuario
+import RolUsuario
+import RolPermiso
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import mapper
 from sqlalchemy.sql import select
@@ -13,8 +15,8 @@ __file__ = 'CtrlAdmUsr.py'
     
 engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgp')
 metadata = MetaData(bind=engine)
-usuario_table = get_table(metadata)
-mapper(Usuario, usuario_table)
+usuario_table = Usuario.get_table(metadata)
+mapper(Usuario.Usuario, usuario_table)
 conn = engine.connect()
 
 def getUsuarioList():
@@ -75,7 +77,7 @@ def modUsr(iduser,username,passwrd,nombre,apellido,telefono,ci):
                            apellido=apellido,
                            telefono=telefono,
                            ci=ci)
-                ) 
+                )          
 def getId(iduser):
     s = select([usuario_table],usuario_table.c.idusuario==iduser)
     result = conn.execute(s)

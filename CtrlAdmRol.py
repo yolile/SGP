@@ -1,6 +1,8 @@
-from Rol import Rol, get_table 
-from RolPermiso import RolPermiso, get_table
-from Permiso import Permiso, get_table 
+#from Rol import Rol, get_table 
+import Rol
+#from RolPermiso import RolPermiso, get_table
+import RolPermiso 
+import Permiso
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import mapper
 from sqlalchemy.sql import select
@@ -8,8 +10,16 @@ from sqlalchemy.sql import select
     
 engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgp')
 metadata = MetaData(bind=engine)
-usuario_table = get_table(metadata)
-mapper(Usuario, usuario_table)
+
+rol_table = Rol.get_table(metadata)
+mapper(Rol.Rol, rol_table)
+
+permiso_table = Permiso.get_table(metadata)
+mapper(Permiso.Permiso, permiso_table)
+
+rolpermiso_table = RolPermiso.get_table(metadata)
+mapper(RolPermiso.RolPermiso, rolpermiso_table)
+
 conn = engine.connect()
 
 def getRolList():
@@ -18,22 +28,20 @@ def getRolList():
     result = s.execute()
     return result
 
-def buscarUsuario(username):
-    """Funcion que retorna verdadero si el usuario se encuentra en la BD"""
-    usuarioList = getUsuarioList()
-    for user in usuarioList:
-        if username == user.username:
-            return True
-    return False
+def getPermisoList():
+    """Funcion que retorna la lista de todos los permisos en la base de datos."""   
+    s = select([permiso_table])
+    result = s.execute()
+    return result
 
 def getMayorIdRol():
-    """Funcion que retorna el mayor idRol en la tabla usuarios"""
-    lista = getUsuarioList()
-    idusuariomax =0
-    for user in lista:
-        if idusuariomax < user.idusuario:
-            idusuariomax = user.idusuario
-    return idusuariomax   
+    """Funcion que retorna el mayor idRol en la tabla roles"""
+    lista = getRolList()
+    idrolmax =0
+    for rol in lista:
+        if idrolmax < rol.idrol:
+            idrolmax = rol.idrol
+    return idrolmax   
 
 def getIdRol(idrol):
     s = select([rol_table],rol_table.c.idrol==idrol)
@@ -57,9 +65,23 @@ def rol(idRol):
     for rol in lista:
         if idRol == rol.idrol:
             return rol
+
 def permiso(idPermiso):
-    """Funcion que recibe el Id de un Permiso y retorna el objeto Permiso"""
+    """Funcion que recibe el Id de un Permiso y retorna el objeto Permiso"""   
     lista = getPermisoList()
     for permiso in lista:
         if idpermiso == permiso.idpermiso:
             return permiso
+        
+def crearRol(nombre,descripcion,idPermisoList):
+    """Funcion que recibe los atributos de un usuario y lo periste en la base de datos."""
+    idrolmax=getMayorIdRol()
+    result = rol_table.insert().execute(idrol=idrolmax+1,
+                                             nombre=nombre,
+                                             descripcion=descripcion)
+    
+    for idpermiso in idPermisoList:
+        result = rolpermiso_table.insert().execute(idrol=idrolmax+1,
+                                             idpermiso = int(idpermiso))
+
+      
