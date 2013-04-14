@@ -1,0 +1,22 @@
+    <body class=formato1>
+        <form class='estilos'>
+		<div><label>Asignar Roles a Usuario</label></div>	
+			<div style="height:150px;width:200px;overflow:scroll;">	
+			<table width="50%" border="1">
+			<tr>
+			<th scope="col">Nombre</th>
+			<th scope="col">OK</th>
+			</tr>
+            	{% for rol in listRol %}
+						<tr>
+						<td>{{ rol.nombre }}</td>
+						<td><INPUT TYPE="checkbox" NAME="select" VALUE="0"></td>
+						</tr>   	
+  				{% endfor %}
+			</table>
+			</div>
+		
+           	 <div><center><input type='submit' value='Aceptar'>
+           	 <div><center><input type='submit' value='Cancelar'>
+        </form>
+    </body>

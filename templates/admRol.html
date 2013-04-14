@@ -10,10 +10,10 @@
 <th scope="col">OK</th>
 </tr>
 
-	  {% for user in listRol %}
+	  {% for rol in listRol %}
 <tr>
 <td>{{ rol.nombre }}</td>
-<td>{{ rol.escripcion }}</td>
+<td>{{ rol.descripcion }}</td>
 <td><input name="select" type="radio" value={{ rol.idrol }} /></td>
 </tr>  	
   	{% endfor %}
