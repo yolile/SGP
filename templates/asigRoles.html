@@ -1,6 +1,11 @@
-    <body class=formato1>
-        <form class='estilos'>
-		<div><label>Asignar Roles a Usuario</label></div>	
+{% extends "layout.html" %}
+{% block body %}
+	<body class=formato1>
+        <form class='estilos' action="{{ url_for('admUsr') }}" method=get>
+       	<center><h1>Asignar Roles a Usuario</h1></center>
+          <br>
+          <br>            
+            <div><label>Roles<label></div>	
 			<div style="height:150px;width:200px;overflow:scroll;">	
 			<table width="50%" border="1">
 			<tr>
@@ -10,13 +15,13 @@
             	{% for rol in listRol %}
 						<tr>
 						<td>{{ rol.nombre }}</td>
-						<td><INPUT TYPE="checkbox" NAME="select" VALUE="0"></td>
-						</tr>   	
+						<td><INPUT TYPE="checkbox" NAME="select" VALUE="{{ rol.idRol}}"></td>						
+						</tr>  	
   				{% endfor %}
 			</table>
 			</div>
-		
-           	 <div><center><input type='submit' value='Aceptar'>
-           	 <div><center><input type='submit' value='Cancelar'>
+		    <div><center><input type='submit' value='Aceptar'>	     
+            </center></div>
         </form>
     </body>
+{% endblock %}

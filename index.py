@@ -144,6 +144,8 @@ def admRol():
             return render_template('conRol.html', rol=rol,
                                                     idpermisos=idpermisos,
                                                     listPermiso=listPermiso)
+        if request.form['opcion'] == "Home":
+            return render_template('main.html') 
         
 @app.route('/crearRol', methods=['GET','POST'])
 def crearRol():
@@ -167,6 +169,29 @@ def modRol():
                               request.form.getlist('idpermisos'))
             flash('Rol modificado')
         return redirect(url_for('admRol')) 
- 
+    
+"""------------------------Permisos---------------------------------------"""
+@app.route('/conPerm', methods=['GET','POST'])
+def conPerm():
+    """Funcion que presenta visualiza los permisos del sistema"""  
+    if request.method == 'GET':
+        listPermiso = CtrlAdmRol.getPermisoList()   
+        return render_template('conPerm.html',listPermiso = listPermiso)
+    if request.method == 'POST':
+        if request.form['opcion'] == "Home":
+            return render_template('main.html')  
+         
+"""------------------------PROYECTOS---------------------------------------"""       
+@app.route('/admProy', methods=['GET','POST'])
+def admProy():
+    """Funcion que presenta el menu para administrar Proyectos."""  
+    if request.method == 'GET':
+        return render_template('admProy.html')
+    if request.method == 'POST':
+        if request.form['opcion'] == "Crear":
+            return render_template('crearProy.html')
+        if request.form['opcion'] == "Home":
+            return render_template('main.html')                   
+                      
 if __name__=='__main__':
     app.run()
