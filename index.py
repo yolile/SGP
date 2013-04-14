@@ -18,6 +18,7 @@ app.secret_key = 'secreto'
 app.config.from_object(__name__)
 app.config.from_envvar('SGP_SETTINGS', silent=True)
 
+owner=""
 
 @app.route('/')
 def index():
@@ -32,6 +33,8 @@ def login():
     if request.method == 'POST':
         valido = CtrlAdmUsr.validarUsuario(request.form['username'], request.form['password'])
         if valido:
+            global owner 
+            owner = request.form['username']
             session['logged_in'] = True
             flash('Estas logueado')
             return redirect(url_for('menu'))
@@ -56,7 +59,7 @@ def admUsr():
     """Funcion que presenta el menu para administrar usuarios."""  
     if request.method == 'GET':
         listUser = CtrlAdmUsr.getUsuarioList()
-        return render_template('admUsr.html', listUser=listUser)   
+        return render_template('admUsr.html', listUser=listUser, owner=owner)   
     if request.method == 'POST':
         if request.form['opcion'] == "Crear":
             return render_template('crearUsr.html')

@@ -12,14 +12,16 @@
 <th scope="col">OK</th>
 </tr>
 
-	  {% for user in listUser %}
-<tr>
-<td>{{ user.username }}</td>
-<td>{{ user.nombre }}</td>
-<td>{{ user.apellido }}</td>
-<td>{{ user.ci }}</td>
-<td><input name="select" type="radio" value={{ user.idusuario }} /></td>
-</tr>  	
+	 {% for user in listUser %}
+		{% if user.username != owner and user.idusuario != 1 %}
+			<tr>
+				<td>{{ user.username }}</td>
+				<td>{{ user.nombre }}</td>
+				<td>{{ user.apellido }}</td>
+				<td>{{ user.ci }}</td>
+				<td><input name="select" type="radio" value={{ user.idusuario }} /></td>
+			</tr>  	
+  		{% endif %}
   	{% endfor %}
 
 </table>
