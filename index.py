@@ -74,8 +74,10 @@ def admUsr():
         if request.form['opcion'] == "Consultar":
             usr = CtrlAdmUsr.usr(int(request.form['select']))        
             return render_template('conUsr.html', usr=usr)
-        if request.form['opcion'] == "Asignar Roles":
-            return render_template('asigRoles.html')
+        if request.form['opcion'] == "AsignarRoles":
+            usr = CtrlAdmUsr.usr(int(request.form['select']))    
+            listRol = CtrlAdmRol.getRolList()   
+            return render_template('asigRoles.html',usr=usr,listRol = listRol)      
         if request.form['opcion'] == "Buscar":
             listUser = CtrlAdmUsr.busUsr(request.form['buscar'],
                                          request.form['atributo'])
@@ -111,8 +113,16 @@ def modUsr():
                               request.form['telefono'],
                               int(request.form['ci']))
             flash('Usuario modificado')
-        return redirect(url_for('admUsr'))      
-    
+        return redirect(url_for('admUsr'))
+          
+@app.route('/asigRoles', methods=['GET','POST'])
+def asigRoles():
+    """Funcion que presenta el menu para asignar Roles a los usuarios."""  
+    if request.method == 'POST':
+        if(request.form['opcion'] == "Aceptar"): 
+            CtrlAdmUsr.asigRol(request.form.getlist('roles') )
+            flash('Roles asignados al usuario')
+        return redirect(url_for('admUsr'))       
 """------------------------ROLES---------------------------------------"""         
 @app.route('/admRol', methods=['GET','POST'])
 def admRol():
@@ -136,7 +146,6 @@ def admRol():
             listRol = CtrlAdmRol.getRolList()
             flash('Rol eliminado')
             return render_template('admRol.html', listRol=listRol)
-        
         if request.form['opcion'] == "Consultar":
             rol = CtrlAdmRol.rol(int(request.form['select']))        
             idpermisos = CtrlAdmRol.idPermisoList(int(rol.idrol))   

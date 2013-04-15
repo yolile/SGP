@@ -18,9 +18,14 @@
 			<tr>
 			<th scope="col">Nombre</th>
 			</tr>
-            	{% for rol in listRol %}
+            	{% for roles in listRol %}
 						<tr>
 						<td>{{ rol.nombre }}</td>
+						{% if rol.idrol in idroles %}
+							<td><INPUT TYPE="checkbox" NAME="idroles"  disabled="disabled" checked="checked" VALUE={{ rol.idrol }}></td>
+						{% else %}
+                        	<td><INPUT TYPE="checkbox" NAME="idroles"  disabled="disabled" VALUE={{ rol.idrol }}></td>
+                        {% endif %}
 						</tr>  	
   				{% endfor %}
 			</table>

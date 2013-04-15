@@ -77,7 +77,12 @@ def modUsr(iduser,username,passwrd,nombre,apellido,telefono,ci):
                            apellido=apellido,
                            telefono=telefono,
                            ci=ci)
-                )          
+                )
+def asigRoles(iduser, idRolList):
+    """Funcion que recibe los roles a asignarse a un usuario"""
+    for idrol in idRolList:
+        result = rolusuario_table.insert().execute( idrol = int(idrol),
+                                                   iduser=iduser)              
 def getId(iduser):
     s = select([usuario_table],usuario_table.c.idusuario==iduser)
     result = conn.execute(s)
