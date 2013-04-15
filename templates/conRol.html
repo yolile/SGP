@@ -2,6 +2,9 @@
 {% block body %}
 	<body class=formato1>
         <form class='estilos' action="{{ url_for('admRol') }}" method=get>
+         <center><h1>Consulta de Rol</h1></center>
+ 			<br>
+ 			<br>
             <div><label>Nombres:</label>{{ rol.nombre }}</div>
             <div><label>Descripcion:</label><textarea cols="4" rows="4" readonly>{{rol.descripcion}}</textarea></div>
             

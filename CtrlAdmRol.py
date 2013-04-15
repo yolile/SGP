@@ -80,7 +80,7 @@ def permiso(idPermiso):
             return permiso
         
 def crearRol(nombre,descripcion,idPermisoList):
-    """Funcion que recibe los atributos de un usuario y lo periste en la base de datos."""
+    """Funcion que recibe los atributos de un usuario y lo persiste en la base de datos."""
     idrolmax=getMayorIdRol()
     result = rol_table.insert().execute(idrol=idrolmax+1,
                                              nombre=nombre,

@@ -2,6 +2,9 @@
 {% block body %}
 <body class=formato1>
         <form class='estilos' action="{{ url_for('modRol') }}" method=post>
+          <center><h1>Modificacion de Rol</h1></center>
+          <br>
+          <br>  
             <div><input type='hidden' name=idrol value="{{ rol.idrol }}"></div>
             <div><label>Nombres:</label><input type='text' name=nombre value="{{ rol.nombre }}"></div>
             <div><label>Descripcion:</label><input type='text' name=descripcion value="{{ rol.descripcion }}"></div>
