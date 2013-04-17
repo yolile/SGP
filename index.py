@@ -72,16 +72,20 @@ def admUsr():
             flash('Usuario eliminado')
             return render_template('admUsr.html', listUser=listUser) 
         if request.form['opcion'] == "Consultar":
-            usr = CtrlAdmUsr.usr(int(request.form['select']))        
-            return render_template('conUsr.html', usr=usr)
+            usr = CtrlAdmUsr.usr(int(request.form['select'])) 
+            idroles = CtrlAdmUsr.idRolList(int(usr.idusuario))  
+            listRol = CtrlAdmRol.getRolList()     
+            return render_template('conUsr.html',usr=usr,
+                                                idroles=idroles,
+                                                listRol=listRol)
         if request.form['opcion'] == "AsignarRoles":
             usr = CtrlAdmUsr.usr(int(request.form['select']))    
             listRol = CtrlAdmRol.getRolList()            
             return render_template('asigRoles.html',usr=usr,listRol = listRol)                  
         if request.form['opcion'] == "Buscar":
-            listUser = CtrlAdmUsr.busUsr(request.form['buscar'],
+            listUser = CtrlAdmUsr.busquedaUsr(request.form['buscar'],
                                          request.form['atributo'])
-            flash('Usuarios con'+request.form['atributo']+" igual a "+request.form['buscar'])
+            flash('Resultado de la busqueda')
             return render_template('admUsr.html', listUser=listUser)
         if request.form['opcion'] == "Home":
             return render_template('main.html')    

@@ -29,7 +29,19 @@ def getUsuarioList():
     s = select([usuario_table])
     result = s.execute()
     return result
-
+def getRolUsuarioList():
+    """Funcion que retorna la lista de todos los rolusuarios en la base de datos."""   
+    s = select([rolusuario_table])
+    result = s.execute()
+    return result
+def idRolList(idusuario):
+    """Funcion que recibe el Id de un Rol y retorna la lista de rolpermisos del rol"""
+    lista = getRolUsuarioList()
+    idRolList=[]
+    for rolusuario in lista:
+        if(rolusuario.idusuario == idusuario):
+            idRolList.append(rolusuario.idrol)
+    return idRolList
 def validarUsuario(username, password):
     """Funcion que retorna verdadero si el usuario y password son correctos."""
     usuarioList = getUsuarioList()
@@ -40,7 +52,7 @@ def validarUsuario(username, password):
     return False
 
 def buscarUsuario(username):
-    """Funcion que retorna verdadero si el usuario se encuentra en la BD"""
+    """Funcion para loguearse:retorna verdadero si el usuario se encuentra en la BD"""
     usuarioList = getUsuarioList()
     for user in usuarioList:
         if username == user.username:
@@ -125,6 +137,16 @@ def getCi(iduser):
     result = conn.execute(s)
     row = result.fetchone()
     return row['ci']
+
+def busquedaUsr(parametro,atributo):
+    if atributo == 'nombre':
+        s = select([usuario_table],usuario_table.c.nombre.like(parametro+'%' ))
+    if atributo == 'apellido':
+        s = select([usuario_table],usuario_table.c.apellido.like(parametro+'%' ))            
+    if atributo == 'username':
+        s = select([usuario_table],usuario_table.c.username.like(parametro+'%' ))  
+    result = conn.execute(s)
+    return result
 
 def usr(iduser):
     """Funcion que recibe el Id de un Usuario y retorna el objeto usuario"""
