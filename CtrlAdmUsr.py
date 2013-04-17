@@ -15,8 +15,13 @@ __file__ = 'CtrlAdmUsr.py'
     
 engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgp')
 metadata = MetaData(bind=engine)
+
 usuario_table = Usuario.get_table(metadata)
 mapper(Usuario.Usuario, usuario_table)
+
+rolusuario_table = RolUsuario.get_table(metadata)
+mapper(RolUsuario.RolUsuario, rolusuario_table)
+
 conn = engine.connect()
 
 def getUsuarioList():
@@ -78,11 +83,13 @@ def modUsr(iduser,username,passwrd,nombre,apellido,telefono,ci):
                            telefono=telefono,
                            ci=ci)
                 )
-def asigRoles(iduser, idRolList):
-    """Funcion que recibe los roles a asignarse a un usuario"""
+    
+def asigRoles(iduser,idRolList):
+    """Funcion que recibe los roles a asignarse a un usuario """
     for idrol in idRolList:
-        result = rolusuario_table.insert().execute( idrol = int(idrol),
-                                                   iduser=iduser)              
+        result = rolusuario_table.insert().execute( idrol= int(idrol),
+                                                   idusuario= iduser)              
+
 def getId(iduser):
     s = select([usuario_table],usuario_table.c.idusuario==iduser)
     result = conn.execute(s)
