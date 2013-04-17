@@ -76,8 +76,8 @@ def admUsr():
             return render_template('conUsr.html', usr=usr)
         if request.form['opcion'] == "AsignarRoles":
             usr = CtrlAdmUsr.usr(int(request.form['select']))    
-            listRol = CtrlAdmRol.getRolList()   
-            return render_template('asigRoles.html',usr=usr,listRol = listRol)      
+            listRol = CtrlAdmRol.getRolList()            
+            return render_template('asigRoles.html',usr=usr,listRol = listRol)                  
         if request.form['opcion'] == "Buscar":
             listUser = CtrlAdmUsr.busUsr(request.form['buscar'],
                                          request.form['atributo'])
@@ -120,9 +120,10 @@ def asigRoles():
     """Funcion que presenta el menu para asignar Roles a los usuarios."""  
     if request.method == 'POST':
         if(request.form['opcion'] == "Aceptar"): 
-            CtrlAdmUsr.asigRol(request.form.getlist('roles') )
+            CtrlAdmUsr.asigRoles(int(request.form['idusuario']),
+                                 request.form.getlist('roles'))
             flash('Roles asignados al usuario')
-        return redirect(url_for('admUsr'))       
+    return redirect(url_for('admUsr'))       
 """------------------------ROLES---------------------------------------"""         
 @app.route('/admRol', methods=['GET','POST'])
 def admRol():

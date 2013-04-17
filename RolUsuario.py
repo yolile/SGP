@@ -17,4 +17,4 @@ class RolUsuario(object):
 
 
     def __repr__(self):
-        return "<RolUsuario '%s' '%s'>" % self.idrol, self.idUsuario
+        return "<RolUsuario '%s' '%s'>" % self.idrol, self.idusuario
