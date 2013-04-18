@@ -84,8 +84,9 @@ def admUsr():
                                                 listRol=listRol)
         if request.form['opcion'] == "AsignarRoles":
             usr = CtrlAdmUsr.usr(int(request.form['select']))    
-            listRol = CtrlAdmRol.getRolList()            
-            return render_template('asigRoles.html',usr=usr,listRol = listRol)                  
+            listRol = CtrlAdmRol.getRolList()     
+            idroles = CtrlAdmUsr.idRolList(int(request.form['select']))
+            return render_template('asigRoles.html',usr=usr,listRol = listRol, idroles=idroles)                  
         if request.form['opcion'] == "Buscar":
             listUser = CtrlAdmUsr.busquedaUsr(request.form['buscar'],
                                          request.form['atributo'])

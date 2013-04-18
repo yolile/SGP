@@ -22,7 +22,11 @@
 	  					{% if rol.idrol != 100 %}
 							<tr>
 							<td>{{ rol.nombre }}</td>
-							<td><INPUT TYPE="checkbox" NAME="roles" VALUE="{{ rol.idrol}}"></td>	
+							{% if rol.idrol in idroles %}
+								<td><INPUT TYPE="checkbox" checked="checked" NAME="roles" VALUE="{{ rol.idrol}}"></td>	
+							{% else %}
+								<td><INPUT TYPE="checkbox" NAME="roles" VALUE="{{ rol.idrol}}"></td>	
+							{% endif %}
 							</tr>
 						{% endif %}  	
   				{% endfor %}
