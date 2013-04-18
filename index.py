@@ -58,8 +58,12 @@ def menu():
 def admUsr():
     """Funcion que presenta el menu para administrar usuarios."""  
     if request.method == 'GET':
-        listUser = CtrlAdmUsr.getUsuarioList()
-        return render_template('admUsr.html', listUser=listUser, owner=owner)   
+         if CtrlAdmUsr.havePermission(owner,200):
+             listUser = CtrlAdmUsr.getUsuarioList()
+             return render_template('admUsr.html', listUser=listUser, owner=owner)
+         else:
+             flash('No tiene permisos para realizar esta operacion ')
+             return redirect(url_for('menu')) 
     if request.method == 'POST':
         if request.form['opcion'] == "Crear":
             return render_template('crearUsr.html')
@@ -133,8 +137,12 @@ def asigRoles():
 def admRol():
     """Funcion que presenta el menu para administrar Roles."""  
     if request.method == 'GET':
-        listRol = CtrlAdmRol.getRolList()
-        return render_template('admRol.html', listRol = listRol)   
+        if CtrlAdmUsr.havePermission(owner,201):
+            listRol = CtrlAdmRol.getRolList()
+            return render_template('admRol.html', listRol = listRol)
+        else:
+             flash('No tiene permisos para realizar esta operacion ')
+             return redirect(url_for('menu'))           
     if request.method == 'POST':
         if request.form['opcion'] == "Crear":
             listPermiso = CtrlAdmRol.getPermisoList()   
