@@ -2,6 +2,7 @@
 import Usuario
 import RolUsuario
 import RolPermiso
+import CtrlAdmRol
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import mapper
 from sqlalchemy.sql import select
@@ -154,3 +155,20 @@ def usr(iduser):
     for user in lista:
         if iduser == user.idusuario:
             return user
+        
+def havePermission(owner,permiso):
+    """Funcion que recibe como parametro un username y el codigo de un permiso y
+    verifica si el usuario puede tiene acceso a ese permiso"""
+    listaUsuario = getUsuarioList()
+    for usuario in listaUsuario:
+        if owner == usuario.username:
+             break
+    
+    listaRoles = idRolList(usuario.idusuario)
+    
+    for idRol in listaRoles:
+        listaPermiso = CtrlAdmRol.idPermisoList(idRol)
+        for idPermiso in listaPermiso:
+            if idPermiso == permiso:
+                return True
+    return False
