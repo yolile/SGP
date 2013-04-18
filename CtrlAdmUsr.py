@@ -82,6 +82,7 @@ def crearUsr(username,passwrd,nombre,apellido,telefono,ci):
 
 def elimUsr(iduser):
     """Funcion que recibe el Id de un Usuario y elimina de la base de datos"""
+    conn.execute(rolusuario_table.delete().where(rolusuario_table.c.idusuario==iduser)) 
     conn.execute(usuario_table.delete().where(usuario_table.c.idusuario==iduser)) 
     
     

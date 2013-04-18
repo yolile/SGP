@@ -3,6 +3,7 @@ import Rol
 #from RolPermiso import RolPermiso, get_table
 import RolPermiso 
 import Permiso
+import CtrlAdmUsr
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import mapper
 from sqlalchemy.sql import select
@@ -112,5 +113,6 @@ def modRol(idrol,nombre,descripcion,idPermisoList):
                                              idpermiso = int(idpermiso))
         
 def elimRol(idrol):
+    conn.execute(CtrlAdmUsr.rolusuario_table.delete().where(CtrlAdmUsr.rolusuario_table.c.idrol==idrol)) 
     conn.execute(rolpermiso_table.delete().where(rolpermiso_table.c.idrol==idrol)) 
     conn.execute(rol_table.delete().where(rol_table.c.idrol==idrol)) 
