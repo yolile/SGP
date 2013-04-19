@@ -173,3 +173,10 @@ def havePermission(owner,permiso):
             if idPermiso == permiso:
                 return True
     return False
+
+def getIdByUsername(usrname):
+    """Funcion que retorna un idusuario dado un username"""
+    s = select([usuario_table],usuario_table.c.username==usrname)
+    result = conn.execute(s)
+    row = result.fetchone()
+    return row['idusuario']

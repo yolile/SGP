@@ -18,12 +18,12 @@
 	<th scope="col">OK</th>
 	</tr>
 
-		  {% for user in listProy %}
+		  {% for proyecto in listProy %}
 	<tr>
 	<td>{{ proyecto.nombre }}</td>
-	<td>{{ proyecto.fechaCreacion}}</td>	
-	<td>{{ proyecto.lider }}</td>
-	<td><input name="select" type="radio" value={{ proyecto.idproyecto }} /></td>
+	<td>{{ proyecto.fechacreacion}}</td>	
+	<td>{{ proyecto.usuariolider }}</td>
+	<td><input name="select" type="radio" value={{ proyecto.idproyecto }} checked /></td>
 	</tr>  	
 	  	{% endfor %}
 	  	

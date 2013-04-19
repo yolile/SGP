@@ -5,7 +5,7 @@
        	<center><h1>Asignar Roles a Usuario</h1></center>
           <br>
           <br>
-            <div><input type='hidden' name='idusuario' value="{{ usr.idusuario }}"></div>
+          
             <div><label>Nombres:</label>{{ usr.nombre }}</div>
             <div><label>Apellidos:</label>{{ usr.apellido }}</div>
             <div><label>Username:</label>{{ usr.username }}</div>
@@ -22,18 +22,14 @@
 	  					{% if rol.idrol != 100 %}
 							<tr>
 							<td>{{ rol.nombre }}</td>
-							{% if rol.idrol in idroles %}
-								<td><INPUT TYPE="checkbox" checked="checked" NAME="roles" VALUE="{{ rol.idrol}}"></td>	
-							{% else %}
-								<td><INPUT TYPE="checkbox" NAME="roles" VALUE="{{ rol.idrol}}"></td>	
-							{% endif %}
+							<td><INPUT TYPE="checkbox" NAME="roles" VALUE="{{ rol.idrol}}"></td>	
 							</tr>
 						{% endif %}  	
   				{% endfor %}
 			</table>
 			</div>
-		    <div><center><input NAME="opcion"  type='submit' value='Aceptar'>          <br>
-		    <div><center><input NAME="opcion"  type='submit' value='Cancelar'>		    	     
+		    <div><center><input type='submit' value='Aceptar'>          <br>
+		    <div><center><input type='submit' value='Cancelar'>		    	     
             </center></div>
         </form>
     </body>

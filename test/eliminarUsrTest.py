@@ -6,7 +6,8 @@ Created on 05/04/2013
 Controla si un usuario es eliminado correctamente
 '''
 import unittest
-from CtrlAdmUsr import crearUsr,buscarUsuario,getMayorIdUsuario,getUsername,getPasswrd,getNombre,getApellido,getTelefono,getCi,eliminarUsr
+from CtrlAdmUsrTest import crearUsr,buscarUsuario,getMayorIdUsuario,getUsername,getPasswrd,getNombre,getApellido,getTelefono,getCi,eliminarUsr
+
 class crearUsrTest(unittest.TestCase):
     global id_user
     def createScenario(self):
@@ -31,5 +32,5 @@ def makeCrearUsrTestSuite():
     return suite
 
 if __name__ == '__main__':
-    # When this module is executed from the command-line, run all its tests
+    # Cuando este modulo se ejecuta directamente, corren todos sus tests
     unittest.main()

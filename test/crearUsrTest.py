@@ -6,7 +6,8 @@ Created on 05/04/2013
 Controla si un usuario es creado correctamente
 '''
 import unittest
-from CtrlAdmUsr import crearUsr,getMayorIdUsuario,getUsername,getPasswrd,getNombre,getApellido,getTelefono,getCi,eliminarUsr
+from CtrlAdmUsrTest import crearUsr,getMayorIdUsuario,getUsername,getPasswrd,getNombre,getApellido,getTelefono,getCi,eliminarUsr
+
 class crearUsrTest(unittest.TestCase):
     global id_user
     def createScenario(self):
