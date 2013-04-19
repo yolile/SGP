@@ -1,4 +1,4 @@
-	{% extends "layout.html" %}
+{% extends "layout.html" %}
 {% block body %}
 	<body class=formato1>
         <form class='estilos' action="{{ url_for('admUsr') }}" method=get>
@@ -18,13 +18,13 @@
 			<tr>
 			<th scope="col">Nombre</th>
 			</tr>
-            	{% for rol in listRol %}
+            	{% for roles in listRol %}
 						<tr>
 						<td>{{ rol.nombre }}</td>
 						{% if rol.idrol in idroles %}
 							<td><INPUT TYPE="checkbox" NAME="idroles"  disabled="disabled" checked="checked" VALUE={{ rol.idrol }}></td>
 						{% else %}
-                        	<td><INPUT TYPE="checkbox" NAME="idroles"  disabled="disabled" VALUE={{rol.idrol }}></td>
+                        	<td><INPUT TYPE="checkbox" NAME="idroles"  disabled="disabled" VALUE={{ rol.idrol }}></td>
                         {% endif %}
 						</tr>  	
   				{% endfor %}
