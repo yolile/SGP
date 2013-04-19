@@ -107,3 +107,14 @@ def crearFase(nombre,descripcion,idproyecto):
                                              nombre=nombre, 
                                              descripcion=descripcion
                                              )
+def setProyIniciado(idproyecto):
+    conn.execute(proyecto_table.update().
+                    where(proyecto_table.c.idproyecto==idproyecto).
+                    values(estado='iniciado'))
+                    
+def getProyEstado(idproyecto):
+    s = select([proyecto_table],proyecto_table.c.idproyecto==idproyecto)
+    result = conn.execute(s)
+    row = result.fetchone()
+    return row['estado']
+    
