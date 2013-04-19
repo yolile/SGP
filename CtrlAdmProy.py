@@ -101,7 +101,7 @@ def getMaxIdFase():
 def crearFase(nombre,descripcion,idproyecto):
     maxsecuencia = getMaxSeqProy(idproyecto)
     maxidfase = getMaxIdFase()
-    result = proyecto_table.insert().execute(idfase=maxidfase+1,
+    result = fase_table.insert().execute(idfase=maxidfase+1,
                                              idproyecto=idproyecto, 
                                              posicionfase=maxsecuencia+1,
                                              nombre=nombre, 
