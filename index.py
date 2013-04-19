@@ -21,6 +21,9 @@ app.config.from_envvar('SGP_SETTINGS', silent=True)
 
 owner=""
 proyectoRoy=0
+"""fases creadas es una variable global que ayuda a saber si fueron creadas
+nuevas fases dentro de la llamada defFases"""
+fasesCreadas=0
 
 @app.route('/')
 def index():
@@ -211,7 +214,7 @@ def conPerm():
 def admProy():
     """Funcion que presenta el menu para administrar Proyectos."""  
     if request.method == 'GET':
-        if CtrlAdmUsr.havePermission(owner,200):
+        if CtrlAdmUsr.havePermission(owner,202):
             listaProy = CtrlAdmProy.getProyectoList()
             return render_template('admProy.html',listProy=listaProy)
         else:
@@ -222,6 +225,8 @@ def admProy():
             return render_template('crearProy.html')
         if request.form['opcion'] == "Definir Fases":
             global proyectoRoy
+            global fasesCreadas
+            fasesCreadas=0
             proyectoRoy = int(request.form['select'])
             return redirect(url_for('defFases'))
         if request.form['opcion'] == "Home":
@@ -248,10 +253,18 @@ def defFases():
         listaFases = CtrlAdmProy.getFasesListByProy(proyectoRoy)
         return render_template('defFases.html',listFases=listaFases,proyecto=proyectoRoy)
     if request.method == 'POST':
+        proy=request.form['proyecto']
         if (request.form['opcion']=="Definir"):
-             proy=request.form['proyecto']
-             return render_template('crearFase.html',idproyecto=proy)
+            if(CtrlAdmProy.getProyEstado(proy)=='no-iniciado'):
+               return render_template('crearFase.html',idproyecto=proy)
+            else:
+                 flash('Proyecto Iniciado, imposible definir mas fases')
+                 return redirect(url_for('defFases'))
         if (request.form['opcion']=="Volver a ADM Proyectos"):
+             global fasesCreadas
+             if(fasesCreadas != 0):
+                 CtrlAdmProy.setProyIniciado(proy)
+                 fasesCreadas = 0
              return redirect(url_for('admProy'))
         return redirect(url_for('defFases'))
 
@@ -265,7 +278,11 @@ def crearFase():
                                   request.form['descripcion'],
                                   project)
             flash('Fase creada')
+            global fasesCreadas
+            fasesCreadas=fasesCreadas+1
         listaFases = CtrlAdmProy.getFasesListByProy(project)
         return render_template('defFases.html',listFases=listaFases,proyecto=project)                      
+
+
 if __name__=='__main__':
     app.run()
