@@ -20,7 +20,7 @@ app.config.from_object(__name__)
 app.config.from_envvar('SGP_SETTINGS', silent=True)
 
 owner=""
-proyecto=0
+proyectoRoy=0
 
 @app.route('/')
 def index():
@@ -211,8 +211,12 @@ def conPerm():
 def admProy():
     """Funcion que presenta el menu para administrar Proyectos."""  
     if request.method == 'GET':
-        listaProy = CtrlAdmProy.getProyectoList()
-        return render_template('admProy.html',listProy=listaProy)
+        if CtrlAdmUsr.havePermission(owner,200):
+            listaProy = CtrlAdmProy.getProyectoList()
+            return render_template('admProy.html',listProy=listaProy)
+        else:
+            flash('No tiene permisos para realizar esta operacion ')
+            return redirect(url_for('menu')) 
     if request.method == 'POST':
         if request.form['opcion'] == "Crear":
             return render_template('crearProy.html')
@@ -221,7 +225,8 @@ def admProy():
             proyectoRoy = int(request.form['select'])
             return redirect(url_for('defFases'))
         if request.form['opcion'] == "Home":
-            return render_template('main.html')                   
+            return render_template('main.html')
+        return redirect(url_for('admProy'))                 
 
 @app.route('/crearProy', methods=['GET','POST'])
 def crearProy():
@@ -240,23 +245,27 @@ def crearProy():
 def defFases():
     """Funcion que permite definir fases dentro de un proyecto"""
     if request.method == 'GET':
-        listaFases = CtrlAdmProy.getFasesListByProy(proyecto)
-        return render_template('defFases.html',listFases=listaFases,proyecto=proyecto)
+        listaFases = CtrlAdmProy.getFasesListByProy(proyectoRoy)
+        return render_template('defFases.html',listFases=listaFases,proyecto=proyectoRoy)
     if request.method == 'POST':
         if (request.form['opcion']=="Definir"):
              proy=request.form['proyecto']
              return render_template('crearFase.html',idproyecto=proy)
+        if (request.form['opcion']=="Volver a ADM Proyectos"):
+             return redirect(url_for('admProy'))
+        return redirect(url_for('defFases'))
 
 @app.route('/crearFase', methods=['GET','POST'])
 def crearFase():
     """Funcion que permite crear una fase de un proyecto"""
     if request.method == 'POST':
+        project=int(request.form['idproyecto'])
         if request.form['opcion']=="Crear":
             CtrlAdmProy.crearFase(request.form['nombre'],
                                   request.form['descripcion'],
-                                  int(request.form['idproyecto']))
+                                  project)
             flash('Fase creada')
-        return redirect(url_for('defFases'))
-                      
+        listaFases = CtrlAdmProy.getFasesListByProy(project)
+        return render_template('defFases.html',listFases=listaFases,proyecto=project)                      
 if __name__=='__main__':
     app.run()
