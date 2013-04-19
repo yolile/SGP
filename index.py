@@ -3,6 +3,7 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash, _app_ctx_stack
 import CtrlAdmUsr
 import CtrlAdmRol
+import CtrlAdmProy
 
 """Modulo de ejecucion principal de SGP"""  
 __author__ = 'Grupo 5'
@@ -209,12 +210,48 @@ def conPerm():
 def admProy():
     """Funcion que presenta el menu para administrar Proyectos."""  
     if request.method == 'GET':
-        return render_template('admProy.html')
+        listaProy = CtrlAdmProy.getProyectoList()
+        return render_template('admProy.html',listProy=listaProy)
     if request.method == 'POST':
         if request.form['opcion'] == "Crear":
             return render_template('crearProy.html')
+	if request.form['opcion'] == "Definir Fases":
+            proy = int(request.form['select'])
+            listaFases = CtrlAdmProy.getFasesListByProy(proy)
+            return render_template('defFases.html',listFases=listaFases,proyecto=proy)
         if request.form['opcion'] == "Home":
             return render_template('main.html')                   
+
+@app.route('/crearProy', methods=['GET','POST'])
+def crearProy():
+    """Funcion que permite crear proyectos"""
+    if request.method == 'POST':
+        if request.form['opcion'] == "Crear":
+            CtrlAdmProy.crearProy(request.form['nombre'], 
+                                request.form['descripcion'], 
+                                request.form['presupuesto'],
+                                owner,
+                                )
+            flash('Proyecto creado')
+        return redirect(url_for('admProy'))
+    return render_template('crearProy.html')
+    
+@app.route('/defFases', methods=['GET','POST'])
+def defFases():
+    """Funcion que permite definir fases dentro de un proyecto"""
+    if request.method == 'POST':
+        if (request.form['opcion']=="Definir"):
+            proy=request.form['proyecto']
+            return render_template('crearFase.html',proyecto=proy)
+
+@app.route('/crearFase', methods=['GET','POST'])
+def crearFase():
+    """Funcion que permite crear una fase de un proyecto"""
+    if request.method == 'POST':
+        if request.form['opcion']=="Crear":
+            CtrlAdmProy.crearFase(request.form['nombre'],request.form['descripcion'],request.form['proyecto'])
+            flash('Fase creada')
+    return redirect(url_for('defFases'))
                       
 if __name__=='__main__':
     app.run()
