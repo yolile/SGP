@@ -9,7 +9,7 @@ Ejecuta todos los tests
 import unittest
 
 def suite():
-    modules_to_test = ('crearUsrTest','eliminarUsrTest') # and so on
+    modules_to_test = ('duplicateRolTest')
     alltests = unittest.TestSuite()
     for module in map(__import__, modules_to_test):
         alltests.addTest(unittest.findTestCases(module))
