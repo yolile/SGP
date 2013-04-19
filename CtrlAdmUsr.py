@@ -100,6 +100,7 @@ def modUsr(iduser,username,passwrd,nombre,apellido,telefono,ci):
     
 def asigRoles(iduser,idRolList):
     """Funcion que recibe los roles a asignarse a un usuario """
+    conn.execute(rolusuario_table.delete().where(rolusuario_table.c.idusuario==iduser))
     for idrol in idRolList:
         result = rolusuario_table.insert().execute( idrol= int(idrol),
                                                    idusuario= iduser)              
