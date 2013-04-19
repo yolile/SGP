@@ -245,14 +245,16 @@ def defFases():
     if request.method == 'POST':
         if (request.form['opcion']=="Definir"):
              proy=request.form['proyecto']
-             return render_template('crearFase.html',proyecto=proy)
+             return render_template('crearFase.html',idproyecto=proy)
 
 @app.route('/crearFase', methods=['GET','POST'])
 def crearFase():
     """Funcion que permite crear una fase de un proyecto"""
     if request.method == 'POST':
         if request.form['opcion']=="Crear":
-            #CtrlAdmProy.crearFase(request.form['nombre'],request.form['descripcion'],request.form['idproyecto'])
+            CtrlAdmProy.crearFase(request.form['nombre'],
+                                  request.form['descripcion'],
+                                  int(request.form['idproyecto']))
             flash('Fase creada')
         return redirect(url_for('defFases'))
                       
