@@ -20,6 +20,7 @@ app.config.from_object(__name__)
 app.config.from_envvar('SGP_SETTINGS', silent=True)
 
 owner=""
+proyecto=0
 
 @app.route('/')
 def index():
@@ -215,10 +216,10 @@ def admProy():
     if request.method == 'POST':
         if request.form['opcion'] == "Crear":
             return render_template('crearProy.html')
-	if request.form['opcion'] == "Definir Fases":
-            proy = int(request.form['select'])
-            listaFases = CtrlAdmProy.getFasesListByProy(proy)
-            return render_template('defFases.html',listFases=listaFases,proyecto=proy)
+        if request.form['opcion'] == "Definir Fases":
+            global proyectoRoy
+            proyectoRoy = int(request.form['select'])
+            return redirect(url_for('defFases'))
         if request.form['opcion'] == "Home":
             return render_template('main.html')                   
 
@@ -234,24 +235,26 @@ def crearProy():
                                 )
             flash('Proyecto creado')
         return redirect(url_for('admProy'))
-    return render_template('crearProy.html')
     
 @app.route('/defFases', methods=['GET','POST'])
 def defFases():
     """Funcion que permite definir fases dentro de un proyecto"""
+    if request.method == 'GET':
+        listaFases = CtrlAdmProy.getFasesListByProy(proyecto)
+        return render_template('defFases.html',listFases=listaFases,proyecto=proyecto)
     if request.method == 'POST':
         if (request.form['opcion']=="Definir"):
-            proy=request.form['proyecto']
-            return render_template('crearFase.html',proyecto=proy)
+             proy=request.form['proyecto']
+             return render_template('crearFase.html',proyecto=proy)
 
 @app.route('/crearFase', methods=['GET','POST'])
 def crearFase():
     """Funcion que permite crear una fase de un proyecto"""
     if request.method == 'POST':
         if request.form['opcion']=="Crear":
-            CtrlAdmProy.crearFase(request.form['nombre'],request.form['descripcion'],request.form['proyecto'])
+            #CtrlAdmProy.crearFase(request.form['nombre'],request.form['descripcion'],request.form['idproyecto'])
             flash('Fase creada')
-    return redirect(url_for('defFases'))
+        return redirect(url_for('defFases'))
                       
 if __name__=='__main__':
     app.run()
