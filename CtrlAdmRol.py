@@ -115,4 +115,37 @@ def modRol(idrol,nombre,descripcion,idPermisoList):
 def elimRol(idrol):
     conn.execute(CtrlAdmUsr.rolusuario_table.delete().where(CtrlAdmUsr.rolusuario_table.c.idrol==idrol)) 
     conn.execute(rolpermiso_table.delete().where(rolpermiso_table.c.idrol==idrol)) 
-    conn.execute(rol_table.delete().where(rol_table.c.idrol==idrol)) 
+    conn.execute(rol_table.delete().where(rol_table.c.idrol==idrol))
+    
+def truncarPermiso():
+    trans = conn.begin()
+    try:
+        conn.execute('truncate table "public"."permiso" cascade')
+        trans.commit()
+    except :
+        trans.rollback()
+        
+def truncarRol():
+    trans = conn.begin()
+    try:
+        conn.execute('truncate table "public"."rol" cascade')
+        trans.commit()
+    except :
+        trans.rollback()
+        
+def truncarRolPermiso():
+    trans = conn.begin()
+    try:
+        conn.execute('truncate table "public"."rolpermiso" cascade')
+        trans.commit()
+    except :
+        trans.rollback()
+
+def insertarRol(idrol,nombre,descripcion,idPermisoList):
+    """Funcion utilizada solo en tests"""
+    result = rol_table.insert().execute(idrol=idrol,
+                                             nombre=nombre,
+                                             descripcion=descripcion)   
+    for idpermiso in idPermisoList:
+        result = rolpermiso_table.insert().execute(idrol=idrol,
+                                             idpermiso = int(idpermiso))

@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block body %}
+	<body class=formato1>
+        <form class='estilos' action="{{ url_for('modUsr') }}" method=post>
+            <center><h1>Modificacion de Usuario</h1></center>
+          	<br>
+          	<br>
+            <div><input type='hidden' name='idusuario' value="{{ usr.idusuario }}"></div>
+            <div><label>Nombres:</label><input type='text' name=nombre value="{{ usr.nombre }}"></div>
+            <div><label>Apellidos:</label><input type='text' name=apellido value="{{ usr.apellido }}"></div>
+            <div><label>Username:</label><input type='text' name=username value="{{ usr.username }}"></div>
+            <div><label>Password</label><input type='password' name=passwrd value="{{ usr.passwrd }}"></div>
+            <div><label>Telefono:</label><input type='text' name=telefono value="{{ usr.telefono }}"></div>
+            <div><label>CI:</label><input type='text' name=ci value="{{ usr.ci }}"></div>
+            <div><center><input type='submit' name="opcion" value='Modificar'>
+            <input type='submit' name="opcion" value='Cancelar'></center></div>
+        </form>
+    </body>
+{% endblock %}

@@ -117,4 +117,19 @@ def getProyEstado(idproyecto):
     result = conn.execute(s)
     row = result.fetchone()
     return row['estado']
-    
+
+def truncarProyecto():
+    trans = conn.begin()
+    try:
+        conn.execute('truncate table "public"."proyecto" cascade')
+        trans.commit()
+    except :
+        trans.rollback()
+        
+def truncarFase():
+    trans = connfase.begin()
+    try:
+        connfase.execute('truncate table "public"."fase" cascade')
+        trans.commit()
+    except :
+        trans.rollback()

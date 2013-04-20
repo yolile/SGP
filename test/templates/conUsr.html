@@ -1,0 +1,38 @@
+{% extends "layout.html" %}
+{% block body %}
+	<body class=formato1>
+        <form class='estilos' action="{{ url_for('admUsr') }}" method=get>
+            <center><h1>Consulta de Usuario</h1></center>
+          	<br>
+          	<br>
+            <div><label>Nombres:</label>{{ usr.nombre }}</div>
+            <div><label>Apellidos:</label>{{ usr.apellido }}</div>
+            <div><label>Username:</label>{{ usr.username }}</div>
+            <div><label>Telefono:</label>{{ usr.telefono }}</div>
+            <div><label>CI:</label>{{ usr.ci }}</div>
+
+            
+            <div><label>Roles<label></div>	
+			<div style="height:150px;width:200px;overflow:scroll;">	
+			<table width="50%" border="1">
+			<tr>
+			<th scope="col">Nombre</th>
+			</tr>
+            	{% for rol in listRol %}
+						<tr>
+						<td>{{ rol.nombre }}</td>
+						{% if rol.idrol in idroles %}
+							<td><INPUT TYPE="checkbox" NAME="idroles"  disabled="disabled" checked="checked" VALUE={{ rol.idrol }}></td>
+						{% else %}
+                        	<td><INPUT TYPE="checkbox" NAME="idroles"  disabled="disabled" VALUE={{ rol.idrol }}></td>
+                        {% endif %}
+						</tr>  	
+  				{% endfor %}
+			</table>
+			</div>
+			
+		    <div><center><input type='submit' value='Aceptar'>	     
+            </center></div>
+        </form>
+    </body>
+{% endblock %}

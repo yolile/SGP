@@ -1,9 +1,9 @@
 from __future__ import with_statement
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash, _app_ctx_stack
-import CtrlAdmUsrTestTest
-import CtrlAdmRolTest
-import CtrlAdmProyTest
+import CtrlAdmUsr
+import CtrlAdmRol
+import CtrlAdmProy
 
 """Modulo de ejecucion principal de SGP"""  
 __author__ = 'Grupo 5'
@@ -20,6 +20,10 @@ app.config.from_object(__name__)
 app.config.from_envvar('SGP_SETTINGS', silent=True)
 
 owner=""
+proyectoRoy=0
+"""fases creadas es una variable global que ayuda a saber si fueron creadas
+nuevas fases dentro de la llamada defFases"""
+fasesCreadas=0
 
 @app.route('/')
 def index():
@@ -32,7 +36,7 @@ def login():
     if request.method == 'GET':
         return render_template('login.html')        
     if request.method == 'POST':
-        valido = CtrlAdmUsrTestTest.validarUsuario(request.form['username'], request.form['password'])
+        valido = CtrlAdmUsr.validarUsuario(request.form['username'], request.form['password'])
         if valido:
             global owner 
             owner = request.form['username']
@@ -59,30 +63,39 @@ def menu():
 def admUsr():
     """Funcion que presenta el menu para administrar usuarios."""  
     if request.method == 'GET':
-        listUser = CtrlAdmUsrTestTest.getUsuarioList()
-        return render_template('admUsr.html', listUser=listUser, owner=owner)   
+         if CtrlAdmUsr.havePermission(owner,200):
+             listUser = CtrlAdmUsr.getUsuarioList()
+             return render_template('admUsr.html', listUser=listUser, owner=owner)
+         else:
+             flash('No tiene permisos para realizar esta operacion ')
+             return redirect(url_for('menu')) 
     if request.method == 'POST':
         if request.form['opcion'] == "Crear":
             return render_template('crearUsr.html')
         if request.form['opcion'] == "Modificar":
-            usr = CtrlAdmUsrTestTest.usr(int(request.form['select']))        
+            usr = CtrlAdmUsr.usr(int(request.form['select']))        
             return render_template('modUsr.html', usr=usr) 
         if request.form['opcion'] == "Eliminar":
-            CtrlAdmUsrTestTest.elimUsr(int(request.form['select']))   
-            listUser = CtrlAdmUsrTestTest.getUsuarioList()
+            CtrlAdmUsr.elimUsr(int(request.form['select']))   
+            listUser = CtrlAdmUsr.getUsuarioList()
             flash('Usuario eliminado')
             return render_template('admUsr.html', listUser=listUser) 
         if request.form['opcion'] == "Consultar":
-            usr = CtrlAdmUsrTestTest.usr(int(request.form['select']))        
-            return render_template('conUsr.html', usr=usr)
+            usr = CtrlAdmUsr.usr(int(request.form['select'])) 
+            idroles = CtrlAdmUsr.idRolList(int(usr.idusuario))  
+            listRol = CtrlAdmRol.getRolList()     
+            return render_template('conUsr.html',usr=usr,
+                                                idroles=idroles,
+                                                listRol=listRol)
         if request.form['opcion'] == "AsignarRoles":
-            usr = CtrlAdmUsrTestTest.usr(int(request.form['select']))    
-            listRol = CtrlAdmRolTest.getRolList()   
-            return render_template('asigRoles.html',usr=usr,listRol = listRol)      
+            usr = CtrlAdmUsr.usr(int(request.form['select']))    
+            listRol = CtrlAdmRol.getRolList()     
+            idroles = CtrlAdmUsr.idRolList(int(request.form['select']))
+            return render_template('asigRoles.html',usr=usr,listRol = listRol, idroles=idroles)                  
         if request.form['opcion'] == "Buscar":
-            listUser = CtrlAdmUsrTestTest.busUsr(request.form['buscar'],
+            listUser = CtrlAdmUsr.busquedaUsr(request.form['buscar'],
                                          request.form['atributo'])
-            flash('Usuarios con'+request.form['atributo']+" igual a "+request.form['buscar'])
+            flash('Resultado de la busqueda')
             return render_template('admUsr.html', listUser=listUser)
         if request.form['opcion'] == "Home":
             return render_template('main.html')    
@@ -92,7 +105,7 @@ def crearUsr():
     """Funcion que presenta el menu para crear usuario."""  
     if request.method == 'POST':
         if(request.form['opcion'] == "Crear"):        
-            CtrlAdmUsrTestTest.crearUsr(request.form['username'], 
+            CtrlAdmUsr.crearUsr(request.form['username'], 
                                 request.form['passwrd'], 
                                 request.form['nombre'],
                                 request.form['apellido'],
@@ -106,7 +119,7 @@ def modUsr():
     """Funcion que presenta el menu para modificar usuario."""  
     if request.method == 'POST':
         if(request.form['opcion'] == "Modificar"):
-            CtrlAdmUsrTestTest.modUsr(int(request.form['idusuario']), 
+            CtrlAdmUsr.modUsr(int(request.form['idusuario']), 
                               request.form['username'], 
                               request.form['passwrd'], 
                               request.form['nombre'],
@@ -118,39 +131,44 @@ def modUsr():
           
 @app.route('/asigRoles', methods=['GET','POST'])
 def asigRoles():
-    """Funcion que presenta el menu para asignar Roles a los usuarios."""  
+    """Funcion que presenta el menu para asignar Roles a los usuarios.""" 
     if request.method == 'POST':
         if(request.form['opcion'] == "Aceptar"): 
-            CtrlAdmUsrTestTest.asigRol(request.form.getlist('roles') )
+            CtrlAdmUsr.asigRoles(int(request.form['idusuario']),
+                                 request.form.getlist('roles'))
             flash('Roles asignados al usuario')
-        return redirect(url_for('admUsr'))       
+    return redirect(url_for('admUsr'))       
 """------------------------ROLES---------------------------------------"""         
 @app.route('/admRol', methods=['GET','POST'])
 def admRol():
     """Funcion que presenta el menu para administrar Roles."""  
     if request.method == 'GET':
-        listRol = CtrlAdmRolTest.getRolList()
-        return render_template('admRol.html', listRol = listRol)   
+        if CtrlAdmUsr.havePermission(owner,201):
+            listRol = CtrlAdmRol.getRolList()
+            return render_template('admRol.html', listRol = listRol)
+        else:
+             flash('No tiene permisos para realizar esta operacion ')
+             return redirect(url_for('menu'))           
     if request.method == 'POST':
         if request.form['opcion'] == "Crear":
-            listPermiso = CtrlAdmRolTest.getPermisoList()   
+            listPermiso = CtrlAdmRol.getPermisoList()   
             return render_template('crearRol.html',listPermiso = listPermiso)
         if request.form['opcion'] == "Modificar":
-            rol = CtrlAdmRolTest.rol(int(request.form['select']))        
-            idpermisos = CtrlAdmRolTest.idPermisoList(int(rol.idrol))   
-            listPermiso = CtrlAdmRolTest.getPermisoList()               
+            rol = CtrlAdmRol.rol(int(request.form['select']))        
+            idpermisos = CtrlAdmRol.idPermisoList(int(rol.idrol))   
+            listPermiso = CtrlAdmRol.getPermisoList()               
             return render_template('modRol.html', rol=rol,
                                                  idpermisos=idpermisos,
                                                  listPermiso=listPermiso) 
         if request.form['opcion'] == "Eliminar":
-            CtrlAdmRolTest.elimRol(int(request.form['select']))   
-            listRol = CtrlAdmRolTest.getRolList()
+            CtrlAdmRol.elimRol(int(request.form['select']))   
+            listRol = CtrlAdmRol.getRolList()
             flash('Rol eliminado')
             return render_template('admRol.html', listRol=listRol)
         if request.form['opcion'] == "Consultar":
-            rol = CtrlAdmRolTest.rol(int(request.form['select']))        
-            idpermisos = CtrlAdmRolTest.idPermisoList(int(rol.idrol))   
-            listPermiso = CtrlAdmRolTest.getPermisoList()               
+            rol = CtrlAdmRol.rol(int(request.form['select']))        
+            idpermisos = CtrlAdmRol.idPermisoList(int(rol.idrol))   
+            listPermiso = CtrlAdmRol.getPermisoList()               
             return render_template('conRol.html', rol=rol,
                                                     idpermisos=idpermisos,
                                                     listPermiso=listPermiso)
@@ -162,7 +180,7 @@ def crearRol():
     """Funcion que presenta el menu para crear Rol."""  
     if request.method == 'POST':
         if(request.form['opcion'] == "Crear"): 
-            CtrlAdmRolTest.crearRol(request.form['nombre'],
+            CtrlAdmRol.crearRol(request.form['nombre'],
                                 request.form['descripcion'],
                                 request.form.getlist('permisos') )
             flash('Rol creado')
@@ -173,7 +191,7 @@ def modRol():
     """Funcion que presenta el menu para modificar rol."""  
     if request.method == 'POST':
         if(request.form['opcion'] == "Modificar"):
-            CtrlAdmRolTest.modRol(int(request.form['idrol']), 
+            CtrlAdmRol.modRol(int(request.form['idrol']), 
                               request.form['nombre'],
                               request.form['descripcion'], 
                               request.form.getlist('idpermisos'))
@@ -185,7 +203,7 @@ def modRol():
 def conPerm():
     """Funcion que presenta visualiza los permisos del sistema"""  
     if request.method == 'GET':
-        listPermiso = CtrlAdmRolTest.getPermisoList()   
+        listPermiso = CtrlAdmRol.getPermisoList()   
         return render_template('conPerm.html',listPermiso = listPermiso)
     if request.method == 'POST':
         if request.form['opcion'] == "Home":
@@ -196,48 +214,74 @@ def conPerm():
 def admProy():
     """Funcion que presenta el menu para administrar Proyectos."""  
     if request.method == 'GET':
-        listaProy = CtrlAdmProyTest.getProyectoList()
-        return render_template('admProy.html',listProy=listaProy)
+        if CtrlAdmUsr.havePermission(owner,202):
+            listaProy = CtrlAdmProy.getProyectoList()
+            return render_template('admProy.html',listProy=listaProy)
+        else:
+            flash('No tiene permisos para realizar esta operacion ')
+            return redirect(url_for('menu')) 
     if request.method == 'POST':
         if request.form['opcion'] == "Crear":
             return render_template('crearProy.html')
         if request.form['opcion'] == "Definir Fases":
-            proy = int(request.form['select'])
-            listaFases = CtrlAdmProyTest.getFasesListByProy(proy)
-            return render_template('defFases.html',listFases=listaFases,proyecto=proy)
+            global proyectoRoy
+            global fasesCreadas
+            fasesCreadas=0
+            proyectoRoy = int(request.form['select'])
+            return redirect(url_for('defFases'))
         if request.form['opcion'] == "Home":
-            return render_template('main.html')                   
+            return render_template('main.html')
+        return redirect(url_for('admProy'))                 
 
 @app.route('/crearProy', methods=['GET','POST'])
 def crearProy():
     """Funcion que permite crear proyectos"""
     if request.method == 'POST':
         if request.form['opcion'] == "Crear":
-            CtrlAdmProyTest.crearProy(request.form['nombre'], 
+            CtrlAdmProy.crearProy(request.form['nombre'], 
                                 request.form['descripcion'], 
                                 request.form['presupuesto'],
                                 owner,
                                 )
             flash('Proyecto creado')
         return redirect(url_for('admProy'))
-    return render_template('crearProy.html')
     
 @app.route('/defFases', methods=['GET','POST'])
 def defFases():
     """Funcion que permite definir fases dentro de un proyecto"""
+    if request.method == 'GET':
+        listaFases = CtrlAdmProy.getFasesListByProy(proyectoRoy)
+        return render_template('defFases.html',listFases=listaFases,proyecto=proyectoRoy)
     if request.method == 'POST':
+        proy=request.form['proyecto']
         if (request.form['opcion']=="Definir"):
-            proy=request.form['proyecto']
-            return render_template('crearFase.html',proyecto=proy)
+            if(CtrlAdmProy.getProyEstado(proy)=='no-iniciado'):
+               return render_template('crearFase.html',idproyecto=proy)
+            else:
+                 flash('Proyecto Iniciado, imposible definir mas fases')
+                 return redirect(url_for('defFases'))
+        if (request.form['opcion']=="Volver a ADM Proyectos"):
+             global fasesCreadas
+             if(fasesCreadas != 0):
+                 CtrlAdmProy.setProyIniciado(proy)
+                 fasesCreadas = 0
+             return redirect(url_for('admProy'))
+        return redirect(url_for('defFases'))
 
 @app.route('/crearFase', methods=['GET','POST'])
 def crearFase():
     """Funcion que permite crear una fase de un proyecto"""
     if request.method == 'POST':
+        project=int(request.form['idproyecto'])
         if request.form['opcion']=="Crear":
-            CtrlAdmProyTest.crearFase(request.form['nombre'],request.form['descripcion'],request.form['idproyecto'])
+            CtrlAdmProy.crearFase(request.form['nombre'],
+                                  request.form['descripcion'],
+                                  project)
             flash('Fase creada')
-    return redirect(url_for('defFases'))
+            global fasesCreadas
+            fasesCreadas=fasesCreadas+1
+        listaFases = CtrlAdmProy.getFasesListByProy(project)
+        return render_template('defFases.html',listFases=listaFases,proyecto=project)                      
 
 
 if __name__=='__main__':

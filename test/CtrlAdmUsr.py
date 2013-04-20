@@ -14,7 +14,7 @@ __version__ = '1.0'
 __text__ = 'Este modulo contiene funciones que permiten el control de administracion de usuarios'
 __file__ = 'CtrlAdmUsr.py'      
     
-engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgp')
+engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgptest')
 metadata = MetaData(bind=engine)
 
 usuario_table = Usuario.get_table(metadata)
