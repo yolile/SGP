@@ -158,21 +158,22 @@ def usr(iduser):
         if iduser == user.idusuario:
             return user
         
-def havePermission(owner,permiso):
+def havePermission(usr,permiso):
     """Funcion que recibe como parametro un username y el codigo de un permiso y
     verifica si el usuario puede tiene acceso a ese permiso"""
     listaUsuario = getUsuarioList()
-    for usuario in listaUsuario:
-        if owner == usuario.username:
-             break
-    
-    listaRoles = idRolList(usuario.idusuario)
-    
-    for idRol in listaRoles:
-        listaPermiso = CtrlAdmRol.idPermisoList(idRol)
-        for idPermiso in listaPermiso:
-            if idPermiso == permiso:
-                return True
+    flag=0
+    for user in listaUsuario:
+        if usr == user.username:
+            flag=1
+            break
+    if flag==1:
+        listaRoles = idRolList(user.idusuario)  
+        for idRol in listaRoles:
+            listaPermiso = CtrlAdmRol.idPermisoList(idRol)
+            for idPermiso in listaPermiso:
+                if idPermiso == permiso:
+                    return True
     return False
 
 def getIdByUsername(usrname):
@@ -180,4 +181,33 @@ def getIdByUsername(usrname):
     s = select([usuario_table],usuario_table.c.username==usrname)
     result = conn.execute(s)
     row = result.fetchone()
-    return row['idusuario']
+    if(row != None):
+        return row['idusuario']
+    else:
+        raise Exception('No existe este usuario')
+
+def truncarUsuario():
+    trans = conn.begin()
+    try:
+        conn.execute('truncate table "public"."usuario" cascade')
+        trans.commit()
+    except :
+        trans.rollback()
+
+def truncarRolUsuario():
+    trans = conn.begin()
+    try:
+        conn.execute('truncate table "public"."rolusuario" cascade')
+        trans.commit()
+    except :
+        trans.rollback()
+
+def insertarUsuario(idusuario,username,passwrd,nombre,apellido,telefono,ci):
+    """Funcion utilizada en pruebas"""
+    result = usuario_table.insert().execute(idusuario=idusuario,
+                                             username=username, 
+                                             passwrd=passwrd,
+                                             nombre=nombre, 
+                                             apellido=apellido, 
+                                             telefono=telefono, 
+                                             ci=ci)
