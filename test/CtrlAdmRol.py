@@ -3,10 +3,10 @@ import Rol
 #from RolPermiso import RolPermiso, get_table
 import RolPermiso 
 import Permiso
+import CtrlAdmUsr
 from sqlalchemy import create_engine, MetaData
 from sqlalchemy.orm import mapper
 from sqlalchemy.sql import select
-from sqlalchemy import exc
    
     
 engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgptest')
@@ -81,33 +81,23 @@ def permiso(idPermiso):
             return permiso
         
 def crearRol(nombre,descripcion,idPermisoList):
-    """Funcion que recibe los atributos de un usuario y lo persiste en la base de datos.
-    Retorna el nuevo idrol en caso de exito y -1 en caso de error de integridad"""
-    try:
-        idrolmax=getMayorIdRol()
-        result = rol_table.insert().execute(idrol=idrolmax+1,
-                                                 nombre=nombre,
-                                                 descripcion=descripcion)
-        
-        for idpermiso in idPermisoList:
-            result = rolpermiso_table.insert().execute(idrol=idrolmax+1,
-                                                 idpermiso = int(idpermiso))
-    except exc.SQLAlchemyError:
-        return -1
-    return idrolmax+1
+    """Funcion que recibe los atributos de un usuario y lo persiste en la base de datos."""
+    idrolmax=getMayorIdRol()
+    result = rol_table.insert().execute(idrol=idrolmax+1,
+                                             nombre=nombre,
+                                             descripcion=descripcion)
+    
+    for idpermiso in idPermisoList:
+        result = rolpermiso_table.insert().execute(idrol=idrolmax+1,
+                                             idpermiso = int(idpermiso))
 
 def idPermisoList(idRol):
-    """Funcion que recibe el Id de un Rol y retorna la lista de rolpermisos del rol.
-    En caso de malos parametros, captura el error y retorna -1, en caso de 
-    exito, retorna la lista de permisos"""
-    try:
-        lista = getRolPermisoList()
-        idPermisoList=[]
-        for rolpermiso in lista:
-            if(rolpermiso.idrol == idRol):
-                idPermisoList.append(rolpermiso.idpermiso)
-    except ValueError:
-        return -1
+    """Funcion que recibe el Id de un Rol y retorna la lista de rolpermisos del rol"""
+    lista = getRolPermisoList()
+    idPermisoList=[]
+    for rolpermiso in lista:
+        if(rolpermiso.idrol == idRol):
+            idPermisoList.append(rolpermiso.idpermiso)
     return idPermisoList
 
 def modRol(idrol,nombre,descripcion,idPermisoList):
@@ -123,14 +113,39 @@ def modRol(idrol,nombre,descripcion,idPermisoList):
                                              idpermiso = int(idpermiso))
         
 def elimRol(idrol):
-    """Funcion que recibe un idrol y lo elimina de la base de datos,
-    Retorna 0 en caso de exito.
-    Retorna -1 si no se encuentra el rol a eliminar"""
-    try:
-        conn.execute(rolpermiso_table.delete().where(rolpermiso_table.c.idrol==idrol)) 
-        conn.execute(rol_table.delete().where(rol_table.c.idrol==idrol))
-    except Exception:
-        return -1
-    return 0
-        
+    conn.execute(CtrlAdmUsr.rolusuario_table.delete().where(CtrlAdmUsr.rolusuario_table.c.idrol==idrol)) 
+    conn.execute(rolpermiso_table.delete().where(rolpermiso_table.c.idrol==idrol)) 
+    conn.execute(rol_table.delete().where(rol_table.c.idrol==idrol))
     
+def truncarPermiso():
+    trans = conn.begin()
+    try:
+        conn.execute('truncate table "public"."permiso" cascade')
+        trans.commit()
+    except :
+        trans.rollback()
+        
+def truncarRol():
+    trans = conn.begin()
+    try:
+        conn.execute('truncate table "public"."rol" cascade')
+        trans.commit()
+    except :
+        trans.rollback()
+        
+def truncarRolPermiso():
+    trans = conn.begin()
+    try:
+        conn.execute('truncate table "public"."rolpermiso" cascade')
+        trans.commit()
+    except :
+        trans.rollback()
+
+def insertarRol(idrol,nombre,descripcion,idPermisoList):
+    """Funcion utilizada solo en tests"""
+    result = rol_table.insert().execute(idrol=idrol,
+                                             nombre=nombre,
+                                             descripcion=descripcion)   
+    for idpermiso in idPermisoList:
+        result = rolpermiso_table.insert().execute(idrol=idrol,
+                                             idpermiso = int(idpermiso))

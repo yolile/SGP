@@ -101,9 +101,35 @@ def getMaxIdFase():
 def crearFase(nombre,descripcion,idproyecto):
     maxsecuencia = getMaxSeqProy(idproyecto)
     maxidfase = getMaxIdFase()
-    result = proyecto_table.insert().execute(idfase=maxidfase+1,
+    result = fase_table.insert().execute(idfase=maxidfase+1,
                                              idproyecto=idproyecto, 
                                              posicionfase=maxsecuencia+1,
                                              nombre=nombre, 
                                              descripcion=descripcion
                                              )
+def setProyIniciado(idproyecto):
+    conn.execute(proyecto_table.update().
+                    where(proyecto_table.c.idproyecto==idproyecto).
+                    values(estado='iniciado'))
+                    
+def getProyEstado(idproyecto):
+    s = select([proyecto_table],proyecto_table.c.idproyecto==idproyecto)
+    result = conn.execute(s)
+    row = result.fetchone()
+    return row['estado']
+
+def truncarProyecto():
+    trans = conn.begin()
+    try:
+        conn.execute('truncate table "public"."proyecto" cascade')
+        trans.commit()
+    except :
+        trans.rollback()
+        
+def truncarFase():
+    trans = connfase.begin()
+    try:
+        connfase.execute('truncate table "public"."fase" cascade')
+        trans.commit()
+    except :
+        trans.rollback()
