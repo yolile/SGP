@@ -1,0 +1,59 @@
+{% extends "layout.html" %}
+{% block body %}
+
+ <body class = formato2>
+
+<form class='estilos' action="{{ url_for('admProy')}}" method="post">
+
+ <center><h1>ADMINISTRACION DE PROYECTOS</h1></center>
+ <br>
+ <br>
+	<div style="height:150px;width:700px;overflow:scroll;">	
+	
+	<table width="100%" border="1">
+	<tr>
+	<th scope="col">Nombre</th>
+	<th scope="col">Fecha Creacion</th>
+	<th scope="col">Lider</th>
+	<th scope="col">OK</th>
+	</tr>
+
+		  {% for proyecto in listProy %}
+	<tr>
+	<td>{{ proyecto.nombre }}</td>
+	<td>{{ proyecto.fechacreacion}}</td>	
+	<td>{{ proyecto.usuariolider }}</td>
+	<td><input name="select" type="radio" value={{ proyecto.idproyecto }} checked /></td>
+	</tr>  	
+	  	{% endfor %}
+	  	
+
+	</table>
+	</div>	
+	
+	<br>
+	<input type="submit" name="opcion" value="Crear" />
+	<input type="submit" name="opcion" value="Definir Fases" />
+	<input type="submit" name="opcion" value="Modificar" />
+	<input type="submit" name="opcion" value="Eliminar" />
+	<br>
+ 	<br>
+	<input type="submit" name="opcion" value="Consultar " />
+	<input type="submit" name="opcion" value="Comité de Cambios"/>
+	<br>
+	<br>
+	<input type="text" name="buscar"/>
+	<select name="atributo">
+		<option value="nombre">Nombre</option>
+		<option value="fechaCreacion">Fecha de Creacion</option>
+		<option value="lider">Lider</option>
+	</select>
+	<input type="submit" name="opcion" value="Buscar" />
+	<br>
+	<br>
+	<center>
+	<input type="submit" name="opcion" value="Home" />
+	</center>
+	</form>
+	</body>
+{% endblock %}

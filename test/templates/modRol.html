@@ -1,0 +1,39 @@
+   {% extends "layout.html" %}
+{% block body %}
+<body class=formato1>
+        <form class='estilos' action="{{ url_for('modRol') }}" method=post>
+          <center><h1>Modificacion de Rol</h1></center>
+          <br>
+          <br>  
+            <div><input type='hidden' name=idrol value="{{ rol.idrol }}"></div>
+            <div><label>Nombres:</label><input type='text' name=nombre value="{{ rol.nombre }}"></div>
+            <div><label>Descripcion:</label><input type='text' name=descripcion value="{{ rol.descripcion }}"></div>
+            
+		
+		    <div><label>Permisos:<label></div>	
+		<div style="height:150px;width:200px;overflow:scroll;">	
+		<TABLE BORDER WIDTH="70%">
+		<COL SPAN="4" ALIGN="left">
+			<tr>
+			<th scope="col">Nombre</th>
+			<th scope="col">OK</th>
+			</tr>
+            	{% for permiso in listPermiso %}
+						<tr>
+						<td>{{ permiso.nombre }}</td>
+						{% if permiso.idpermiso in idpermisos %}
+							<td><INPUT TYPE="checkbox" NAME="idpermisos" checked="checked" VALUE={{ permiso.idpermiso }}></td>
+						{% else %}
+                        	<td><INPUT TYPE="checkbox" NAME="idpermisos" VALUE={{ permiso.idpermiso }}></td>
+                        {% endif %}
+						</tr>  	
+  				{% endfor %}
+			</table>
+			</div>
+               
+             <div><center><input type='submit' name="opcion" value='Modificar'>
+            <input type='submit' name="opcion" value='Cancelar'></center></div>
+                
+        </form>
+    </body>
+{% endblock %}

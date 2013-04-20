@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<body class = formato2>
+<form class='estilos' action="{{ url_for('admRol')}}" method="post">
+ <center><h1>ADMINISTRACION DE ROLES</h1></center>
+ <br>
+ <br>
+	<div style="height:150px;width:700px;overflow:scroll;">	
+		<table width="100%" border="1">
+		<tr>
+		<th scope="col">Nombre</th>
+		<th scope="col">Descripcion</th>
+		<th scope="col">OK</th>
+		</tr>
+		
+	  {% for rol in listRol %}
+	  	{% if rol.idrol != 100 %}
+			<tr>
+				<td>{{ rol.nombre }}</td>
+				<td>{{ rol.descripcion }}</td>
+				<td><input name="select" type="radio" value={{ rol.idrol }} checked/></td>
+			</tr>
+		{% endif %}  	
+  	{% endfor %}
+		
+		</table>
+	</div>	
+	<br></br>
+	 <center>
+	<input type="submit" name="opcion" value="Crear" />
+	<input type="submit" name="opcion" value="Modificar" />
+	<input type="submit" name="opcion" value="Eliminar" onclick="return confirmar('¿Está seguro que desea eliminar?')"/>
+	<input type="submit" name="opcion" value="Consultar" />
+	<br></br>
+	 </center>
+	<input type="text" name="buscar"/>
+	<select name="atributo">
+		<option value="nombre">Nombre</option>
+	</select>
+	<input type="submit" name="opcion" value="Buscar" />
+	 <br>
+ 	<br>
+	<center>
+	<input type="submit" name="opcion" value="Home" />
+	</center>
+</form>
+</body>
+{% endblock %}
