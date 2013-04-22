@@ -58,6 +58,24 @@ def menu():
     if request.method == 'GET':
         return render_template('main.html') 
     
+"""------------------------MODIFICAR CUENTA---------------------------------------"""    
+@app.route('/conCnt', methods=['GET','POST'])
+def conCnt():
+    if request.method == 'GET':
+            idusuario = CtrlAdmUsr.getIdByUsername(owner)        
+            usr = CtrlAdmUsr.usr(idusuario) 
+            return render_template('conCnt.html', usr=usr)  
+    if request.method == 'POST':
+        if(request.form['opcion'] == "Modificar"):
+            CtrlAdmUsr.modUsr(int(request.form['idusuario']), 
+                              request.form['username'], 
+                              request.form['passwrd'], 
+                              request.form['nombre'],
+                              request.form['apellido'],
+                              request.form['telefono'],
+                              int(request.form['ci']))
+            flash('Cuenta Modificada')
+        return redirect(url_for('menu'))           
 """------------------------USUARIOS---------------------------------------"""    
 @app.route('/admUsr', methods=['GET','POST'])
 def admUsr():
