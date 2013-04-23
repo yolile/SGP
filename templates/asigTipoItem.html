@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block body %}
+	<body class=formato1>
+        <form class='estilos' action="{{ url_for('asigTipoItem') }}" method=post>
+       	<center><h1>Asignar Tipo de Items a una fase</h1></center>
+          <br>
+          <br>
+          <div><input type='hidden' name='idfase' value=""></div>
+                      
+            <div><label>Tipos de Items<label></div>	
+			<div style="height:150px;width:200px;overflow:scroll;">	
+			<table width="50%" border="1">
+			<tr>
+			<th scope="col">Nombre</th>	
+			<th scope="col">OK</th>
+			</tr>
+
+  				{% for rol in listTipoItem %}
+					<tr>
+					<td>{{ tipoItem.nombre }}</td>
+                	<td><INPUT TYPE="checkbox" checked="checked" NAME="roles" VALUE="{{ tipoItem.idtipoItem}}"></td>  
+					</tr> 	
+  				{% endfor %}
+			</table>
+			</div>
+		    <div><center><input name='opcion' type='submit' value='Aceptar'>          <br>
+		    <div><center><input name='opcion' type='submit' value='Cancelar'>		    	     
+            </center></div>
+        </form>
+    </body>
+{% endblock %}

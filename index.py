@@ -319,7 +319,14 @@ def asigRolesFase():
     if request.method == 'POST':
         project=int(request.form['idproyecto'])
         if request.form['opcion']=="Aceptar":
-            return render_template('defFases.html')                                           
+            return render_template('defFases.html')
+        
+@app.route('/asigTipoItem', methods=['GET','POST'])
+def asigTipoItem():
+    if request.method == 'POST':
+        project=int(request.form['idproyecto'])
+        if request.form['opcion']=="Aceptar":
+            return render_template('defFases.html')                                                   
 """------------------------Tipos de Items---------------------------------------"""
 @app.route('/admTipoItem', methods=['GET','POST'])
 def admTipoItem():
