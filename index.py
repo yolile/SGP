@@ -299,8 +299,17 @@ def crearFase():
             global fasesCreadas
             fasesCreadas=fasesCreadas+1
         listaFases = CtrlAdmProy.getFasesListByProy(project)
-        return render_template('defFases.html',listFases=listaFases,proyecto=project)                      
-
+        return render_template('defFases.html',listFases=listaFases,proyecto=project) 
+                         
+"""------------------------Tipos de Items---------------------------------------"""
+@app.route('/tipoItem', methods=['GET','POST'])
+def tipoItem():
+    """Funcion que presenta la administracion de los tipos de Items del sistema"""  
+    if request.method == 'GET':
+        return render_template('tipoItem.html')
+    if request.method == 'POST':
+        if request.form['opcion'] == "Home":
+            return render_template('main.html') 
 
 if __name__=='__main__':
     app.run()
