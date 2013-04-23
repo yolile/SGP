@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block body %}
+<body class=formato1>
+        <form class='estilos' action="{{ url_for('addAtribTipoItem')}}" method="post">
+         <center><h1>Definicion de Atributo <br>de Tipo de Item</h1></center>
+          <br>
+          <br>
+          	<div><input type='hidden' name='idtipoitem' value="{{ idtipoitem }}"></div>
+            <div><label>Nombre Atributo:</label><input type='text' name="nombre"></div>
+            <div><label>Tipo de Dato:</label>
+				<select name="atributo">
+					<option value="INT">Entero</option>
+					<option value="VARCHAR">Varchar</option>
+					<option value="DATE">Fecha</option>
+					<option value="etc">completar lista</option>
+					
+				</select>
+            </div>
+            <div><label>Valor por Defecto</label>
+				<select name="atributo">
+					<option value="INT">0</option>
+					<option value="VARCHAR">null</option>
+					<option value="otros">otros</option>
+				</select>
+				<input type='text' name="">
+            </div>          
+            <div><center><input type='submit' name="opcion" value='Agregar'>
+            <input type='submit' name="opcion" value='Cancelar'></center></div>
+
+        </form>
+    </body>
+{% endblock %}

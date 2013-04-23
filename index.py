@@ -59,12 +59,12 @@ def menu():
         return render_template('main.html') 
     
 """------------------------MODIFICAR CUENTA---------------------------------------"""    
-@app.route('/conCnt', methods=['GET','POST'])
-def conCnt():
+@app.route('/confCnt', methods=['GET','POST'])
+def confCnt():
     if request.method == 'GET':
             idusuario = CtrlAdmUsr.getIdByUsername(owner)        
             usr = CtrlAdmUsr.usr(idusuario) 
-            return render_template('conCnt.html', usr=usr)  
+            return render_template('confCnt.html', usr=usr)  
     if request.method == 'POST':
         if(request.form['opcion'] == "Modificar"):
             CtrlAdmUsr.modUsr(int(request.form['idusuario']), 
@@ -247,6 +247,8 @@ def admProy():
             fasesCreadas=0
             proyectoRoy = int(request.form['select'])
             return redirect(url_for('defFases'))
+        if request.form['opcion'] == "Comite de Cambios":
+            return render_template('comiteCamb.html')
         if request.form['opcion'] == "Home":
             return render_template('main.html')
         return redirect(url_for('admProy'))                 
@@ -284,8 +286,12 @@ def defFases():
                  CtrlAdmProy.setProyIniciado(proy)
                  fasesCreadas = 0
              return redirect(url_for('admProy'))
+        if (request.form['opcion']=="Asignar Roles"):
+               return render_template('asigRolesFase.html')
+        if (request.form['opcion']=="Asignar Tipo de Item"):
+               return render_template('asigTipoItem.html')    
         return redirect(url_for('defFases'))
-
+           
 @app.route('/crearFase', methods=['GET','POST'])
 def crearFase():
     """Funcion que permite crear una fase de un proyecto"""
@@ -299,8 +305,54 @@ def crearFase():
             global fasesCreadas
             fasesCreadas=fasesCreadas+1
         listaFases = CtrlAdmProy.getFasesListByProy(project)
-        return render_template('defFases.html',listFases=listaFases,proyecto=project)                      
+        return render_template('defFases.html',listFases=listaFases,proyecto=project) 
 
+@app.route('/comiteCamb', methods=['GET','POST'])
+def comiteCamb():
+    if request.method == 'POST':
+        project=int(request.form['idproyecto'])
+        if request.form['opcion']=="Asignar/Desasignar Miembros":
+            return render_template('admProy.html')
+        
+@app.route('/asigRolesFase', methods=['GET','POST'])
+def asigRolesFase():
+    if request.method == 'POST':
+        project=int(request.form['idproyecto'])
+        if request.form['opcion']=="Aceptar":
+            return render_template('defFases.html')
+        
+@app.route('/asigTipoItem', methods=['GET','POST'])
+def asigTipoItem():
+    if request.method == 'POST':
+        project=int(request.form['idproyecto'])
+        if request.form['opcion']=="Aceptar":
+            return render_template('defFases.html')                                                   
+"""------------------------Tipos de Items---------------------------------------"""
+@app.route('/admTipoItem', methods=['GET','POST'])
+def admTipoItem():
+    """Funcion que presenta la administracion de los tipos de Items del sistema"""  
+    if request.method == 'GET':
+        return render_template('admTipoItem.html')
+    if request.method == 'POST':
+        if request.form['opcion'] == "Crear":
+            return render_template('crearTipoItem.html')
+        if request.form['opcion'] == "Consultar":
+            return render_template('conTipoItem.html')
+        if request.form['opcion'] == "Home":
+            return render_template('main.html') 
+        
+@app.route('/crearTipoItem', methods=['GET','POST'])
+def crearTipoItem():
+    if request.method == 'GET':
+        return render_template('crearTipoItem.html')
+    if request.method == 'POST':
+        if (request.form['opcion']=="AgregarAtributo"):
+            return render_template('addAtribTipoItem.html')
 
+@app.route('/addAtribTipoItem', methods=['GET','POST'])
+def addAtribTipoItem():
+    if request.method == 'POST':
+        if request.form['opcion']=="Crear":
+            return render_template('crearTipoItem.html') 
 if __name__=='__main__':
     app.run()
