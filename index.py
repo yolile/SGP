@@ -286,8 +286,12 @@ def defFases():
                  CtrlAdmProy.setProyIniciado(proy)
                  fasesCreadas = 0
              return redirect(url_for('admProy'))
+        if (request.form['opcion']=="Asignar Roles"):
+               return render_template('asigRolesFase.html')
+        if (request.form['opcion']=="Asignar Tipo de Item"):
+               return render_template('asigTipoItem.html')    
         return redirect(url_for('defFases'))
-
+           
 @app.route('/crearFase', methods=['GET','POST'])
 def crearFase():
     """Funcion que permite crear una fase de un proyecto"""
@@ -308,7 +312,14 @@ def comiteCamb():
     if request.method == 'POST':
         project=int(request.form['idproyecto'])
         if request.form['opcion']=="Asignar/Desasignar Miembros":
-            return render_template('admProy.html')                          
+            return render_template('admProy.html')
+        
+@app.route('/asigRolesFase', methods=['GET','POST'])
+def asigRolesFase():
+    if request.method == 'POST':
+        project=int(request.form['idproyecto'])
+        if request.form['opcion']=="Aceptar":
+            return render_template('defFases.html')                                           
 """------------------------Tipos de Items---------------------------------------"""
 @app.route('/admTipoItem', methods=['GET','POST'])
 def admTipoItem():
