@@ -314,6 +314,19 @@ def admTipoItem():
             return render_template('conTipoItem.html')
         if request.form['opcion'] == "Home":
             return render_template('main.html') 
+        
+@app.route('/crearTipoItem', methods=['GET','POST'])
+def crearTipoItem():
+    if request.method == 'GET':
+        return render_template('crearTipoItem.html')
+    if request.method == 'POST':
+        if (request.form['opcion']=="AgregarAtributo"):
+            return render_template('addAtribTipoItem.html')
 
+@app.route('/addAtribTipoItem', methods=['GET','POST'])
+def addAtribTipoItem():
+    if request.method == 'POST':
+        if request.form['opcion']=="Crear":
+            return render_template('crearTipoItem.html') 
 if __name__=='__main__':
     app.run()
