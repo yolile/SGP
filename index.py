@@ -302,12 +302,16 @@ def crearFase():
         return render_template('defFases.html',listFases=listaFases,proyecto=project) 
                          
 """------------------------Tipos de Items---------------------------------------"""
-@app.route('/tipoItem', methods=['GET','POST'])
-def tipoItem():
+@app.route('/admTipoItem', methods=['GET','POST'])
+def admTipoItem():
     """Funcion que presenta la administracion de los tipos de Items del sistema"""  
     if request.method == 'GET':
-        return render_template('tipoItem.html')
+        return render_template('admTipoItem.html')
     if request.method == 'POST':
+        if request.form['opcion'] == "Crear":
+            return render_template('crearTipoItem.html')
+        if request.form['opcion'] == "Consultar":
+            return render_template('conTipoItem.html')
         if request.form['opcion'] == "Home":
             return render_template('main.html') 
 
