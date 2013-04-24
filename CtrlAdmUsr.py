@@ -1,11 +1,6 @@
-#from Usuario import Usuario, get_table 
-import Usuario
-import RolUsuario
-import RolPermiso
-import CtrlAdmRol
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import mapper
-from sqlalchemy.sql import select
+from Modelo import Usuario, Permiso, Rol
+from sqlalchemy import create_engine, and_, func
+from sqlalchemy.orm import sessionmaker, join
 
 """Controlador de Administrador de Usuario."""  
 __author__ = 'Grupo 5'
@@ -15,50 +10,35 @@ __text__ = 'Este modulo contiene funciones que permiten el control de administra
 __file__ = 'CtrlAdmUsr.py'      
     
 engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgp')
-metadata = MetaData(bind=engine)
 
-usuario_table = Usuario.get_table(metadata)
-mapper(Usuario.Usuario, usuario_table)
-
-rolusuario_table = RolUsuario.get_table(metadata)
-mapper(RolUsuario.RolUsuario, rolusuario_table)
-
-conn = engine.connect()
+Session = sessionmaker(bind=engine)
+session = Session()
 
 def getUsuarioList():
     """Funcion que retorna la lista de todos los usuarios en la base de datos."""
-    s = select([usuario_table])
-    result = s.execute()
+    result = session.query(Usuario).all()
     return result
-def getRolUsuarioList():
-    """Funcion que retorna la lista de todos los rolusuarios en la base de datos."""   
-    s = select([rolusuario_table])
-    result = s.execute()
-    return result
-def idRolList(idusuario):
-    """Funcion que recibe el Id de un Rol y retorna la lista de rolpermisos del rol"""
-    lista = getRolUsuarioList()
-    idRolList=[]
-    for rolusuario in lista:
-        if(rolusuario.idusuario == idusuario):
-            idRolList.append(rolusuario.idrol)
-    return idRolList
+
 def validarUsuario(username, password):
     """Funcion que retorna verdadero si el usuario y password son correctos."""
-    usuarioList = getUsuarioList()
-    for user in usuarioList:
-        if username == user.username:
-            if password == user.passwrd:
-                return True
-    return False
+    usr = session.query(Usuario).filter(and_(Usuario.username==username,Usuario.passwrd==password)).first()
+    return (usr!=None)
 
-def buscarUsuario(username):
-    """Funcion para loguearse:retorna verdadero si el usuario se encuentra en la BD"""
-    usuarioList = getUsuarioList()
-    for user in usuarioList:
-        if username == user.username:
-            return True
-    return False
+def idRolList(idusuario):
+    """Funcion que recibe el Id de un Rol y retorna la lista de rolpermisos del rol"""
+    usr = session.query(Usuario).filter(Usuario.idusuario==idusuario).first()
+    idRolList=[]
+    for rol in usr.roles:
+        idRolList.append(rol.idrol)
+    return idRolList
+
+# def buscarUsuario(username):
+#     """Funcion para loguearse:retorna verdadero si el usuario se encuentra en la BD"""
+#     usuarioList = getUsuarioList()
+#     for user in usuarioList:
+#         if username == user.username:
+#             return True
+#     return False
 
 def getMayorIdUsuario():
     """Funcion que retorna el mayor idusuario en la tabla usuarios"""
@@ -72,142 +52,125 @@ def getMayorIdUsuario():
 def crearUsr(username,passwrd,nombre,apellido,telefono,ci):
     """Funcion que recibe los atributos de un usuario y lo periste en la base de datos."""
     idusuariomax=getMayorIdUsuario()
-    result = usuario_table.insert().execute(idusuario=idusuariomax+1,
-                                             username=username, 
-                                             passwrd=passwrd,
-                                             nombre=nombre, 
-                                             apellido=apellido, 
-                                             telefono=telefono, 
-                                             ci=ci)
+    nuevo = Usuario(idusuariomax+1,username,passwrd,nombre,apellido,telefono,ci)
+    session.add(nuevo)
+    session.commit()
+        
 
 def elimUsr(iduser):
     """Funcion que recibe el Id de un Usuario y elimina de la base de datos"""
-    conn.execute(rolusuario_table.delete().where(rolusuario_table.c.idusuario==iduser)) 
-    conn.execute(usuario_table.delete().where(usuario_table.c.idusuario==iduser)) 
-    
+    res = session.query(Usuario).filter(Usuario.idusuario==iduser).first()
+    session.delete(res)
+    session.commit()
     
 def modUsr(iduser,username,passwrd,nombre,apellido,telefono,ci):
     """Funcion que recibe los atributos de un usuario y lo modifica en la base de datos"""
-    conn.execute(usuario_table.update().
-                    where(usuario_table.c.idusuario==iduser).
-                    values(username=username,
-                           passwrd=passwrd,
-                           nombre=nombre,
-                           apellido=apellido,
-                           telefono=telefono,
-                           ci=ci)
-                )
+    usr = session.query(Usuario).filter(Usuario.idusuario==iduser).first()
+    usr.username = username
+    usr.passwrd = passwrd
+    usr.nombre = nombre
+    usr.apellido = apellido
+    usr.telefono = telefono
+    usr.ci = ci
+    session.commit()
+    
     
 def asigRoles(iduser,idRolList):
     """Funcion que recibe los roles a asignarse a un usuario """
-    conn.execute(rolusuario_table.delete().where(rolusuario_table.c.idusuario==iduser))
-    for idrol in idRolList:
-        result = rolusuario_table.insert().execute( idrol= int(idrol),
-                                                   idusuario= iduser)              
-
-def getId(iduser):
-    s = select([usuario_table],usuario_table.c.idusuario==iduser)
-    result = conn.execute(s)
-    row = result.fetchone()
-    return row['idusuario']
-def getUsername(iduser):
-    s = select([usuario_table],usuario_table.c.idusuario==iduser)
-    result = conn.execute(s)
-    row = result.fetchone()
-    return row['username']
-def getPasswrd(iduser):
-    s = select([usuario_table],usuario_table.c.idusuario==iduser)
-    result = conn.execute(s)
-    row = result.fetchone()
-    return row['passwrd']
-def getNombre(iduser):
-    s = select([usuario_table],usuario_table.c.idusuario==iduser)
-    result = conn.execute(s)
-    row = result.fetchone()
-    return row['nombre']
-def getApellido(iduser):
-    s = select([usuario_table],usuario_table.c.idusuario==iduser)
-    result = conn.execute(s)
-    row = result.fetchone()
-    return row['apellido']
-def getTelefono(iduser):
-    s = select([usuario_table],usuario_table.c.idusuario==iduser)
-    result = conn.execute(s)
-    row = result.fetchone()
-    return row['telefono']
-def getCi(iduser):
-    s = select([usuario_table],usuario_table.c.idusuario==iduser)
-    result = conn.execute(s)
-    row = result.fetchone()
-    return row['ci']
+    usr = session.query(Usuario).filter(Usuario.idusuario==iduser).first()
+    listaroles = session.query(Rol).filter(Rol.idrol.in_(idRolList)).all()
+    usr.roles = listaroles
+    session.commit()
+# 
+# def getId(iduser):
+#     s = select([usuario_table],usuario_table.c.idusuario==iduser)
+#     result = conn.execute(s)
+#     row = result.fetchone()
+#     return row['idusuario']
+# def getUsername(iduser):
+#     s = select([usuario_table],usuario_table.c.idusuario==iduser)
+#     result = conn.execute(s)
+#     row = result.fetchone()
+#     return row['username']
+# def getPasswrd(iduser):
+#     s = select([usuario_table],usuario_table.c.idusuario==iduser)
+#     result = conn.execute(s)
+#     row = result.fetchone()
+#     return row['passwrd']
+# def getNombre(iduser):
+#     s = select([usuario_table],usuario_table.c.idusuario==iduser)
+#     result = conn.execute(s)
+#     row = result.fetchone()
+#     return row['nombre']
+# def getApellido(iduser):
+#     s = select([usuario_table],usuario_table.c.idusuario==iduser)
+#     result = conn.execute(s)
+#     row = result.fetchone()
+#     return row['apellido']
+# def getTelefono(iduser):
+#     s = select([usuario_table],usuario_table.c.idusuario==iduser)
+#     result = conn.execute(s)
+#     row = result.fetchone()
+#     return row['telefono']
+# def getCi(iduser):
+#     s = select([usuario_table],usuario_table.c.idusuario==iduser)
+#     result = conn.execute(s)
+#     row = result.fetchone()
+#     return row['ci']
 
 def busquedaUsr(parametro,atributo):
     if atributo == 'nombre':
-        s = select([usuario_table],usuario_table.c.nombre.like(parametro+'%' ))
+        result = session.query(Usuario).filter(Usuario.nombre.like(parametro+'%')).all()
     if atributo == 'apellido':
-        s = select([usuario_table],usuario_table.c.apellido.like(parametro+'%' ))            
+        result = session.query(Usuario).filter(Usuario.apellido.like(parametro+'%')).all()
     if atributo == 'username':
-        s = select([usuario_table],usuario_table.c.username.like(parametro+'%' ))  
-    result = conn.execute(s)
+        result = session.query(Usuario).filter(Usuario.username.like(parametro+'%')).all()
     return result
 
 def usr(iduser):
     """Funcion que recibe el Id de un Usuario y retorna el objeto usuario"""
-    lista = getUsuarioList()
-    for user in lista:
-        if iduser == user.idusuario:
-            return user
+    usr = session.query(Usuario).filter(Usuario.idusuario==iduser).first()
+    return usr
         
 def havePermission(usr,permiso):
     """Funcion que recibe como parametro un username y el codigo de un permiso y
     verifica si el usuario puede tiene acceso a ese permiso"""
-    listaUsuario = getUsuarioList()
-    flag=0
-    for user in listaUsuario:
-        if usr == user.username:
-            flag=1
-            break
-    if flag==1:
-        listaRoles = idRolList(user.idusuario)  
-        for idRol in listaRoles:
-            listaPermiso = CtrlAdmRol.idPermisoList(idRol)
-            for idPermiso in listaPermiso:
-                if idPermiso == permiso:
-                    return True
+    lista = session.query(Usuario).join((Rol,Usuario.roles)).join((Permiso, Rol.permisos)).filter(Permiso.idpermiso==permiso).all()
+    for user in lista:
+        if user.username == usr:
+            return True
     return False
-
+    
 def getIdByUsername(usrname):
     """Funcion que retorna un idusuario dado un username"""
-    s = select([usuario_table],usuario_table.c.username==usrname)
-    result = conn.execute(s)
-    row = result.fetchone()
-    if(row != None):
-        return row['idusuario']
+    usr = session.query(Usuario).filter(Usuario.username==usrname).first()
+    if(usr != None):
+        return usr.idusuario
     else:
         raise Exception('No existe este usuario')
 
-def truncarUsuario():
-    trans = conn.begin()
-    try:
-        conn.execute('truncate table "public"."usuario" cascade')
-        trans.commit()
-    except :
-        trans.rollback()
-
-def truncarRolUsuario():
-    trans = conn.begin()
-    try:
-        conn.execute('truncate table "public"."rolusuario" cascade')
-        trans.commit()
-    except :
-        trans.rollback()
-
-def insertarUsuario(idusuario,username,passwrd,nombre,apellido,telefono,ci):
-    """Funcion utilizada en pruebas"""
-    result = usuario_table.insert().execute(idusuario=idusuario,
-                                             username=username, 
-                                             passwrd=passwrd,
-                                             nombre=nombre, 
-                                             apellido=apellido, 
-                                             telefono=telefono, 
-                                             ci=ci)
+# def truncarUsuario():
+#     trans = conn.begin()
+#     try:
+#         conn.execute('truncate table "public"."usuario" cascade')
+#         trans.commit()
+#     except :
+#         trans.rollback()
+# 
+# def truncarRolUsuario():
+#     trans = conn.begin()
+#     try:
+#         conn.execute('truncate table "public"."rolusuario" cascade')
+#         trans.commit()
+#     except :
+#         trans.rollback()
+# 
+# def insertarUsuario(idusuario,username,passwrd,nombre,apellido,telefono,ci):
+#     """Funcion utilizada en pruebas"""
+#     result = usuario_table.insert().execute(idusuario=idusuario,
+#                                              username=username, 
+#                                              passwrd=passwrd,
+#                                              nombre=nombre, 
+#                                              apellido=apellido, 
+#                                              telefono=telefono, 
+#                                              ci=ci)

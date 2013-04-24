@@ -1,11 +1,7 @@
 from CtrlAdmUsr import getIdByUsername
-import RolUsuario
-import RolPermiso
-import Proyecto
-import Fase
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import mapper
-from sqlalchemy.sql import select
+from Modelo import Fase, Proyecto
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from datetime import *
 
 """Controlador de Administrador de Proyectos."""  
@@ -16,19 +12,12 @@ __text__ = 'Este modulo contiene funciones que permiten el control de administra
 __file__ = 'CtrlAdmProy.py'      
     
 engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgp')
-metadata = MetaData(bind=engine)
-proyecto_table = Proyecto.get_table(metadata)
-mapper(Proyecto.Proyecto, proyecto_table)
-conn = engine.connect()
-
-fase_table = Fase.get_table(metadata)
-mapper(Fase.Fase, fase_table)
-connfase = engine.connect()
+Session = sessionmaker(bind=engine)
+session = Session() 
 
 def getProyectoList(): 
     """Funcion que retorna la lista de todos los proyectos en la base de datos."""
-    s = select([proyecto_table])
-    result = s.execute()
+    result = session.query(Proyecto).all()
     return result
 
 def getMayorIdProyecto():
@@ -44,34 +33,24 @@ def crearProy (nombre,descripcion,presupuesto,liderusername):
     idproyectomax = getMayorIdProyecto()
     usuariolider = getIdByUsername(liderusername)
     fechaactual = date.today()
-    result = proyecto_table.insert().execute(idproyecto=idproyectomax+1,
-                                             nombre=nombre, 
-                                             descripcion=descripcion,
-                                             fechacreacion=fechaactual, 
-                                             complejidad=0, 
-                                             estado='no-iniciado', 
-                                             usuariolider=usuariolider,
-                                             presupuesto=presupuesto
-                                             )
-
+    proy_nuevo = Proyecto(idproyectomax+1,nombre,descripcion,fechaactual,0,'no-iniciado',usuariolider,presupuesto)
+    session.add(proy_nuevo)
+    session.commit()
+    
 def proy(idproyecto):
     """Funcion que recibe el Id de un Proyecto y retorna el objeto proyecto"""
-    lista = getProyectoList()
-    for project in lista:
-        if idproyecto == project.idproyecto:
-            return project
+    proy = session.query(Proyecto).filter(Proyecto.idproyecto).first()
+    return proy
 
 def getFasesList():
     """Funcion que retorna la lista de todas las fases dentro del sistema"""
-    s = select([fase_table])
-    result=connfase.execute(s)
+    result = session.query(Fase).all()
     return result
 
 def getFasesListByProy(idproyecto):
     """Funcion que recibe el Id de un Proyecto y retorna su lista de fases"""
-    s = select([fase_table],fase_table.c.idproyecto==idproyecto).order_by(fase_table.c.posicionfase)
-    result = connfase.execute(s)
-    return result
+    faseList = session.query(Fase).filter(Fase.idproyecto==idproyecto).all()
+    return faseList
 
 def getMaxSeqProy(idproyecto):
     """Funcion que recibe el ID de un proyecto y devuelve el numero maximo
@@ -84,11 +63,9 @@ def getMaxSeqProy(idproyecto):
     return result
 
 def getFase(idfase):
-    lista = getFasesList()
-    for fase in lista:
-        if idfase == fase.idfase:
-            return fase
-
+    fase = session.query(Fase).filter(Fase.idfase==idfase).first()
+    return fase
+    
 def getMaxIdFase():
     """Funcion que retorna el mayor idfase en la tabla fase"""
     lista = getFasesList()
@@ -101,35 +78,31 @@ def getMaxIdFase():
 def crearFase(nombre,descripcion,idproyecto):
     maxsecuencia = getMaxSeqProy(idproyecto)
     maxidfase = getMaxIdFase()
-    result = fase_table.insert().execute(idfase=maxidfase+1,
-                                             idproyecto=idproyecto, 
-                                             posicionfase=maxsecuencia+1,
-                                             nombre=nombre, 
-                                             descripcion=descripcion
-                                             )
+    nueva_fase = Fase(maxidfase+1,idproyecto,maxsecuencia+1,nombre,descripcion)
+    session.add(nueva_fase)
+    session.commit()
+    
 def setProyIniciado(idproyecto):
-    conn.execute(proyecto_table.update().
-                    where(proyecto_table.c.idproyecto==idproyecto).
-                    values(estado='iniciado'))
+    proy = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
+    proy.estado = 'iniciado'
+    session.commit() 
                     
 def getProyEstado(idproyecto):
-    s = select([proyecto_table],proyecto_table.c.idproyecto==idproyecto)
-    result = conn.execute(s)
-    row = result.fetchone()
-    return row['estado']
+    proy = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
+    return proy.estado
 
-def truncarProyecto():
-    trans = conn.begin()
-    try:
-        conn.execute('truncate table "public"."proyecto" cascade')
-        trans.commit()
-    except :
-        trans.rollback()
-        
-def truncarFase():
-    trans = connfase.begin()
-    try:
-        connfase.execute('truncate table "public"."fase" cascade')
-        trans.commit()
-    except :
-        trans.rollback()
+# def truncarProyecto():
+#     trans = conn.begin()
+#     try:
+#         conn.execute('truncate table "public"."proyecto" cascade')
+#         trans.commit()
+#     except :
+#         trans.rollback()
+#         
+# def truncarFase():
+#     trans = connfase.begin()
+#     try:
+#         connfase.execute('truncate table "public"."fase" cascade')
+#         trans.commit()
+#     except :
+#         trans.rollback()
