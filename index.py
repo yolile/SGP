@@ -190,6 +190,12 @@ def admRol():
             return render_template('conRol.html', rol=rol,
                                                     idpermisos=idpermisos,
                                                     listPermiso=listPermiso)
+        if request.form['opcion'] == "Buscar":
+            listRol = CtrlAdmRol.busquedaRol(request.form['buscar'],
+                                         request.form['atributo'])
+            flash('Resultado de la busqueda')
+            return render_template('admRol.html', listRol=listRol)
+        
         if request.form['opcion'] == "Home":
             return render_template('main.html') 
         
@@ -248,7 +254,11 @@ def admProy():
             proyectoRoy = int(request.form['select'])
             return redirect(url_for('defFases'))
         if request.form['opcion'] == "Comite de Cambios":
-            return render_template('comiteCamb.html')
+            listUser = CtrlAdmUsr.getUsuarioList()
+            return render_template('comiteCamb.html', 
+                                   listUser=listUser, 
+                                   owner=owner, 
+                                   idproyecto=request.form['select'])
         if request.form['opcion'] == "Home":
             return render_template('main.html')
         return redirect(url_for('admProy'))                 
@@ -310,9 +320,18 @@ def crearFase():
 @app.route('/comiteCamb', methods=['GET','POST'])
 def comiteCamb():
     if request.method == 'POST':
-        project=int(request.form['idproyecto'])
         if request.form['opcion']=="Asignar/Desasignar Miembros":
-            return render_template('admProy.html')
+            if (len(request.form.getlist('idusuarioList')) % 2 == 0):
+                CtrlAdmProy.asigComiteCamb(int(request.form['idproyecto']),
+                                 request.form.getlist('idusuarioList'))
+            else:
+                listUser = CtrlAdmUsr.getUsuarioList()
+                return render_template('comiteCamb.html', 
+                                   listUser=listUser, 
+                                   owner=owner, 
+                                   idproyecto=request.form['idproyecto'],
+                                   error="El numero de miembros debe ser par")
+        return redirect(url_for('admProy'))
         
 @app.route('/asigRolesFase', methods=['GET','POST'])
 def asigRolesFase():
@@ -354,5 +373,6 @@ def addAtribTipoItem():
     if request.method == 'POST':
         if request.form['opcion']=="Crear":
             return render_template('crearTipoItem.html') 
+
 if __name__=='__main__':
     app.run()

@@ -1,9 +1,9 @@
-from Modelo import Permiso, Rol
+from Modelo import Permiso, Rol, engine
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
    
     
-engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgp')
+#engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgptest')
 
 Session = sessionmaker(bind=engine)
 session = Session()   
@@ -91,6 +91,12 @@ def elimRol(idrol):
     res = session.query(Rol).filter(Rol.idrol==idrol).first()
     session.delete(res)
     session.commit()
+    
+def busquedaRol(parametro,atributo):
+    if atributo == 'nombre':
+        result = session.query(Rol).filter(Rol.nombre.like(parametro+'%')).all()
+    return result
+
     
 # def truncarPermiso():
 #     trans = conn.begin()
