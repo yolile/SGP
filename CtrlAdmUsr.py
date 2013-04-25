@@ -1,4 +1,4 @@
-from Modelo import Usuario, Permiso, Rol
+from Modelo import Usuario, Permiso, Rol, engine
 from sqlalchemy import create_engine, and_, func
 from sqlalchemy.orm import sessionmaker, join
 
@@ -9,7 +9,7 @@ __version__ = '1.0'
 __text__ = 'Este modulo contiene funciones que permiten el control de administracion de usuarios'
 __file__ = 'CtrlAdmUsr.py'      
     
-engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgp')
+#engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgptest')
 
 Session = sessionmaker(bind=engine)
 session = Session()

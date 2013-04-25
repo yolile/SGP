@@ -1,5 +1,5 @@
 from CtrlAdmUsr import getIdByUsername
-from Modelo import Fase, Proyecto
+from Modelo import Fase, Proyecto, Usuario, engine
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import *
@@ -11,9 +11,9 @@ __version__ = '1.0'
 __text__ = 'Este modulo contiene funciones que permiten el control de administracion de proyectos'
 __file__ = 'CtrlAdmProy.py'      
     
-engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgp')
+#engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgptest')
 Session = sessionmaker(bind=engine)
-session = Session() 
+session = Session()     
 
 def getProyectoList(): 
     """Funcion que retorna la lista de todos los proyectos en la base de datos."""
@@ -39,7 +39,7 @@ def crearProy (nombre,descripcion,presupuesto,liderusername):
     
 def proy(idproyecto):
     """Funcion que recibe el Id de un Proyecto y retorna el objeto proyecto"""
-    proy = session.query(Proyecto).filter(Proyecto.idproyecto).first()
+    proy = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
     return proy
 
 def getFasesList():
@@ -91,6 +91,12 @@ def getProyEstado(idproyecto):
     proy = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
     return proy.estado
 
+def asigComiteCamb(idproyecto, idusuarioList):
+    proyecto = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
+    listausuario = session.query(Usuario).filter(Usuario.idusuario.in_(idusuarioList)).all()
+    proyecto.comitecambios=listausuario
+    session.commit()
+    
 # def truncarProyecto():
 #     trans = conn.begin()
 #     try:
