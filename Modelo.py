@@ -12,7 +12,7 @@ __credits__ = 'none'
 __text__ = 'Modulo con las clases y las tablas relacionadas entre si'
 __file__ = 'Modelo.py' 
 
-engine = create_engine('postgresql+psycopg2://admin:admin@localhost/newsgp')
+engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgp')
 Base = declarative_base()
 
 """------------------------TABLAS DE RELACION---------------------------------------"""
@@ -215,7 +215,7 @@ class Item(Base):
     estado = Column(String(45))
     idtipoitem = Column(Integer, ForeignKey('tipoitem.idtipoitem'))
     idfase = Column(Integer, ForeignKey('fase.idfase'))        
-    #idlineabase = Column (Integer,ForeignKey ('lineabase.idlineabase'))
+    idlineabase = Column (Integer,ForeignKey ('lineabase.idlineabase'))
  
     def __init__(self, iditem, nombre, estado, idtipoitem,idfase):
         self.iditem = iditem
@@ -223,66 +223,66 @@ class Item(Base):
         self.estado = estado
         self.idtipoitem = idtipoitem
         self.idfase = idfase
-        #self.idlineabase = idlineabase               
+        self.idlineabase = idlineabase               
  
  
     def __repr__(self):
         return "<Item '%s' '%s' '%s' '%s' '%s' '%s' '%s'>" % self.idtipoitem, self.nombre,self.estado, self.idtipoitem, self.idfase, self.lineabase
         
 """------------------------VERSION DEL ITEM---------------------------------------"""
-# class VersionItem(Base):
-#     __tablename__ = 'versionitem'
-#     idversionitem = Column(Integer, primary_key=True)   
-#     iditem = Column(Integer,ForeignKey('item.iditem'), primary_key=True) 
-#     idusuario = Column (Integer, ForeignKey('usuario.idusuario'))
-#     descripcion = Column(String(160))
-#     complejidad = Column(Integer)
-#     prioridad = Column(Integer)
-#     costo = Column(Integer)                   
-# 
-#     def __init__(self, idversionitem, iditem, idusuario,descripcion,complejidad,prioridad,costo):
-#         self.idversionitem = idversionitem
-#         self.iditem = iditem
-#         self.idusuario = idusuario
-#         self.descripcion = descripcion
-#         self.complejidad = complejidad
-#         self.prioridad = prioridad
-#         self.costo = costo        
-# 
-#     def __repr__(self):
-#         return "<Item '%s' '%s' '%s' '%s' '%s' '%s' '%s'>" % self.idversionitem, self.iditem, self.idusuario, self.descripcion, self.complejidad, self.prioridad, self.costo
+class VersionItem(Base):
+    __tablename__ = 'versionitem'
+    idversionitem = Column(Integer, primary_key=True)   
+    iditem = Column(Integer,ForeignKey('item.iditem')) 
+    idusuario = Column (Integer, ForeignKey('usuario.idusuario'))
+    descripcion = Column(String(160))
+    complejidad = Column(Integer)
+    prioridad = Column(Integer)
+    costo = Column(Integer)                   
+
+    def __init__(self, idversionitem, iditem, idusuario,descripcion,complejidad,prioridad,costo):
+        self.idversionitem = idversionitem
+        self.iditem = iditem
+        self.idusuario = idusuario
+        self.descripcion = descripcion
+        self.complejidad = complejidad
+        self.prioridad = prioridad
+        self.costo = costo        
+
+    def __repr__(self):
+        return "<Item '%s' '%s' '%s' '%s' '%s' '%s' '%s'>" % self.idversionitem, self.iditem, self.idusuario, self.descripcion, self.complejidad, self.prioridad, self.costo
     
 """------------------------RELACION ENTRE ITEMS---------------------------------------"""
-# class Relacion(Base):
-#     __tablename__ = 'relacion'
-#     delitem = Column(Integer,ForeignKey('item.iditem'), primary_key=True)   
-#     alitem = Column(Integer,ForeignKey('item.iditem'), primary_key=True)
-#     tipo = Column(String(45))
-# 
-#     def __init__(self, delitem, alitem,tipo):
-#         self.delitem = delitem
-#         self.alitem = alitem
-#         self.tipo = tipo
-# 
-#     def __repr__(self):
-#         return "<Item '%s' '%s' '%s'>" % self.delitem, self.alitem, self.tipo
+class Relacion(Base):
+    __tablename__ = 'relacion'
+    delitem = Column(Integer,ForeignKey('item.iditem'), primary_key=True)   
+    alitem = Column(Integer,ForeignKey('item.iditem'), primary_key=True)
+    tipo = Column(String(45))
+
+    def __init__(self, delitem, alitem,tipo):
+        self.delitem = delitem
+        self.alitem = alitem
+        self.tipo = tipo
+
+    def __repr__(self):
+        return "<Item '%s' '%s' '%s'>" % self.delitem, self.alitem, self.tipo
  
 """------------------------LINEA BASE---------------------------------------"""
-# class LineaBase(Base):
-#     __tablename__ = 'lineabase'
-#     idlineabase = Column(Integer,primary_key=True)   
-#     idfase = Column(Integer,ForeignKey('fase.idfase'))
-#     estado = Column(String(45))
-#     numero = Column(Integer)
-#     
-#     def __init__(self, idlineabase, idfase, estado,numero):
-#         self.idlineabase = idlineabase
-#         self.idfase = idfase
-#         self.estado = estado
-#         selnumero = numero
-# 
-# 
-#     def __repr__(self):
-#         return "<LineaBase'%s' '%s' '%s' '%s'>" % self.idlineabase, self.idfase, self.estado, self.numero  
+class LineaBase(Base):
+    __tablename__ = 'lineabase'
+    idlineabase = Column(Integer,primary_key=True)   
+    idfase = Column(Integer,ForeignKey('fase.idfase'))
+    estado = Column(String(45))
+    numero = Column(Integer)
     
+    def __init__(self, idlineabase, idfase, estado,numero):
+        self.idlineabase = idlineabase
+        self.idfase = idfase
+        self.estado = estado
+        selnumero = numero
+
+
+    def __repr__(self):
+        return "<LineaBase'%s' '%s' '%s' '%s'>" % self.idlineabase, self.idfase, self.estado, self.numero
+        
 Base.metadata.create_all(engine)  
