@@ -75,7 +75,8 @@ def confCnt():
                               request.form['telefono'],
                               int(request.form['ci']))
             flash('Cuenta Modificada')
-        return redirect(url_for('menu'))           
+        return redirect(url_for('menu'))
+               
 """------------------------USUARIOS---------------------------------------"""    
 @app.route('/admUsr', methods=['GET','POST'])
 def admUsr():
@@ -347,6 +348,8 @@ def asigTipoItem():
         project=int(request.form['idproyecto'])
         if request.form['opcion']=="Aceptar":
             return render_template('defFases.html')
+        
+"""-------------------------MODULO DE DESARROLLO---------------------------------------"""        
                                                            
 """------------------------Tipos de Items---------------------------------------"""
 @app.route('/admTipoItem', methods=['GET','POST'])
@@ -394,7 +397,23 @@ def relacion():
         return render_template('relacion.html')
     if request.method == 'POST':
         if request.form['opcion'] == "Home":
-            return render_template('main.html')                        
-
+            return render_template('main.html')
+                                
+"""---------------------Abrir Proyecto-----------------------------------"""
+@app.route('/abrirProyecto', methods=['GET','POST'])
+def abrirProyecto():
+    """Funcion para seleccionar el proyecto a ser utilizado en el modo de desarrollo"""  
+    if request.method == 'GET':
+        if CtrlAdmUsr.havePermission(owner,202):
+            listaProy = CtrlAdmProy.getProyectoList()
+            return render_template('abrirProyecto.html',listProy=listaProy)
+        else:
+            flash('No tiene permisos para realizar esta operacion ')
+            return redirect(url_for('menu')) 
+    if request.method == 'POST':
+        if request.form['opcion'] == "Home":
+            return render_template('main.html')
+        return redirect(url_for('admProy'))    
+              
 if __name__=='__main__':
     app.run()
