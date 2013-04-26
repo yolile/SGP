@@ -411,9 +411,10 @@ def abrirProyecto():
             flash('No tiene permisos para realizar esta operacion ')
             return redirect(url_for('menu')) 
     if request.method == 'POST':
+        if request.form['opcion'] == "Abrir":
+            return render_template('main.html')
         if request.form['opcion'] == "Home":
             return render_template('main.html')
-        return redirect(url_for('admProy'))    
-              
+        return redirect(url_for('abrirProyecto'))     
 if __name__=='__main__':
     app.run()
