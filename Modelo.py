@@ -1,4 +1,5 @@
 from sqlalchemy import Table, Integer, ForeignKey, String, Column, Date, create_engine
+from sqlalchemy import Sequence
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -11,7 +12,7 @@ __credits__ = 'none'
 __text__ = 'Modulo con las clases y las tablas relacionadas entre si'
 __file__ = 'Modelo.py' 
 
-engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgptest')
+engine = create_engine('postgresql+psycopg2://admin:admin@localhost/newsgp')
 Base = declarative_base()
 
 """------------------------TABLAS DE RELACION---------------------------------------"""
@@ -38,10 +39,10 @@ ComiteCambios = Table('comitecambios', Base.metadata,
                                             primary_key=True)
 )
 
-# TipoItemFase = Table('tipoitemfase',Base.metadata,
-#     Column('idtipoitem', Integer, ForeignKey('tipoitem.idtipoitem'),primary_key=True),
-#     Column('idfase', Integer, ForeignKey('fase.idfase'),primary_key=True)
-# )
+TipoItemFase = Table('tipoitemfase',Base.metadata,
+    Column('idtipoitem', Integer, ForeignKey('tipoitem.idtipoitem'),primary_key=True),
+    Column('idfase', Integer, ForeignKey('fase.idfase'),primary_key=True)
+)
 
 """------------------------USUARIO---------------------------------------""" 
 class Usuario(Base):
@@ -141,7 +142,7 @@ class Fase(Base):
     nombre = Column(String(45))
     descripcion = Column(String(45))
     roles = relationship("Rol", secondary=RolFase)
-#     tipositems = relationship("TipoItem", secondary=TipoItemFase)
+    tipositems = relationship("TipoItem", secondary=TipoItemFase)
     
     def __init__(self, idfase, idproyecto, posicionfase, nombre, descripcion):
         self.idfase = idfase
@@ -155,87 +156,78 @@ class Fase(Base):
         return "<Fase '%s' '%s' '%s' '%s' '%s' '%s' '%s'>" % self.idfase, self.idproyecto, self.posicionfase, self.nombre, self.descripcion 
 
 """------------------------TIPO DE ITEM---------------------------------------"""
-# class TipoItem(Base):
-#     __tablename__ = 'tipoitem'
-#     idtipoitem = Column(Integer,primary_key=True)
-#     nombre = Column(String(160))
-#     descripcion = Column(String(300))
-#     atributos = relationship("AtributoTipo")
-# 
-#     def __init__(self, idtipoitem,nombre, descripcion):
-#         self.idtipoitem = idtipoitem
-#         self.nombre = nombre
-#         self.descripcion = descripcion
-# 
-# 
-#     def __repr__(self):
-#         return "<TipoItem '%s' '%s' '%s'>" % self.idtipoitem, self.nombre, self.descripcion
+class TipoItem(Base):
+    __tablename__ = 'tipoitem'
+    idtipoitem = Column(Integer,Sequence('sec_idtipoitem'),primary_key=True)
+    nombre = Column(String(160))
+    descripcion = Column(String(300))
+    atributos = relationship("AtributoTipo")
+ 
+    def __init__(self,nombre, descripcion):
+        #self.idtipoitem = idtipoitem #La secuencia se encargara de esto
+        self.nombre = nombre
+        self.descripcion = descripcion
+ 
+ 
+    def __repr__(self):
+        return "<TipoItem '%s' '%s' '%s'>" % self.idtipoitem, self.nombre, self.descripcion
     
 """------------------------ATRIBUTO POR TIPO DE ITEM---------------------------------------"""
-# class AtributoTipo(Base):
-#     __tablename__ = 'atributotipo'
-#     idatributo = Column(Integer,primary_key=True)
-#     nombre = Column(String(160))
-#     tipo = Column(String(45))
-#     valordefecto = Column(String(45))
-#     idtipoitem = Column(Integer,ForeignKey('tipoitem.idtipoitem',
-#                                             onupdate="CASCADE",
-#                                             ondelete="CASCADE"))
-# 
-# 
-#     def __init__(self, idatributo,nombre, tipo, valordefecto,idtipoitem):
-#         self.idatributo = idatributo
-#         self.nombre = nombre
-#         self.tipo = tipo
-#         self.valordefecto = valordefecto
-#         self.idtipoitem = idtipoitem
-# 
-# 
-#     def __repr__(self):
-#         return "<AtributoTipo '%s' '%s' '%s' '%s' '%s'>" % self.idatributo, self.nombre, self.tipo, self.valordefecto, self.idtipoitem
+class AtributoTipo(Base):
+    __tablename__ = 'atributotipo'
+    idatributo = Column(Integer,Sequence('sec_atributotipo'),primary_key=True)
+    idtipoitem = Column(Integer,ForeignKey('tipoitem.idtipoitem',
+                                        onupdate="CASCADE",
+                                        ondelete="CASCADE"))
+    nombre = Column(String(160))
+    tipo = Column(String(45))
+    valordefecto = Column(String(45))
+
+    def __init__(self,idtipoitem, nombre, tipo, valordefecto):
+        self.idtipoitem = idtipoitem
+        self.nombre = nombre
+        self.tipo = tipo
+        self.valordefecto = valordefecto
+
+    def __repr__(self):
+        return "<AtributoTipo '%s' '%s' '%s' '%s' '%s'>" % self.idatributo, self.idtipoitem, self.nombre, self.tipo, self.valordefecto
         
 """------------------------ATRIBUTO DE ITEM POR TIPO DE ITEM---------------------------------------"""
-# class AtributoItemPorTipo(Base):
-#     __tablename__ = 'atributoitemportipo'
-#     iditem = Column(Integer, ForeignKey('versionitem.iditem'),primary_key=True)
-#     nroversion= Column(Integer,ForeignKey('versionitem.idversionitem'),primary_key=True)
-#     idatributo = Column(Integer,ForeignKey('atributotipo.idatributo'),primary_key=True)
-#     valor = Column(String(45))
-#       
-# 
-#     def __init__(self, iditem, nroversion, idatributo, valor):
-#         self.iditem = iditem
-#         self.nroversion = nroversion
-#         self.idatributo = idatributo
-#         self.valor = valor
-# 
-# 
-#     def __repr__(self):
-#         return "<AtributoItemPorTipo '%s' '%s' '%s' '%s'>" % self.iditem, self.nroversion, self.idatributo, self.valor
+class AtributoItemPorTipo(Base):
+    __tablename__ = 'atributoitemportipo'
+    iditem = Column(Integer, ForeignKey('item.iditem'),primary_key=True)
+    idatributo = Column(Integer,ForeignKey('atributotipo.idatributo'),primary_key=True)
+    valor = Column(String(45))
+       
+    def __init__(self, iditem, idatributo, valor):
+        self.iditem = iditem
+        self.idatributo = idatributo
+        self.valor = valor
+ 
+    def __repr__(self):
+        return "<AtributoItemPorTipo '%s' '%s' '%s' '%s'>" % self.iditem, self.idatributo, self.valor
        
 """------------------------ITEM---------------------------------------"""
-# class Item(Base):
-#     __tablename__ = 'item'
-#     iditem = Column(Integer,primary_key=True)
-#     nombre = Column(String(160))
-#     #versionactual = Column(Integer, ForeignKey ('versionitem.idversionitem'))
-#     estado = Column(String(45))
-#     idtipoitem = Column(Integer, ForeignKey('tipoitem.idtipoitem'))
-#     idfase = Column(Integer, ForeignKey('fase.idfase'))        
-#     idlineabase = Column (Integer,ForeignKey ('lineabase.idlineabase'))
-# 
-#     def __init__(self, iditem, nombre, estado, idtipoitem,idfase,idlineabase):
-#         self.iditem = iditem
-#         self.nombre = nombre 
-#         #self.versionactual = versionactual
-#         self.estado = estado
-#         self.idtipoitem = idtipoitem
-#         self.idfase = idfase
-#         self.idlineabase = idlineabase               
-# 
-# 
-#     def __repr__(self):
-#         return "<Item '%s' '%s' '%s' '%s' '%s' '%s' '%s'>" % self.idtipoitem, self.nombre,self.estado, self.idtipoitem, self.idfase, self.lineabase
+class Item(Base):
+    __tablename__ = 'item'
+    iditem = Column(Integer,primary_key=True)
+    nombre = Column(String(160))
+    estado = Column(String(45))
+    idtipoitem = Column(Integer, ForeignKey('tipoitem.idtipoitem'))
+    idfase = Column(Integer, ForeignKey('fase.idfase'))        
+    #idlineabase = Column (Integer,ForeignKey ('lineabase.idlineabase'))
+ 
+    def __init__(self, iditem, nombre, estado, idtipoitem,idfase):
+        self.iditem = iditem
+        self.nombre = nombre 
+        self.estado = estado
+        self.idtipoitem = idtipoitem
+        self.idfase = idfase
+        #self.idlineabase = idlineabase               
+ 
+ 
+    def __repr__(self):
+        return "<Item '%s' '%s' '%s' '%s' '%s' '%s' '%s'>" % self.idtipoitem, self.nombre,self.estado, self.idtipoitem, self.idfase, self.lineabase
         
 """------------------------VERSION DEL ITEM---------------------------------------"""
 # class VersionItem(Base):
