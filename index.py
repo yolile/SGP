@@ -385,7 +385,16 @@ def crearItem():
     if request.method == 'POST':
         if request.form['opcion'] == "Home":
             return render_template('main.html')
-                
+
+"""-----------------------Relacion entre Items---------------------------------------"""
+@app.route('/relacion', methods=['GET','POST'])
+def relacion():
+    """Funcion para relacionar los items"""  
+    if request.method == 'GET':
+        return render_template('relacion.html')
+    if request.method == 'POST':
+        if request.form['opcion'] == "Home":
+            return render_template('main.html')                        
 
 if __name__=='__main__':
     app.run()
