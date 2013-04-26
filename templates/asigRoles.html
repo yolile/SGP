@@ -10,8 +10,9 @@
             <div><label>Apellidos:</label>{{ usr.apellido }}</div>
             <div><label>Username:</label>{{ usr.username }}</div>
                       
-            <div><label>Roles<label></div>	
-			<div style="height:150px;width:200px;overflow:scroll;">	
+            <div><label>Roles<label></div>
+           	<center> 	
+			<div style="height:150px;width:170px;overflow:scroll;">	
 			<table width="50%" border="1">
 			<tr>
 			<th scope="col">Nombre</th>	
@@ -31,10 +32,11 @@
 						{% endif %}  	
   				{% endfor %}
 			</table>
-			</div>
-		    <div><center><input name='opcion' type='submit' value='Aceptar'>          <br>
-		    <div><center><input name='opcion' type='submit' value='Cancelar'>		    	     
-            </center></div>
+			</div></center>
+		    <div><center>
+		    <input name='opcion' type='submit' value='Aceptar'>
+		    <input name='opcion' type='submit' value='Cancelar'>		    	     
+			</center></div>
         </form>
     </body>
 {% endblock %}

@@ -21,7 +21,7 @@
     height: 1000px;
     margin: auto;
     background-color: #E2ECEE;
-}
+    
 
 .flash { 
 	background: #CEE5F5; padding: 0.5em;
