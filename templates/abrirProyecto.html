@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block body %}
+
+ <body class = formato4>
+
+<form class='estilos' action="{{ url_for('abrirProyecto')}}" method="post">
+
+ <center><h1>Seleccionar Proyecto</h1></center>
+ <br>
+ <br>
+	<div style="height:250px;width:500px;overflow:scroll;">	
+	
+	<table width="100%" border="1">
+	<tr>
+	<th scope="col">Nombre</th>
+	<th scope="col">Fecha Creacion</th>
+	<th scope="col">Lider</th>
+	<th scope="col">OK</th>
+	</tr>
+
+		  {% for proyecto in listProy %}
+	<tr>
+	<td>{{ proyecto.nombre }}</td>
+	<td>{{ proyecto.fechacreacion}}</td>	
+	<td>{{ proyecto.usuariolider }}</td>
+	<td><input name="select" type="radio" value={{ proyecto.idproyecto }} checked /></td>
+	</tr>  	
+	  	{% endfor %}
+	  	
+
+	</table>
+	</div>	
+
+	<div><center><input type="submit" name="opcion" value="Abrir " />
+	<input type="submit" name="opcion" value="Home" /></center></div>
+	<input type="text" name="buscar"/>
+	<select name="atributo">
+		<option value="nombre">Nombre</option>
+		<option value="fechaCreacion">Fecha de Creacion</option>
+		<option value="lider">Lider</option>
+	</select>
+	<input type="submit" name="opcion" value="Buscar" />
+	</form>
+	</body>
+{% endblock %}

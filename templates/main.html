@@ -7,18 +7,19 @@
 	<ul class="nav">
 	    <li><a href="">Modulo de <br> Administracion</a>
 		 <ul>
-		      <li><a href="{{ url_for('admUsr') }}">Usuario</a></li>
+		      <li><a href="{{ url_for('admUsr') }}">Usuarios</a></li>
 		      <li><a href="{{ url_for('admRol') }}">Roles</a></li>
 		      <li><a href="{{ url_for('conPerm') }}">Permisos</a></li>
-		      <li><a href="{{ url_for('admProy') }}">Proyecto</a></li>
+		      <li><a href="{{ url_for('admProy') }}">Proyectos</a></li>
 
 		  </ul>
 	    </li>
 	    <li><a href="">  Modulo de    <br>Desarrollo</a>
 		<ul>
-		      <li><a href="{{ url_for('admTipoItem') }}">Tipos de Items</a></li>
-		    <li><a href="">Menu 2</a></li>
-		    <li><a href="">Menu 3</a>
+		    	<li><a href="{{ url_for('admTipoItem') }}">Tipos de Items</a></li>
+		    	<li><a href="{{ url_for('abrirProyecto') }}">Abrir Proyecto</a></li>		    	
+  	
+		    	<li><a href="">menu3</a>
 		        <ul>
 		            <li><a href="">Submenu 1</a></li>
 		            <li><a href="">Submenu 2</a></li>
@@ -38,8 +39,8 @@
 
 	    <li><a href="">Modulo de <br>Gestion de Cambios</a>
 		<ul>
-		    <li><a href="">Menu 1</a></li>
-		    <li><a href="">Menu 2</a></li>
+		    <li><a href="{{ url_for('crearItem') }}">Crear Item (para ver como queda)</a></li>
+		    <li><a href="{{ url_for('relacion') }}">Relacion Item (para ver como queda)</a></li>
 		    <li><a href="">Menu 3</a></li>
 		    <li><a href="">Menu 4</a></li>
 		</ul>

@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block body %}
+	<body class=formato1>
+        <form class='estilos' action="{{ url_for('relacion') }}" method=post>
+       	<center><h1>RELACION ENTRE ITEMS</h1></center>
+          <br>
+          <br>
+            <div><label>Tipo de Relacion:</label><br>
+				<select name="tipo">
+						<option value="padre-hijo">Padre-Hijo</option>
+						<option value="sucesor-antecesor">Sucesor-Antecesor</option>						
+				</select>
+            <br> <br>         
+            <div><label>Lista de Items<label></div>
+		<div style="height:150px;width:150px;overflow:scroll;">	
+		<TABLE BORDER WIDTH="70%">
+		<COL SPAN="4" ALIGN="left">
+			<tr>
+			<th scope="col">ITEM</th>
+			<th scope="col">OK</th>
+			</tr>
+            	{% for item in listItem %}
+						<tr>
+						<td>{{ permiso.nombre }}</td>
+						<td><INPUT TYPE="checkbox" NAME="permisos" VALUE={{ item.iditem }}></td>
+						</tr>  	
+  				{% endfor %}
+			</table>
+			</div>
+			
+		    <div><center>
+		    <input name='opcion' type='submit' value='Crear'>
+		    <input name='opcion' type='submit' value='Cancelar'>		    	     
+			</center></div>
+        </form>
+    </body>
+{% endblock %}
