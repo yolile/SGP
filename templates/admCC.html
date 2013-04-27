@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block body %}
+
+ <body class = formato2>
+
+<form class='estilos' action="{{ url_for('admCC')}}" method="post">
+
+ <center><h1>ADMINISTRACION DEL COMITE DE CAMBIOS</h1></center>
+ <br>
+ <br>
+ 	<div style="height:150px;overflow:scroll;">	
+	
+	<table width="100%" border="1">
+	<tr>
+	<th scope="col">Usuario</th>
+	<th scope="col">Nombre</th>
+	<th scope="col">Apellido</th>
+	<th scope="col">CI</th>
+	<th scope="col">OK</th>
+	</tr>
+
+	 {% for user in listUser %}
+			<tr>
+				<td>{{ user.username }}</td>
+				<td>{{ user.nombre }}</td>
+				<td>{{ user.apellido }}</td>
+				<td>{{ user.ci }}</td>
+				<td><input name="select" type="radio" value={{ user.idusuario }} checked/></td>
+			</tr>  	
+  	{% endfor %}
+	  	
+
+	</table>
+	</div>	
+	
+	<br>
+	<input type="submit" name="opcion" value="Modificar Comite de Cambios" />
+	<input type="submit" name="opcion" value="Consultar Miembros" />
+	<input type="submit" name="opcion" value="Administracion de Proyectos" />
+	<br>
+	<br>
+	<center>
+	<input type="submit" name="opcion" value="Home" />
+	</center>
+	</form>
+	</body>
+{% endblock %}

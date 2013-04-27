@@ -12,7 +12,7 @@ __credits__ = 'none'
 __text__ = 'Modulo con las clases y las tablas relacionadas entre si'
 __file__ = 'Modelo.py' 
 
-engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgp')
+engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgptest')
 Base = declarative_base()
 
 """------------------------TABLAS DE RELACION---------------------------------------"""

@@ -20,7 +20,7 @@ app.config.from_object(__name__)
 app.config.from_envvar('SGP_SETTINGS', silent=True)
 
 owner=""
-proyectoRoy=0
+proyecto=0
 """fases creadas es una variable global que ayuda a saber si fueron creadas
 nuevas fases dentro de la llamada defFases"""
 fasesCreadas=0
@@ -250,17 +250,32 @@ def admProy():
         if request.form['opcion'] == "Crear":
             return render_template('crearProy.html')
         if request.form['opcion'] == "Definir Fases":
-            global proyectoRoy
             global fasesCreadas
             fasesCreadas=0
-            proyectoRoy = int(request.form['select'])
+            global proyecto
+            proyecto = int(request.form['select'])
             return redirect(url_for('defFases'))
         if request.form['opcion'] == "Comite de Cambios":
-            listUser = CtrlAdmUsr.getUsuarioList()
-            return render_template('comiteCamb.html', 
-                                   listUser=listUser, 
-                                   owner=owner, 
-                                   idproyecto=request.form['select'])
+            proyecto = int(request.form['select'])
+            return redirect(url_for('admCC'))            
+#             listMiembros = CtrlAdmProy.getMiembrosList(int(request.form['select']))
+#             return render_template('admCC.html', 
+#                                    listUser=listMiembros, 
+#                                    idproyecto=request.form['select'])
+        if request.form['opcion'] == "Buscar":
+            listProy = CtrlAdmProy.busquedaProy(request.form['buscar'],
+                                         request.form['atributo'])
+            
+            flash('Resultado de la busqueda')
+            return render_template('admProy.html',listProy=listProy)
+        if request.form['opcion'] == "Eliminar":
+            CtrlAdmProy.elimProy(int(request.form['select']))   
+            listaProy = CtrlAdmProy.getProyectoList()
+            flash('Proyecto eliminado')
+            return render_template('admProy.html',listProy=listaProy)
+        if request.form['opcion'] == "Modificar":
+            proy = CtrlAdmProy.proy(int(request.form['select']))        
+            return render_template('modProy.html', proyecto=proy) 
         if request.form['opcion'] == "Home":
             return render_template('main.html')
         return redirect(url_for('admProy'))                 
@@ -278,12 +293,26 @@ def crearProy():
             flash('Proyecto creado')
         return redirect(url_for('admProy'))
     
+@app.route('/modProy', methods=['GET','POST'])    
+def modProy():
+    """Funcion que presenta el menu para modificar proyecto."""  
+    if request.method == 'POST':
+        if(request.form['opcion'] == "Modificar"):
+            CtrlAdmProy.modProy(int(request.form['idproyecto']), 
+                              request.form['nombre'],
+                              request.form['descripcion'],
+                              int(request.form['presupuesto']))
+            flash('Proyecto modificado')
+        return redirect(url_for('admProy'))
+
+    
 @app.route('/defFases', methods=['GET','POST'])
 def defFases():
     """Funcion que permite definir fases dentro de un proyecto"""
     if request.method == 'GET':
-        listaFases = CtrlAdmProy.getFasesListByProy(proyectoRoy)
-        return render_template('defFases.html',listFases=listaFases,proyecto=proyectoRoy)
+        global proyecto
+        listaFases = CtrlAdmProy.getFasesListByProy(proyecto)
+        return render_template('defFases.html',listFases=listaFases,proyecto=proyecto)
     if request.method == 'POST':
         proy=request.form['proyecto']
         if (request.form['opcion']=="Definir"):
@@ -319,21 +348,57 @@ def crearFase():
         listaFases = CtrlAdmProy.getFasesListByProy(project)
         return render_template('defFases.html',listFases=listaFases,proyecto=project) 
 
-@app.route('/comiteCamb', methods=['GET','POST'])
-def comiteCamb():
+@app.route('/admCC', methods=['GET','POST'])
+def admCC():
+    """Funcion que presenta el menu para administrar usuarios."""  
+    if request.method == 'GET':
+        global proyecto
+        listMiembros = CtrlAdmProy.getMiembrosList(proyecto)
+        return render_template('admCC.html', 
+                                   listUser=listMiembros)
     if request.method == 'POST':
-        if request.form['opcion']=="Asignar/Desasignar Miembros":
-            if (len(request.form.getlist('idusuarioList')) % 2 == 0):
-                CtrlAdmProy.asigComiteCamb(int(request.form['idproyecto']),
-                                 request.form.getlist('idusuarioList'))
+        if request.form['opcion'] == "Consultar Miembros":
+            usr = CtrlAdmUsr.usr(int(request.form['select'])) 
+            idroles = CtrlAdmUsr.idRolList(int(usr.idusuario))  
+            listRol = CtrlAdmRol.getRolList()     
+            return render_template('conMiembro.html',
+                                   usr=usr,
+                                   idroles=idroles,
+                                   listRol=listRol)
+        if request.form['opcion'] == "Modificar Comite de Cambios":
+            listUser = CtrlAdmUsr.getUsuarioList()
+            listidMiembros = CtrlAdmProy.getidMiembrosList(proyecto)
+            usuariolider = CtrlAdmProy.getliderProyecto(proyecto)
+            return render_template('modCC.html', 
+                                   listUser=listUser, 
+                                   listidMiembros=listidMiembros,
+                                   usuariolider=usuariolider) 
+        if request.form['opcion'] == "Administracion de Proyectos":
+            return redirect(url_for('admProy')) 
+        if request.form['opcion'] == "Home":
+            return render_template('main.html')    
+        return redirect(url_for('admProy')) 
+
+
+@app.route('/modCC', methods=['GET','POST'])
+def modCC():
+    if request.method == 'POST':
+        if request.form['opcion']=="Modificar":
+            listSeleccionados = []
+            for i in request.form.getlist('idusuarioList'):
+                listSeleccionados.append(int(i))
+            if (len(listSeleccionados) % 2 == 0):
+                CtrlAdmProy.asigComiteCamb(proyecto,
+                                 listSeleccionados)
             else:
                 listUser = CtrlAdmUsr.getUsuarioList()
-                return render_template('comiteCamb.html', 
-                                   listUser=listUser, 
-                                   owner=owner, 
-                                   idproyecto=request.form['idproyecto'],
-                                   error="El numero de miembros debe ser par")
-        return redirect(url_for('admProy'))
+                usuariolider = CtrlAdmProy.getliderProyecto(proyecto)
+                return render_template('modCC.html', 
+                                       listUser=listUser, 
+                                       listidMiembros=listSeleccionados,
+                                       usuariolider=usuariolider,
+                                       error="El numero de miembros debe ser impar")
+        return redirect(url_for('admCC'))
         
 @app.route('/asigRolesFase', methods=['GET','POST'])
 def asigRolesFase():

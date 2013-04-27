@@ -34,6 +34,8 @@ def crearProy (nombre,descripcion,presupuesto,liderusername):
     usuariolider = getIdByUsername(liderusername)
     fechaactual = date.today()
     proy_nuevo = Proyecto(idproyectomax+1,nombre,descripcion,fechaactual,0,'no-iniciado',usuariolider,presupuesto)
+    lider = session.query(Usuario).filter(Usuario.idusuario==usuariolider).first()
+    proy_nuevo.comitecambios.append(lider)
     session.add(proy_nuevo)
     session.commit()
     
@@ -94,9 +96,49 @@ def getProyEstado(idproyecto):
 def asigComiteCamb(idproyecto, idusuarioList):
     proyecto = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
     listausuario = session.query(Usuario).filter(Usuario.idusuario.in_(idusuarioList)).all()
+    lider = proyecto.usuario
+    listausuario.append(lider)
     proyecto.comitecambios=listausuario
     session.commit()
     
+def busquedaProy(parametro,atributo):
+    if atributo == 'nombre':
+        result = session.query(Proyecto).filter(Proyecto.nombre.like(parametro+'%')).all()
+    if atributo == 'fechaCreacion':
+        result = session.query(Proyecto).filter(Proyecto.fechacreacion.like(parametro+'%')).all()
+    if atributo == 'lider':
+        result = session.query(Proyecto).join((Usuario,Proyecto.usuario)).filter(Usuario.username.like(parametro+'%')).all()
+    return result
+
+def elimProy(idproyecto):
+    """Funcion que recibe el Id de un Proyecto y elimina de la base de datos"""
+    res = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
+    session.delete(res)
+    session.commit()
+
+def modProy(idproyecto,nombre,descripcion,presupuesto):
+    """Funcion que recibe los atributos de un proyecto y lo modifica en la base de datos"""
+    proy = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
+    proy.nombre = nombre
+    proy.descripcion = descripcion
+    proy.presupuesto = presupuesto
+    session.commit()
+
+def getidMiembrosList(idproyecto):
+    proy = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
+    listidmiembros=[]
+    for usr in proy.comitecambios:
+        listidmiembros.append(usr.idusuario)
+    return listidmiembros
+
+def getMiembrosList(idproyecto):
+    proy = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
+    return proy.comitecambios
+
+def getliderProyecto(idproyecto):
+    proy = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
+    return proy.usuariolider
+
 # def truncarProyecto():
 #     trans = conn.begin()
 #     try:
