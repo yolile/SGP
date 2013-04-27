@@ -12,7 +12,7 @@ __credits__ = 'none'
 __text__ = 'Modulo con las clases y las tablas relacionadas entre si'
 __file__ = 'Modelo.py' 
 
-engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgptest')
+engine = create_engine('postgresql+psycopg2://admin:admin@localhost/newsgp')
 Base = declarative_base()
 
 """------------------------TABLAS DE RELACION---------------------------------------"""
@@ -158,13 +158,13 @@ class Fase(Base):
 """------------------------TIPO DE ITEM---------------------------------------"""
 class TipoItem(Base):
     __tablename__ = 'tipoitem'
-    idtipoitem = Column(Integer,Sequence('sec_idtipoitem'),primary_key=True)
+    idtipoitem = Column(Integer,primary_key=True)
     nombre = Column(String(160))
     descripcion = Column(String(300))
     atributos = relationship("AtributoTipo")
  
-    def __init__(self,nombre, descripcion):
-        #self.idtipoitem = idtipoitem #La secuencia se encargara de esto
+    def __init__(self, idtipoitem, nombre, descripcion):
+        self.idtipoitem = idtipoitem
         self.nombre = nombre
         self.descripcion = descripcion
  
@@ -175,7 +175,7 @@ class TipoItem(Base):
 """------------------------ATRIBUTO POR TIPO DE ITEM---------------------------------------"""
 class AtributoTipo(Base):
     __tablename__ = 'atributotipo'
-    idatributo = Column(Integer,Sequence('sec_atributotipo'),primary_key=True)
+    idatributo = Column(Integer,primary_key=True)
     idtipoitem = Column(Integer,ForeignKey('tipoitem.idtipoitem',
                                         onupdate="CASCADE",
                                         ondelete="CASCADE"))
@@ -183,7 +183,8 @@ class AtributoTipo(Base):
     tipo = Column(String(45))
     valordefecto = Column(String(45))
 
-    def __init__(self,idtipoitem, nombre, tipo, valordefecto):
+    def __init__(self, idatributo, idtipoitem, nombre, tipo, valordefecto):
+        self.idatributo=idatributo
         self.idtipoitem = idtipoitem
         self.nombre = nombre
         self.tipo = tipo
