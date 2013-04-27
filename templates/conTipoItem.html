@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block body %}
+<body class=formato1>
+        <form class='estilos' action="{{ url_for('conTipoItem') }}" method=post>
+        <input type="hidden" name="idtipoitem" value=" {{ idtipoitem }}">
+            <center><h1>CONSULTAR TIPO DE ITEM</h1></center>
+          	<br>
+          	<br>
+            <div><label>Nombre:</label><input type='text' name='nombre' value="{{ nombre }}" readonly="readonly"></div>
+            <div><label>Descripcion:</label><textarea readonly rows='3' name='descripcion'>{{ descripcion}}</textarea></div>
+		    
+		    <div><label>Atributos<label></div>	
+    
+		<div style="height:150px;width:350px;overflow:scroll;">	
+		<TABLE BORDER WIDTH="70%">
+		<COL SPAN="4" ALIGN="left">
+			<tr>
+			<th scope="col">Nombre </th>
+			<th scope="col">Tipo </th>
+			<th scope="col">ValorPorDefecto</th>
+			</tr>
+			
+            	{% for atribTipoItem in listAtribTipoItem %}
+						<tr>
+						<td>{{ atribTipoItem.nombre }}</td>
+						<td>{{ atribTipoItem.tipo }}</td>
+						<td>{{ atribTipoItem.valordefecto }}</td>
+  				{% endfor %}
+  			             
+  		</TABLE>
+  		</div> 
+  			  <center><input type='submit' name="opcion" value='Volver'></center>   
+        </form>
+</body>
+{% endblock %}
+   

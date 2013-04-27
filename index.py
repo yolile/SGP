@@ -4,6 +4,7 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
 import CtrlAdmUsr
 import CtrlAdmRol
 import CtrlAdmProy
+import CtrlAdmTipoItem
 
 """Modulo de ejecucion principal de SGP"""  
 __author__ = 'Grupo 5'
@@ -419,31 +420,77 @@ def asigTipoItem():
 """------------------------Tipos de Items---------------------------------------"""
 @app.route('/admTipoItem', methods=['GET','POST'])
 def admTipoItem():
-    """Funcion que presenta la administracion de los tipos de Items del sistema"""  
+    """Funcion que presenta la administracion de los tipos de Items del sistema"""
     if request.method == 'GET':
-        return render_template('admTipoItem.html')
+        listaTiposItem=CtrlAdmTipoItem.getTipoItemList()
+        return render_template('admTipoItem.html',listTipoItem=listaTiposItem)
     if request.method == 'POST':
         if request.form['opcion'] == "Crear":
-            return render_template('crearTipoItem.html')
+            #se crea un tipo de item para poder crearle atributos,
+            #al cancelar la operacion el item sera eliminado
+            #y sus atributos seran eliminados en cascada
+            idtipoitem=CtrlAdmTipoItem.crearTipoItem('','')
+            return render_template('crearTipoItem.html',idtipoitemtemp=idtipoitem)
         if request.form['opcion'] == "Consultar":
-            return render_template('conTipoItem.html')
+            idtipo=int(request.form['select'])
+            return render_template('conTipoItem.html',idtipoitem=idtipo)
         if request.form['opcion'] == "Home":
             return render_template('main.html') 
         
 @app.route('/crearTipoItem', methods=['GET','POST'])
 def crearTipoItem():
     if request.method == 'GET':
-        return render_template('crearTipoItem.html')
+        idtipoitem=request.form['idtipoitemtemp']
+        listaAtributosTipo=CtrlAdmTipoItem.getAtributosTipo(idtipoitem)
+        nombre=CtrlAdmTipoItem.getNombre(idtipoitem)
+        descripcion=CtrlAdmTipoItem.getDescripcion(idtipoitem)
+        return render_template('crearTipoItem.html',listAtribTipoItem=listaAtributosTipo,
+                               idtipoitemtemp=idtipoitem,nombre=nombre,descripcion=descripcion)
     if request.method == 'POST':
         if (request.form['opcion']=="AgregarAtributo"):
-            return render_template('addAtribTipoItem.html')
+            nombre=request.form['nombre']
+            descripcion=request.form['descripcion']
+            CtrlAdmTipoItem.modTipoItem(int(request.form['idtipoitemtemp']),nombre,descripcion)
+            return render_template('addAtribTipoItem.html',idtipoitem=int(request.form['idtipoitemtemp']))
+        if(request.form['opcion']=="Crear"):
+            nombre=request.form['nombre']
+            descripcion=request.form['descripcion']
+            CtrlAdmTipoItem.modTipoItem(int(request.form['idtipoitemtemp']),nombre,descripcion)
+            return redirect(url_for('admTipoItem'))
+        if(request.form['opcion']=="Cancelar"):
+            CtrlAdmTipoItem.borrarTipoItem(int(request.form['idtipoitemtemp']))
+        return redirect(url_for('admTipoItem'))
 
 @app.route('/addAtribTipoItem', methods=['GET','POST'])
 def addAtribTipoItem():
     if request.method == 'POST':
-        if request.form['opcion']=="Crear":
-            return render_template('crearTipoItem.html')
-        
+        idtipoitem=int(request.form['idtipoitem'])
+        if request.form['opcion']=="Agregar":
+            nombre=request.form['nombre']
+            tipo=request.form['datatype']
+            bydefault=request.form['bydefault']
+            if(CtrlAdmTipoItem.valorPorDefectoValido(tipo,bydefault)==True):
+                CtrlAdmTipoItem.agregarAtributo(idtipoitem,nombre,tipo,bydefault)
+            else:
+                flash("El valor por defecto no es valido para el tipo de dato")
+                return render_template('addAtribTipoItem.html',idtipoitem=idtipoitem)
+        listaAtributosTipo=CtrlAdmTipoItem.getAtributosTipo(idtipoitem)
+        nombre=CtrlAdmTipoItem.getNombre(idtipoitem)
+        descripcion=CtrlAdmTipoItem.getDescripcion(idtipoitem)
+        return render_template('crearTipoItem.html',listAtribTipoItem=listaAtributosTipo,
+                               idtipoitemtemp=idtipoitem,nombre=nombre,descripcion=descripcion)
+
+@app.route('/conTipoItem', methods=['GET','POST'])
+def conTipoItem():
+    if request.method == 'GET':
+        idtipoitem=int(request.form['idtipoitem'])
+        listaAtributosTipo=CtrlAdmTipoItem.getAtributosTipo(idtipoitem)
+        nombre=CtrlAdmTipoItem.getNombre(idtipoitem)
+        descripcion=CtrlAdmTipoItem.getDescripcion(idtipoitem)
+        return render_template('conTipoItem.html',listAtribTipoItem=listaAtributosTipo,
+                               idtipoitem=idtipoitem,nombre=nombre,descripcion=descripcion)
+    return redirect(url_for('admTipoItem'))
+
 """-----------------------Crear Items---------------------------------------"""
 @app.route('/crearItem', methods=['GET','POST'])
 def crearItem():
