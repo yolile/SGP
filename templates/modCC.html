@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block body %}
+
+ <body class = formato2>
+
+<form class='estilos' action="{{ url_for('modCC')}}" method="post">
+
+ <center><h1>COMITE DE CAMBIOS</h1></center>
+ <br>
+ <br>
+	<div style="height:150px;width:700px;overflow:scroll;">	
+	
+	<table width="100%" border="1">
+	<tr>
+	<th scope="col">Nombre</th>
+	<th scope="col">Apellido</th>
+	<th scope="col">CI</th>
+	<th scope="col">OK</th>
+	</tr>
+	 {% for user in listUser %}
+			<tr>
+				<td>{{ user.nombre }}</td>
+				<td>{{ user.apellido }}</td>
+				<td>{{ user.ci }}</td>
+				{% if user.idusuario != usuariolider %}
+					{% if user.idusuario in listidMiembros %}
+						<td><input name="idusuarioList" type="checkbox" checked="checked" value={{ user.idusuario }} /></td>
+					{% else %}
+						<td><input name="idusuarioList" type="checkbox" value={{ user.idusuario }} /></td>
+					{% endif %}
+				{% else %}
+					<td><input type="checkbox" NAME="idusuarioList"  disabled="disabled" checked="checked" value={{ user.idusuario }}></td>
+				{% endif %}			
+			</tr>  	
+  	{% endfor %}
+	  	
+
+	</table>
+	</div>	
+	
+	<br>
+	<input type="submit" name="opcion" value="Modificar" />
+	<input type="submit" name="opcion" value="Cancelar" />
+	<br>
+	</form>
+	</body>
+{% endblock %}
