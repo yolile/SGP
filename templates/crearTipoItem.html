@@ -2,11 +2,12 @@
 {% block body %}
 <body class=formato1>
         <form class='estilos' action="{{ url_for('crearTipoItem') }}" method=post>
+        <input type="hidden" name="idtipoitemtemp" value=" {{ idtipoitemtemp }}">
             <center><h1>Creacion de Tipo de Item</h1></center>
           	<br>
           	<br>
-            <div><label>Nombre:</label><input type='text' name=nombre></div>
-            <div><label>Descripcion:</label><textarea rows='3'name=descripcion></textarea></div>
+            <div><label>Nombre:</label><input type='text' name='nombre' value="{{ nombre }}"></div>
+            <div><label>Descripcion:</label><textarea rows='3' name='descripcion'>{{ descripcion}}</textarea></div>
 
 		
 		    <div><label>Atributos<label></div>	
@@ -22,9 +23,9 @@
 			
             	{% for atribTipoItem in listAtribTipoItem %}
 						<tr>
-						<td>{{ atribtipoItem.nombre }}</td>
+						<td>{{ atribTipoItem.nombre }}</td>
 						<td>{{ atribTipoItem.tipo }}</td>
-						<td>{{ atribTipoItem.valorDefecto }}</td>
+						<td>{{ atribTipoItem.valordefecto }}</td>
   				{% endfor %}
   			             
   	</TABLE>
