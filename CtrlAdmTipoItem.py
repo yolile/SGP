@@ -79,6 +79,8 @@ def getDescripcion(idtipoitem):
     return result.descripcion
 
 def valorPorDefectoValido(datatype,valor):
+    if valor=="":
+        return True
     if datatype=="DATE":
         try:
             valid_date = time.strptime(valor,'%Y-%m-%d')
