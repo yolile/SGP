@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-<body class=formato1>
+<body class=formato4>
         <form class='estilos' action="{{ url_for('conTipoItem') }}" method=post>
         <input type="hidden" name="idtipoitem" value=" {{ idtipoitem }}">
             <center><h1>CONSULTAR TIPO DE ITEM</h1></center>
@@ -11,13 +11,13 @@
 		    
 		    <div><label>Atributos<label></div>	
     
-		<div style="height:150px;width:350px;overflow:scroll;">	
+		<div style="height:150px;width:auto;overflow:auto;">	
 		<TABLE BORDER WIDTH="70%">
 		<COL SPAN="4" ALIGN="left">
 			<tr>
 			<th scope="col">Nombre </th>
 			<th scope="col">Tipo </th>
-			<th scope="col">ValorPorDefecto</th>
+			<th scope="col">Valor Por Defecto</th>
 			</tr>
 			
             	{% for atribTipoItem in listAtribTipoItem %}
