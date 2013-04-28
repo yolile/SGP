@@ -250,7 +250,7 @@ def admProy():
     if request.method == 'POST':
         if request.form['opcion'] == "Crear":
             return render_template('crearProy.html')
-        if request.form['opcion'] == "Definir Fases":
+        if request.form['opcion'] == "Administrar Fases":
             global fasesCreadas
             fasesCreadas=0
             global proyecto
@@ -309,7 +309,7 @@ def modProy():
     
 @app.route('/defFases', methods=['GET','POST'])
 def defFases():
-    """Funcion que permite definir fases dentro de un proyecto"""
+    """Funcion que permite administrar fases dentro de un proyecto"""
     if request.method == 'GET':
         global proyecto
         listaFases = CtrlAdmProy.getFasesListByProy(proyecto)
@@ -439,6 +439,17 @@ def admTipoItem():
             return render_template('conTipoItem.html',idtipoitem=idtipo,
                                    listAtribTipoItem=listaAtributosTipo,
                                    nombre=nombre, descripcion=descripcion)
+        if request.form['opcion']=="Redefinir":
+            idtipoitem=int(request.form['select'])
+            if(CtrlAdmTipoItem.tipoDeItemNoInstanciado(idtipoitem)==False):
+                flash('Tipo de Item instanciado, imposible redefinir')
+                return redirect(url_for('admTipoItem'))
+            listaAtributosTipo=CtrlAdmTipoItem.getAtributosTipo(idtipoitem)
+            nombre=CtrlAdmTipoItem.getNombre(idtipoitem)
+            descripcion=CtrlAdmTipoItem.getDescripcion(idtipoitem)
+            return render_template('modTipoItem.html',idtipoitem=idtipoitem,
+                                   listAtribTipoItem=listaAtributosTipo,
+                                   nombre=nombre,descripcion=descripcion)
         if request.form['opcion'] == "Home":
             return redirect(url_for('menu'))
         
@@ -452,43 +463,90 @@ def crearTipoItem():
         return render_template('crearTipoItem.html',listAtribTipoItem=listaAtributosTipo,
                                idtipoitemtemp=idtipoitem,nombre=nombre,descripcion=descripcion)
     if request.method == 'POST':
+        nombre=request.form['nombre']
+        descripcion=request.form['descripcion']
+        idtipoitem=int(request.form['idtipoitemtemp'])
         if (request.form['opcion']=="AgregarAtributo"):
-            nombre=request.form['nombre']
-            descripcion=request.form['descripcion']
-            CtrlAdmTipoItem.modTipoItem(int(request.form['idtipoitemtemp']),nombre,descripcion)
-            return render_template('addAtribTipoItem.html',idtipoitem=int(request.form['idtipoitemtemp']))
+            CtrlAdmTipoItem.modTipoItem(idtipoitem,nombre,descripcion)
+            return render_template('addAtribTipoItem.html',idtipoitem=idtipoitem,
+                                   operacion='crear')
         if(request.form['opcion']=="Crear"):
-            nombre=request.form['nombre']
-            descripcion=request.form['descripcion']
-            CtrlAdmTipoItem.modTipoItem(int(request.form['idtipoitemtemp']),nombre,descripcion)
+            CtrlAdmTipoItem.modTipoItem(idtipoitem,nombre,descripcion)
             return redirect(url_for('admTipoItem'))
         if(request.form['opcion']=="Cancelar"):
-            CtrlAdmTipoItem.borrarTipoItem(int(request.form['idtipoitemtemp']))
-        return redirect(url_for('admTipoItem'))
+            CtrlAdmTipoItem.borrarTipoItem(idtipoitem)
+            return redirect(url_for('admTipoItem'))
+        #y si eligio eliminar uno de los atributos...
+        CtrlAdmTipoItem.borrarAtributo(int(request.form['opcion']))
+        listaAtributosTipo=CtrlAdmTipoItem.getAtributosTipo(idtipoitem)
+        return render_template('crearTipoItem.html',idtipoitemtemp=idtipoitem,
+                               listAtribTipoItem=listaAtributosTipo,
+                               nombre=nombre,descripcion=descripcion)
 
 @app.route('/addAtribTipoItem', methods=['GET','POST'])
 def addAtribTipoItem():
     if request.method == 'POST':
         idtipoitem=int(request.form['idtipoitem'])
+        operacion=request.form['operacion']
         if request.form['opcion']=="Agregar":
             nombre=request.form['nombre']
             tipo=request.form['datatype']
             bydefault=request.form['bydefault']
             if(CtrlAdmTipoItem.valorPorDefectoValido(tipo,bydefault)==True):
-                CtrlAdmTipoItem.agregarAtributo(idtipoitem,nombre,tipo,bydefault)
+                if(operacion=='crear'):
+                    CtrlAdmTipoItem.agregarAtributo(idtipoitem,nombre,tipo,bydefault)
+                else:
+                    CtrlAdmTipoItem.agregarAtributoSession(idtipoitem,nombre,tipo,bydefault)
             else:
                 flash("El valor por defecto no es valido para el tipo de dato")
                 return render_template('addAtribTipoItem.html',idtipoitem=idtipoitem)
         listaAtributosTipo=CtrlAdmTipoItem.getAtributosTipo(idtipoitem)
         nombre=CtrlAdmTipoItem.getNombre(idtipoitem)
         descripcion=CtrlAdmTipoItem.getDescripcion(idtipoitem)
-        return render_template('crearTipoItem.html',listAtribTipoItem=listaAtributosTipo,
-                               idtipoitemtemp=idtipoitem,nombre=nombre,descripcion=descripcion)
-
+        if(operacion=='crear'):
+            return render_template('crearTipoItem.html',listAtribTipoItem=listaAtributosTipo,
+                                   idtipoitemtemp=idtipoitem,nombre=nombre,descripcion=descripcion)
+        else:
+            return render_template('modTipoItem.html',listAtribTipoItem=listaAtributosTipo,
+                                   idtipoitem=idtipoitem,nombre=nombre,descripcion=descripcion)
+            
 @app.route('/conTipoItem', methods=['GET','POST'])
 def conTipoItem():
     if request.method == 'POST':
         return redirect(url_for('admTipoItem'))
+
+@app.route('/modTipoItem', methods=['GET','POST'])
+def modTipoItem():
+    if request.method == 'GET':
+        idtipoitem=request.form['idtipoitem']
+        listaAtributosTipo=CtrlAdmTipoItem.getAtributosTipo(idtipoitem)
+        nombre=CtrlAdmTipoItem.getNombre(idtipoitem)
+        descripcion=CtrlAdmTipoItem.getDescripcion(idtipoitem)
+        return render_template('modTipoItem.html',listAtribTipoItem=listaAtributosTipo,
+                               idtipoitem=idtipoitem,nombre=nombre,descripcion=descripcion)
+    if request.method == 'POST':
+        nombre=request.form['nombre']
+        descripcion=request.form['descripcion']
+        idtipoitem=int(request.form['idtipoitem'])
+        if (request.form['opcion']=="AgregarAtributo"):
+            CtrlAdmTipoItem.modTipoItemSession(idtipoitem,nombre,descripcion)
+            return render_template('addAtribTipoItem.html',idtipoitem=idtipoitem,
+                                   operacion='modificar')
+        if(request.form['opcion']=="Guardar"):
+            CtrlAdmTipoItem.modTipoItemSession(idtipoitem,nombre,descripcion)
+            CtrlAdmTipoItem.guardarCambios()
+            return redirect(url_for('admTipoItem'))
+        if(request.form['opcion']=="Cancelar"):
+            CtrlAdmTipoItem.descartarCambios()
+            return redirect(url_for('admTipoItem'))
+        #y si eligio eliminar uno de los atributos...
+        CtrlAdmTipoItem.borrarAtributoSession(int(request.form['opcion']))
+        listaAtributosTipo=CtrlAdmTipoItem.getAtributosTipo(idtipoitem)
+        return render_template('modTipoItem.html',idtipoitem=idtipoitem,
+                               listAtribTipoItem=listaAtributosTipo,
+                               nombre=nombre,descripcion=descripcion)
+
+
 
 """-----------------------Crear Items---------------------------------------"""
 @app.route('/crearItem', methods=['GET','POST'])
