@@ -15,7 +15,7 @@
 			<th scope="col">OK</th>
 			</tr>
 
-  				{% for rol in listTipoItem %}
+  				{% for tipoItem in listTipoItem %}
 					<tr>
 					<td>{{ tipoItem.nombre }}</td>
                 	<td><INPUT TYPE="checkbox" checked="checked" NAME="roles" VALUE="{{ tipoItem.idtipoItem}}"></td>  
@@ -24,7 +24,7 @@
 			</table>
 			</div>
 		    <div><center><input name='opcion' type='submit' value='Aceptar'>
-		    <br>          
+		    <br>  
 		    <div><center><input name='opcion' type='submit' value='Cancelar'>		    	     
             </center></div>
         </form>
