@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block body %}
-<body class=formato1>
+<body class=formato4>
         <form class='estilos' action="{{ url_for('crearTipoItem') }}" method=post>
         <input type="hidden" name="idtipoitemtemp" value=" {{ idtipoitemtemp }}">
             <center><h1>Creacion de Tipo de Item</h1></center>
@@ -12,13 +12,13 @@
 		
 		    <div><label>Atributos<label></div>	
     
-		<div style="height:150px;width:350px;overflow:scroll;">	
-		<TABLE BORDER WIDTH="70%">
+		<div style="height:150px;width:550px;overflow:scroll;">	
+		<TABLE BORDER WIDTH="100%">
 		<COL SPAN="4" ALIGN="left">
 			<tr>
 			<th scope="col">Nombre </th>
 			<th scope="col">Tipo </th>
-			<th scope="col">ValorPorDefecto</th>
+			<th scope="col">Valor Por Defecto</th>
 			</tr>
 			
             	{% for atribTipoItem in listAtribTipoItem %}
@@ -26,6 +26,10 @@
 						<td>{{ atribTipoItem.nombre }}</td>
 						<td>{{ atribTipoItem.tipo }}</td>
 						<td>{{ atribTipoItem.valordefecto }}</td>
+						<td><button name="opcion" value={{ atribTipoItem.idatributo}} type="submit">
+						Borrar
+						</button></td>
+						</tr>
   				{% endfor %}
   			             
   	</TABLE>
