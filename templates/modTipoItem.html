@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block body %}
+<body class=formato4>
+        <form class='estilos' action="{{ url_for('modTipoItem') }}" method=post>
+        <input type="hidden" name="idtipoitem" value=" {{ idtipoitem }}">
+            <center><h1>Redefinicion de Tipo de Item</h1></center>
+          	<br>
+          	<br>
+            <div><label>Nombre:</label><input type='text' name='nombre' value="{{ nombre }}"></div>
+            <div><label>Descripcion:</label><textarea rows='3' name='descripcion'>{{ descripcion}}</textarea></div>
+
+		
+		    <div><label>Atributos<label></div>	
+    
+		<div style="height:150px;width:550px;overflow:scroll;">	
+		<TABLE BORDER WIDTH="100%">
+		<COL SPAN="4" ALIGN="left">
+			<tr>
+			<th scope="col">Nombre </th>
+			<th scope="col">Tipo </th>
+			<th scope="col">Valor Por Defecto</th>
+			</tr>
+			
+            	{% for atribTipoItem in listAtribTipoItem %}
+						<tr>
+						<td>{{ atribTipoItem.nombre }}</td>
+						<td>{{ atribTipoItem.tipo }}</td>
+						<td>{{ atribTipoItem.valordefecto }}</td>
+						<td><button name="opcion" value={{ atribTipoItem.idatributo}} type="submit">
+						Borrar
+						</button></td>
+						</tr>
+  				{% endfor %}
+  			             
+  	</TABLE>
+  	</div> 
+  			  <center><input type='submit' name="opcion" value='AgregarAtributo'></center>
+  			  <br>   
+             <div><center><input type='submit' name="opcion" value='Guardar'>
+            <input type='submit' name="opcion" value='Cancelar'></center></div>
+                
+        </form>
+    </body>
+{% endblock %}
+   
