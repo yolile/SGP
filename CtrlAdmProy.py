@@ -13,7 +13,7 @@ __file__ = 'CtrlAdmProy.py'
     
 #engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgptest')
 Session = sessionmaker(bind=engine)
-session = Session()     
+session = Session()
 
 def getProyectoList(): 
     """Funcion que retorna la lista de todos los proyectos en la base de datos."""
