@@ -111,6 +111,27 @@
     background: -webkit-linear-gradient(top, #cfe6ef 0%,#edfcff 100%);
 }
 
+/*Esto hace que los botones se vean como links*/
+.formato4 button, button:focus, button:active {
+    border: none;
+    display: inline;
+    margin: 0em;
+    padding: 0em;
+    outline: none;
+    outline-offset: 0em;
+    background: none;
+    color: #798e94;
+    cursor: pointer;
+    font: inherit;
+    text-decoration: underline;
+}
+/* Sacar los espacios extra de los botones en Firefox */
+.formato4 button::-moz-focus-inner {
+    border: none;
+    padding: 0em;
+}
+
+
 
  /*Para el formato del menu*/
 * {
