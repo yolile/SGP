@@ -433,9 +433,14 @@ def admTipoItem():
             return render_template('crearTipoItem.html',idtipoitemtemp=idtipoitem)
         if request.form['opcion'] == "Consultar":
             idtipo=int(request.form['select'])
-            return render_template('conTipoItem.html',idtipoitem=idtipo)
+            listaAtributosTipo=CtrlAdmTipoItem.getAtributosTipo(idtipo)
+            nombre=CtrlAdmTipoItem.getNombre(idtipo)
+            descripcion=CtrlAdmTipoItem.getDescripcion(idtipo)
+            return render_template('conTipoItem.html',idtipoitem=idtipo,
+                                   listAtribTipoItem=listaAtributosTipo,
+                                   nombre=nombre, descripcion=descripcion)
         if request.form['opcion'] == "Home":
-            return render_template('main.html') 
+            return redirect(url_for('menu'))
         
 @app.route('/crearTipoItem', methods=['GET','POST'])
 def crearTipoItem():
@@ -482,14 +487,8 @@ def addAtribTipoItem():
 
 @app.route('/conTipoItem', methods=['GET','POST'])
 def conTipoItem():
-    if request.method == 'GET':
-        idtipoitem=int(request.form['idtipoitem'])
-        listaAtributosTipo=CtrlAdmTipoItem.getAtributosTipo(idtipoitem)
-        nombre=CtrlAdmTipoItem.getNombre(idtipoitem)
-        descripcion=CtrlAdmTipoItem.getDescripcion(idtipoitem)
-        return render_template('conTipoItem.html',listAtribTipoItem=listaAtributosTipo,
-                               idtipoitem=idtipoitem,nombre=nombre,descripcion=descripcion)
-    return redirect(url_for('admTipoItem'))
+    if request.method == 'POST':
+        return redirect(url_for('admTipoItem'))
 
 """-----------------------Crear Items---------------------------------------"""
 @app.route('/crearItem', methods=['GET','POST'])
