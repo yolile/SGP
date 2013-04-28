@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block body %}
 <body class=formato4>
-        <form class='estilos' action="{{ url_for('crearTipoItem') }}" method=post>
-        <input type="hidden" name="idtipoitemtemp" value=" {{ idtipoitemtemp }}">
-            <center><h1>Creacion de Tipo de Item</h1></center>
+        <form class='estilos' action="{{ url_for('modTipoItem') }}" method=post>
+        <input type="hidden" name="idtipoitem" value=" {{ idtipoitem }}">
+            <center><h1>Redefinicion de Tipo de Item</h1></center>
           	<br>
           	<br>
             <div><label>Nombre:</label><input type='text' name='nombre' value="{{ nombre }}"></div>
@@ -36,7 +36,7 @@
   	</div> 
   			  <center><input type='submit' name="opcion" value='AgregarAtributo'></center>
   			  <br>   
-             <div><center><input type='submit' name="opcion" value='Crear'>
+             <div><center><input type='submit' name="opcion" value='Guardar'>
             <input type='submit' name="opcion" value='Cancelar'></center></div>
                 
         </form>

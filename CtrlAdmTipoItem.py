@@ -21,10 +21,11 @@ def getMaxIdTipoItem():
 
 def crearTipoItem(nombre,descripcion):
     """Funcion que crea un tipo de item y devuelve el idtipoitem generado"""
+    session1=Session()
     idtipoitem=getMaxIdTipoItem()+1
     nuevo=TipoItem(idtipoitem,nombre,descripcion)
-    session.add(nuevo)
-    session.commit()
+    session1.add(nuevo)
+    session1.commit()
     return nuevo.idtipoitem
     
 def getAtributosList():
@@ -43,10 +44,12 @@ def getMaxIdAtributo():
 
 def agregarAtributo(tipoitem,nombre,tipodato,bydefault):
     """Funcion que agrega un atributo a un item dado"""
+    session1=Session()
     idatributo=getMaxIdAtributo()+1
-    nuevo = AtributoTipo(idatributo,tipoitem,nombre,tipodato,bydefault)
-    session.add(nuevo)
-    session.commit()
+    if(tipoitem!=""):
+        nuevo = AtributoTipo(idatributo,tipoitem,nombre,tipodato,bydefault)
+        session1.add(nuevo)
+        session1.commit()
     
 def getAtributosTipo(idtipoitem):
     """Funcion que retorna la lista de todos los atributos de un
@@ -56,17 +59,26 @@ def getAtributosTipo(idtipoitem):
 
 def borrarTipoItem(idtipoitem):
     """Funcion que recibe el Id de un tipo de item y lo elimina de la base de datos"""
-    res = session.query(TipoItem).filter(TipoItem.idtipoitem==idtipoitem).first()
-    session.delete(res)
-    session.commit()
+    session1=Session()
+    borrarAtributosTipo(idtipoitem)
+    res = session1.query(TipoItem).filter(TipoItem.idtipoitem==idtipoitem).first()
+    session1.delete(res)
+    session1.commit()
+
+def borrarAtributosTipo(idtipoitem):
+    """Recibe un id de tipo de item y borra sus atributos"""
+    lista=getAtributosTipo(idtipoitem)
+    for atributo in lista:
+        borrarAtributo(atributo.idatributo)
 
 def modTipoItem(idtipoitem,nombre,descripcion):
     """Funcion que recibe un id de tipo de item y
     modifica el tipo de item correspondiente"""
-    tipoitem = session.query(TipoItem).filter(TipoItem.idtipoitem==idtipoitem).first()
+    session1=Session()
+    tipoitem = session1.query(TipoItem).filter(TipoItem.idtipoitem==idtipoitem).first()
     tipoitem.nombre = nombre
     tipoitem.descripcion = descripcion
-    session.commit()
+    session1.commit()
     
 def getNombre(idtipoitem):
     """Devuelve el nombre de un tipo de item dado su id"""
@@ -90,3 +102,44 @@ def valorPorDefectoValido(datatype,valor):
     if datatype=="INT":
         return valor.isdigit()
     return True
+
+def borrarAtributo(idatributo):
+    """Funcion que recibe el Id de un atributo de tipo de item y lo elimina de la base de datos"""
+    session1=Session()
+    res = session1.query(AtributoTipo).filter(AtributoTipo.idatributo==idatributo).first()
+    session1.delete(res)
+    session1.commit()
+    
+def tipoDeItemNoInstanciado(idtipoitem):
+    #Falta implementar. Funcion que retorna si un tipo de item
+    #no fue utilizado en un proyecto, o sea si se puede redefinir
+    return True
+#===============================================================================
+# Las funciones de abajo solo se llevaran a cabo en la sesion (Para redefinir
+# tipos de item) Se usa la sesion global Session
+#===============================================================================
+
+def modTipoItemSession(idtipoitem,nombre,descripcion):
+    """Funcion que recibe un id de tipo de item y
+    modifica el tipo de item correspondiente"""
+    tipoitem = session.query(TipoItem).filter(TipoItem.idtipoitem==idtipoitem).first()
+    tipoitem.nombre = nombre
+    tipoitem.descripcion = descripcion
+    
+def borrarAtributoSession(idatributo):
+    """Funcion que recibe el Id de un atributo de tipo de item y lo elimina"""
+    res = session.query(AtributoTipo).filter(AtributoTipo.idatributo==idatributo).first()
+    session.delete(res)
+
+def agregarAtributoSession(tipoitem,nombre,tipodato,bydefault):
+    """Funcion que agrega un atributo a un item dado"""
+    idatributo=getMaxIdAtributo()+1
+    if(tipoitem!=""):
+        nuevo = AtributoTipo(idatributo,tipoitem,nombre,tipodato,bydefault)
+        session.add(nuevo)
+        
+def descartarCambios():
+    session.rollback()
+    
+def guardarCambios():
+    session.commit()
