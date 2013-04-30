@@ -415,6 +415,7 @@ def asigTipoItem():
         if request.form['opcion']=="Aceptar":
             return render_template('defFases.html')
         
+        
 """-------------------------MODULO DE DESARROLLO---------------------------------------"""        
                                                            
 """------------------------Tipos de Items---------------------------------------"""
@@ -581,9 +582,25 @@ def abrirProyecto():
             return redirect(url_for('menu')) 
     if request.method == 'POST':
         if request.form['opcion'] == "Abrir":
-            return render_template('main.html')
+            return render_template('proyectoX.html')
         if request.form['opcion'] == "Home":
             return render_template('main.html')
-        return redirect(url_for('abrirProyecto'))     
+        return redirect(url_for('abrirProyecto'))
+    
+@app.route('/proyectoX', methods=['GET','POST'])
+def proyectoX():
+    """Funcion que muestra un proyecto seleccionado en el modo de desarrollo"""  
+    if request.method == 'GET':
+        if CtrlAdmUsr.havePermission(owner,202):
+            return render_template('proyectoX.html')
+        else:
+            flash('No tiene permisos para realizar esta operacion ')
+            return redirect(url_for('menu')) 
+    if request.method == 'POST':
+        if request.form['opcion'] == "Abrir":
+            return render_template('proyectoX.html')
+        if request.form['opcion'] == "Home":
+            return render_template('main.html')
+        return redirect(url_for('abrirProyecto'))              
 if __name__=='__main__':
     app.run()
