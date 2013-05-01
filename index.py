@@ -547,47 +547,6 @@ def modTipoItem():
                                listAtribTipoItem=listaAtributosTipo,
                                nombre=nombre,descripcion=descripcion)
 
-
-
-"""-----------------------Crear Items---------------------------------------"""
-@app.route('/crearItem', methods=['GET','POST'])
-def crearItem():
-    """Funcion para crear los items"""  
-    if request.method == 'GET':
-        return render_template('crearItem.html')
-    if request.method == 'POST':
-        if request.form['opcion'] == "Home":
-            return render_template('main.html')
-
-"""-----------------------Relacion entre Items---------------------------------------"""
-@app.route('/relacion', methods=['GET','POST'])
-def relacion():
-    """Funcion para relacionar los items"""  
-    if request.method == 'GET':
-        return render_template('relacion.html')
-    if request.method == 'POST':
-        if request.form['opcion'] == "Home":
-            return render_template('main.html')
-                        
-@app.route('/admProy', methods=['GET','POST'])
-def admProy():
-    """Funcion que presenta el menu para administrar Proyectos."""  
-    if request.method == 'GET':
-        if CtrlAdmUsr.havePermission(owner,202):
-            listaProy = CtrlAdmProy.getProyectoList()
-            return render_template('admProy.html',listProy=listaProy)
-        else:
-            flash('No tiene permisos para realizar esta operacion ')
-            return redirect(url_for('menu')) 
-    if request.method == 'POST':
-        if request.form['opcion'] == "Administrar Fases":
-            global fasesCreadas
-            fasesCreadas=0
-            global proyecto
-            proyecto = int(request.form['select'])
-            return redirect(url_for('defFases'))
-   
-
 @app.route('/abrirProyecto', methods=['GET','POST'])
 def abrirProyecto():
     """Funcion que presenta el menu para administrar Proyectos."""  
@@ -616,11 +575,33 @@ def proyectoX():
         return render_template('proyectoX.html',listFases=listaFases,proyecto=proyecto)
     if request.method == 'POST':
         proy=request.form['proyecto']
-        if (request.form['opcion']=="Definir"):
-            if(CtrlAdmProy.getProyEstado(proy)=='no-iniciado'):
-               return render_template('crearFase.html',idproyecto=proy)
-            else:
-                 flash('Proyecto Iniciado, imposible definir mas fases')
-                 return redirect(url_for('defFases'))
+        if (request.form['opcion']=="Crear Item"):
+            return render_template('crearItem.html',idproyecto=proy)
+        if (request.form['opcion']=="Relacionar"):
+            return render_template('relacion.html',idproyecto=proy)
+        if request.form['opcion'] == "Cerrar Proyecto":
+            return render_template('main.html') 
+
+"""-----------------------Crear Items---------------------------------------"""
+@app.route('/crearItem', methods=['GET','POST'])
+def crearItem():
+    """Funcion para crear los items""" 
+    if request.method == 'GET':
+        listaTiposItem=CtrlAdmTipoItem.getTipoItemList()
+        return render_template('admTipoItem.html',listTipoItem=listaTiposItem)
+    if request.method == 'POST':
+        if request.form['opcion'] == "Home":
+            return render_template('main.html')
+
+"""-----------------------Relacion entre Items---------------------------------------"""
+@app.route('/relacion', methods=['GET','POST'])
+def relacion():
+    """Funcion para relacionar los items"""  
+    if request.method == 'GET':
+        return render_template('relacion.html')
+    if request.method == 'POST':
+        if request.form['opcion'] == "Home":
+            return render_template('main.html')
+                            
 if __name__=='__main__':
     app.run()             

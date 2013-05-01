@@ -3,18 +3,19 @@
 <body class=formato1>
         <form class='estilos' action="{{ url_for('proyectoX') }}" method=post>
         	<input type='hidden' name="proyecto" value={{ proyecto}}>
-             <center><h1>{{ proyecto.nombre}}</h1></center>
+             <center><h1>{{ proyecto.nombre}} nombre proyecto </h1></center>
+             <br>
             <div><label>Seleccionar Fase</label>
-		<div><br>	
-				<select name="fase">
-					{% for fase in listFases %}
-						<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
-				 	{% endfor %}						
-				</select>
-	    </div>
+					<div><br>	
+							<select name="fase">
+								{% for fase in listFases %}
+									<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
+							 	{% endfor %}						
+							</select>
+				    </div>
             		<br>
-				<input type='submit' name="opcion" value='Mostrar Items'>
-	            </div>
+					<input type='submit' name="opcion" value='Mostrar Items'>
+	        </div>
 	            <div><label>Items de fase seleccionada:</label>
 	            	<br>
 	            	<div style="height:150px;width:200px;overflow:auto;">	
@@ -35,7 +36,7 @@
 				    <br>        
             </div>
             
-            <div><center><input type='submit' name="opcion" value='Crear Item '>
+            <div><center><input type='submit' name="opcion" value='Crear Item'>
             <input type='submit' name="opcion" value='Relacionar'></center></div>            
             <div><center><input type='submit' name="opcion" value='Cerrar Proyecto'></center></div>
 

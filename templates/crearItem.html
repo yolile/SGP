@@ -4,19 +4,30 @@
         <form class='estilos' action="{{ url_for('crearItem') }}" method=post>
              <center><h1>CREACION DE ITEM</h1></center>
           	<br>
-          	<br>    
+          	<br>
+          	
+          	<div><input type='hidden' name='idproyecto' value="{{ idproyecto }}"></div>
+          	          	    
             <div><label>Nombre:</label><input type='text' name=nombre></div>        
             <div><label>Descripcion:</label><textarea rows='2	'name=descripcion></textarea></div>
             <div><label>Complejidad</label><input type='password' name=complejidad></div>
             <div><label>Prioridad:</label><input type='text' name=prioridad></div>
             <div><label>Costo:</label><input type='text' name=costo></div>
-            
-            <div><label>Tipo de Item:</label>
-				<select name="tipoitem">
-						<option value="TipoItem">Poner la lista</option>
-				</select>
-				<input type='submit' name="opcion" value='Mostrar Atributos'>
-	            </div>
+
+
+       		 <div><label>Seleccionar Tipo de Item</label>
+				<div><br>	
+					<select name="tipoItem">
+						{% for tipoItem in listTipoItem %}
+							<option value={{ tipoItem.idtipoitem }}>{{ tipoItem.nombre }}</option>
+					 	{% endfor %}						
+					</select>
+				    </div>
+            		<br>
+					<input type='submit' name="opcion" value='Mostrar Atributos'>
+	        	</div>
+
+
 	            <div><label>Atributos segun Tipo de Item:</label>
 	            	<br>
 	            	<div style="height:150px;width:430px;overflow:auto;">	
