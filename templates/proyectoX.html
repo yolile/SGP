@@ -1,33 +1,23 @@
 {% extends "layout.html" %}
 {% block body %}
-<body class=formato4>
+<body class=formato1>
         <form class='estilos' action="{{ url_for('proyectoX') }}" method=post>
-             <center><h1>Proyecto asd</h1></center>
+        	<input type='hidden' name="proyecto" value={{ proyecto}}>
+             <center><h1>{{ proyecto.nombre}}</h1></center>
             <div><label>Seleccionar Fase</label>
-		<div style="height:150px;width:750px;overflow:scroll;">	
-			<br>
-			<input type='hidden' name="proyecto" value={{ proyecto}}>
-			<TABLE WIDTH="100%" BORDER="1">
-				<tr>
-					<th scope="col">Secuencia</th>
-					<th scope="col">Nombre</th>
-					<th scope="col">OK</th>
-				</tr>
-				{% for fase in listFases %}
-					<tr>
-						<td>{{ fase.posicionfase }}</td>
-						<td>{{ fase.nombre}}</td>	
-						<td><input name="select" type="radio" value={{ fase.idfase }} checked /></td>
-					</tr>  	
-				 {% endfor %}
-			 </TABLE>
+		<div><br>	
+				<select name="fase">
+					{% for fase in listFases %}
+						<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
+				 	{% endfor %}						
+				</select>
 	    </div>
-            		<br> <br> 	
+            		<br>
 				<input type='submit' name="opcion" value='Mostrar Items'>
 	            </div>
 	            <div><label>Items de fase seleccionada:</label>
 	            	<br>
-	            	<div style="height:150px;width:430px;overflow:scroll;">	
+	            	<div style="height:150px;width:200px;overflow:auto;">	
 	            	<table width="50%" border="1">
 					<tr>
 					<th scope="col"> </th>
@@ -45,9 +35,9 @@
 				    <br>        
             </div>
             
-            <div><center><input type='submit' name="opcion" value='Crear'>
-            <div><center><input type='submit' name="opcion" value='Relacionar'>            
-            <input type='submit' name="opcion" value='Cerrar Proyecto'></center></div>
+            <div><center><input type='submit' name="opcion" value='Crear Item '>
+            <input type='submit' name="opcion" value='Relacionar'></center></div>            
+            <div><center><input type='submit' name="opcion" value='Cerrar Proyecto'></center></div>
 
         </form>
     </body>
