@@ -5,10 +5,10 @@
        	<center><h1>Asignar Tipo de Items a una fase</h1></center>
           <br>
           <br>
-          <div><input type='hidden' name='idfase' value=""></div>
+          <div><input type='hidden' name='idfase' value={{ idfase }}></div>
                       
             <div><label>Tipos de Items<label></div>	
-			<div style="height:150px;width:200px;overflow:auto;">	
+			<div style="height:150px;width:200px;overflow:scroll;">	
 			<table width="50%" border="1">
 			<tr>
 			<th scope="col">Nombre</th>	
@@ -18,7 +18,11 @@
   				{% for tipoItem in listTipoItem %}
 					<tr>
 					<td>{{ tipoItem.nombre }}</td>
-                	<td><INPUT TYPE="checkbox" checked="checked" NAME="roles" VALUE="{{ tipoItem.idtipoItem}}"></td>  
+					{% if tipoItem.idtipoitem in idtipos %}
+                		<td><INPUT TYPE="checkbox" checked="checked" NAME="tipos" VALUE="{{ tipoItem.idtipoitem}}"></td>  
+					{% else %}
+						<td><INPUT TYPE="checkbox" NAME="tipos" VALUE="{{ tipoItem.idtipoitem}}"></td>  
+					{% endif %}
 					</tr> 	
   				{% endfor %}
 			</table>

@@ -1,4 +1,4 @@
-from Modelo import Usuario, Permiso, Rol, engine
+from Modelo import Usuario, Permiso, Rol, engine, Proyecto, Fase
 from sqlalchemy import create_engine, and_, func
 from sqlalchemy.orm import sessionmaker, join
 
@@ -148,6 +148,29 @@ def getIdByUsername(usrname):
         return usr.idusuario
     else:
         raise Exception('No existe este usuario')
+
+def tienePermisoEnFase(idfase,username,idpermiso):
+    """Funcion que indica si un usuario tiene permisos para
+    una determinada accion en una fase.
+    Para eso debe reunir al menos una de estas condiciones:
+    1)El usuario es el lider del proyecto; o
+    2)El usuario posee un rol que esta asignado a esa fase y ese rol
+    posee el permiso requerido"""
+    fase = session.query(Fase).filter(Fase.idfase==idfase).first()
+    proyecto = session.query(Proyecto).filter(Proyecto.idproyecto==fase.idproyecto).first()
+    iduser=getIdByUsername(username)
+    if(iduser==proyecto.usuariolider):
+        return True
+    rolesFase=fase.roles
+    rolesUsuario=usr(iduser).roles
+    for rolfase in rolesFase:
+        for rolusuario in rolesUsuario:
+            if(rolfase.idrol==rolusuario.idrol):
+                listaperm=rolfase.permisos
+                for permiso in listaperm:
+                    if(permiso.idpermiso==idpermiso):
+                        return True
+    return False
 
 # def truncarUsuario():
 #     trans = conn.begin()

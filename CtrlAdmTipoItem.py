@@ -85,6 +85,10 @@ def getNombre(idtipoitem):
     result = session.query(TipoItem).filter(TipoItem.idtipoitem==idtipoitem).first()
     return result.nombre
 
+def getTipoItem(idtipoitem):
+    result = session.query(TipoItem).filter(TipoItem.idtipoitem==idtipoitem).first()
+    return result
+
 def getDescripcion(idtipoitem):
     """Devuelve la descripcion de un tipo de item dado su id"""
     result = session.query(TipoItem).filter(TipoItem.idtipoitem==idtipoitem).first()
@@ -114,9 +118,18 @@ def tipoDeItemNoInstanciado(idtipoitem):
     #Falta implementar. Funcion que retorna si un tipo de item
     #no fue utilizado en un proyecto, o sea si se puede redefinir
     return True
+
+def descartarCambios():
+    """Funcion que realiza un rollback a la sesion 'session' """
+    session.rollback()
+    
+def guardarCambios():
+    """Funcion que guarda los cambios que se realizaron sobre
+    la sesion 'session' """
+    session.commit()
 #===============================================================================
-# Las funciones de abajo solo se llevaran a cabo en la sesion (Para redefinir
-# tipos de item) Se usa la sesion global Session
+# Las funciones de abajo solo se llevaran a cabo en la sesion global 'session'
+# (Para redefinir tipos de item) 
 #===============================================================================
 
 def modTipoItemSession(idtipoitem,nombre,descripcion):
@@ -137,9 +150,4 @@ def agregarAtributoSession(tipoitem,nombre,tipodato,bydefault):
     if(tipoitem!=""):
         nuevo = AtributoTipo(idatributo,tipoitem,nombre,tipodato,bydefault)
         session.add(nuevo)
-        
-def descartarCambios():
-    session.rollback()
-    
-def guardarCambios():
-    session.commit()
+
