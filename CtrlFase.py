@@ -37,4 +37,4 @@ def crearItem (nombre,estado,idtipoitem,idfase):
     session1.commit()
     return nuevo.iditem
 
-def cargarAtributos(idatributo,iditem,):
+# def cargarAtributos(idatributo,iditem,):
