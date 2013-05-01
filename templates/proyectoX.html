@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block body %}
+<body class=formato1>
+        <form class='estilos' action="{{ url_for('proyectoX') }}" method=post>
+        	<input type='hidden' name="proyecto" value={{ proyecto}}>
+             <center><h1>{{ proyecto.nombre}} nombre proyecto </h1></center>
+             <br>
+            <div><label>Seleccionar Fase</label>
+					<div><br>	
+							<select name="fase">
+								{% for fase in listFases %}
+									<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
+							 	{% endfor %}						
+							</select>
+				    </div>
+            		<br>
+					<input type='submit' name="opcion" value='Mostrar Items'>
+	        </div>
+	            <div><label>Items de fase seleccionada:</label>
+	            	<br>
+	            	<div style="height:150px;width:200px;overflow:auto;">	
+	            	<table width="50%" border="1">
+					<tr>
+					<th scope="col"> </th>
+					<th scope="col">Nro</th>
+					<th scope="col">NOMBRE</th>					
+					</tr>
+						{% for item in listItem %}
+						<tr>
+						<td><input name="select" type="radio" value={{ item.iditem }} checked /></td>	
+						<td>{{ item.numero }}</td>	
+						<td>{{ item.nombre}}</td>
+						</tr>  	
+						  	{% endfor %}
+					</table>
+				    <br>        
+            </div>
+            
+            <div><center><input type='submit' name="opcion" value='Crear Item'>
+            <input type='submit' name="opcion" value='Relacionar'></center></div>            
+            <div><center><input type='submit' name="opcion" value='Cerrar Proyecto'></center></div>
+
+        </form>
+    </body>
+{% endblock %}

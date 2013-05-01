@@ -8,30 +8,32 @@
  <center><h1>Seleccionar Proyecto</h1></center>
  <br>
  <br>
-	<div style="height:250px;width:500px;overflow:scroll;">	
+	<div style="height:250px;width:500px;overflow:auto;">	
 	
 	<table width="100%" border="1">
 	<tr>
+	<th scope="col"> </th>
 	<th scope="col">Nombre</th>
 	<th scope="col">Fecha Creacion</th>
 	<th scope="col">Lider</th>
-	<th scope="col">OK</th>
 	</tr>
 
 		  {% for proyecto in listProy %}
-	<tr>
-	<td>{{ proyecto.nombre }}</td>
-	<td>{{ proyecto.fechacreacion}}</td>	
-	<td>{{ proyecto.usuariolider }}</td>
-	<td><input name="select" type="radio" value={{ proyecto.idproyecto }} checked /></td>
-	</tr>  	
+		  	{% if proyecto.estado == 'iniciado' %}
+				<tr>
+				<td><input name="select" type="radio" value={{ proyecto.idproyecto }} checked /></td>	
+				<td>{{ proyecto.nombre }}</td>
+				<td>{{ proyecto.fechacreacion}}</td>	
+				<td>{{ proyecto.usuariolider }}</td>
+				</tr>  	
+			{% endif %} 	
 	  	{% endfor %}
 	  	
 
 	</table>
 	</div>	
 
-	<div><center><input type="submit" name="opcion" value="Abrir " />
+	<div><center><input type="submit" name="opcion" value="Abrir" />
 	<input type="submit" name="opcion" value="Home" /></center></div>
 	<input type="text" name="buscar"/>
 	<select name="atributo">
