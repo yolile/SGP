@@ -568,11 +568,29 @@ def relacion():
     if request.method == 'POST':
         if request.form['opcion'] == "Home":
             return render_template('main.html')
-                                
-"""---------------------Abrir Proyecto-----------------------------------"""
+                        
+@app.route('/admProy', methods=['GET','POST'])
+def admProy():
+    """Funcion que presenta el menu para administrar Proyectos."""  
+    if request.method == 'GET':
+        if CtrlAdmUsr.havePermission(owner,202):
+            listaProy = CtrlAdmProy.getProyectoList()
+            return render_template('admProy.html',listProy=listaProy)
+        else:
+            flash('No tiene permisos para realizar esta operacion ')
+            return redirect(url_for('menu')) 
+    if request.method == 'POST':
+        if request.form['opcion'] == "Administrar Fases":
+            global fasesCreadas
+            fasesCreadas=0
+            global proyecto
+            proyecto = int(request.form['select'])
+            return redirect(url_for('defFases'))
+   
+
 @app.route('/abrirProyecto', methods=['GET','POST'])
 def abrirProyecto():
-    """Funcion para seleccionar el proyecto a ser utilizado en el modo de desarrollo"""  
+    """Funcion que presenta el menu para administrar Proyectos."""  
     if request.method == 'GET':
         if CtrlAdmUsr.havePermission(owner,202):
             listaProy = CtrlAdmProy.getProyectoList()
@@ -582,25 +600,27 @@ def abrirProyecto():
             return redirect(url_for('menu')) 
     if request.method == 'POST':
         if request.form['opcion'] == "Abrir":
-            return render_template('proyectoX.html')
-        if request.form['opcion'] == "Home":
-            return render_template('main.html')
-        return redirect(url_for('abrirProyecto'))
-    
+            global fasesCreadas
+            fasesCreadas=0
+            global proyecto
+            proyecto = int(request.form['select'])
+            return redirect(url_for('proyectoX'))
+   
+
 @app.route('/proyectoX', methods=['GET','POST'])
 def proyectoX():
-    """Funcion que muestra un proyecto seleccionado en el modo de desarrollo"""  
+    """Funcion que permite administrar fases dentro de un proyecto"""
     if request.method == 'GET':
-        if CtrlAdmUsr.havePermission(owner,202):
-            return render_template('proyectoX.html')
-        else:
-            flash('No tiene permisos para realizar esta operacion ')
-            return redirect(url_for('menu')) 
+        global proyecto
+        listaFases = CtrlAdmProy.getFasesListByProy(proyecto)
+        return render_template('proyectoX.html',listFases=listaFases,proyecto=proyecto)
     if request.method == 'POST':
-        if request.form['opcion'] == "Abrir":
-            return render_template('proyectoX.html')
-        if request.form['opcion'] == "Home":
-            return render_template('main.html')
-        return redirect(url_for('abrirProyecto'))              
+        proy=request.form['proyecto']
+        if (request.form['opcion']=="Definir"):
+            if(CtrlAdmProy.getProyEstado(proy)=='no-iniciado'):
+               return render_template('crearFase.html',idproyecto=proy)
+            else:
+                 flash('Proyecto Iniciado, imposible definir mas fases')
+                 return redirect(url_for('defFases'))
 if __name__=='__main__':
-    app.run()
+    app.run()             

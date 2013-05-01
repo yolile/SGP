@@ -19,12 +19,14 @@
 	</tr>
 
 		  {% for proyecto in listProy %}
-	<tr>
-	<td><input name="select" type="radio" value={{ proyecto.idproyecto }} checked /></td>	
-	<td>{{ proyecto.nombre }}</td>
-	<td>{{ proyecto.fechacreacion}}</td>	
-	<td>{{ proyecto.usuariolider }}</td>
-	</tr>  	
+		  	{% if proyecto.estado == 'iniciado' %}
+				<tr>
+				<td><input name="select" type="radio" value={{ proyecto.idproyecto }} checked /></td>	
+				<td>{{ proyecto.nombre }}</td>
+				<td>{{ proyecto.fechacreacion}}</td>	
+				<td>{{ proyecto.usuariolider }}</td>
+				</tr>  	
+			{% endif %} 	
 	  	{% endfor %}
 	  	
 

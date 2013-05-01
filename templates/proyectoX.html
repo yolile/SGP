@@ -3,11 +3,26 @@
 <body class=formato4>
         <form class='estilos' action="{{ url_for('proyectoX') }}" method=post>
              <center><h1>Proyecto asd</h1></center>
-            
             <div><label>Seleccionar Fase</label>
-				<select name="fase">
-						<option value="TipoItem">Poner la lista</option>
-				</select>
+		<div style="height:150px;width:750px;overflow:scroll;">	
+			<br>
+			<input type='hidden' name="proyecto" value={{ proyecto}}>
+			<TABLE WIDTH="100%" BORDER="1">
+				<tr>
+					<th scope="col">Secuencia</th>
+					<th scope="col">Nombre</th>
+					<th scope="col">OK</th>
+				</tr>
+				{% for fase in listFases %}
+					<tr>
+						<td>{{ fase.posicionfase }}</td>
+						<td>{{ fase.nombre}}</td>	
+						<td><input name="select" type="radio" value={{ fase.idfase }} checked /></td>
+					</tr>  	
+				 {% endfor %}
+			 </TABLE>
+	    </div>
+            		<br> <br> 	
 				<input type='submit' name="opcion" value='Mostrar Items'>
 	            </div>
 	            <div><label>Items de fase seleccionada:</label>
