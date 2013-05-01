@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<body class = formato2>
+	<form class='estilos' action="{{ url_for('cargarAtributos')}}" method="post">
+		<H1><CENTER>Definicion atributos</CENTER></H1>
+
+	 <div><label>Atributos segun Tipo de Item:</label>
+	            	<br>
+	            	<div style="height:150px;width:430px;overflow:auto;">	
+	            	<table width="50%" border="1">
+					<tr>
+					<th scope="col">NOMBRE</th>
+					<th scope="col">VALOR</th>
+					</tr>
+					{% for atributotipo in listAtributoTipo %}
+								<td><label>{{ atributotipo.nombre }}</label></td>
+								<td><input type='text' name={{ atributotipo.nombre }}</td>
+					
+					</table>
+				    <br>        
+            </div>
+
+	    <center>
+	    <input type="submit" name="opcion" value="Definir"/>
+	<br><br>	
+
+	
+		<br>
+
+		</center>
+	</form>
+</body>
+{% endblock %}
+	           

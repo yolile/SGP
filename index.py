@@ -5,6 +5,7 @@ import CtrlAdmUsr
 import CtrlAdmRol
 import CtrlAdmProy
 import CtrlAdmTipoItem
+import CtrlFase
 
 """Modulo de ejecucion principal de SGP"""  
 __author__ = 'Grupo 5'
@@ -348,7 +349,6 @@ def defFases():
                                    idroles=idRolesEnFase,
                                    idfase=idfase)
         if (request.form['opcion']=="Asignar Tipo de Item"):
-            global owner
             if(CtrlAdmUsr.tienePermisoEnFase(idfase,owner,204)==False):
                 flash('No tiene permisos para realizar esta operacion')
                 return redirect(url_for('defFases'))
@@ -597,7 +597,7 @@ def modTipoItem():
 def abrirProyecto():
     """Funcion que presenta el menu para administrar Proyectos."""  
     if request.method == 'GET':
-        if CtrlAdmUsr.havePermission(owner,202):
+        if CtrlAdmUsr.havePermission(owner,206):
             listaProy = CtrlAdmProy.getProyectoList()
             return render_template('abrirProyecto.html',listProy=listaProy)
         else:
@@ -605,8 +605,6 @@ def abrirProyecto():
             return redirect(url_for('menu')) 
     if request.method == 'POST':
         if request.form['opcion'] == "Abrir":
-            global fasesCreadas
-            fasesCreadas=0
             global proyecto
             proyecto = int(request.form['select'])
             return redirect(url_for('proyectoX'))
@@ -622,7 +620,9 @@ def proyectoX():
     if request.method == 'POST':
         proy=request.form['proyecto']
         if (request.form['opcion']=="Crear Item"):
-            return render_template('crearItem.html',idproyecto=proy)
+            idfase = request.form['fase']
+            tiposEnFase=CtrlAdmProy.getFase(idfase).tipositems
+            return render_template('crearItem.html',idproyecto=proy,listTipoItem=tiposEnFase)
         if (request.form['opcion']=="Relacionar"):
             return render_template('relacion.html',idproyecto=proy)
         if request.form['opcion'] == "Cerrar Proyecto":
@@ -636,8 +636,19 @@ def crearItem():
         listaTiposItem=CtrlAdmTipoItem.getTipoItemList()
         return render_template('admTipoItem.html',listTipoItem=listaTiposItem)
     if request.method == 'POST':
+        if request.form['opcion'] == "cargar Atributos":
+            return render_template('cargarAtributos.html')
         if request.form['opcion'] == "Home":
             return render_template('main.html')
+        
+"""----------------------Agregar Atributos de Tipo de Item por Item-------------------"""        
+@app.route('/cargarAtributos', methods=['GET','POST'])
+def cargarAtributos():
+    if request.method == 'POST':
+        return render_template('cargarAtributos.html')
+    if request.method == 'POST':
+        if request.form['opcion'] == "Home":
+            return render_template('main.html')    
 
 """-----------------------Relacion entre Items---------------------------------------"""
 @app.route('/relacion', methods=['GET','POST'])
