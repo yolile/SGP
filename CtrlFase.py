@@ -28,11 +28,13 @@ def getMaxIdItem():
             iditemmax = item.iditem
     return iditemmax
  
-def crearItem (nombre, estado,idtipoitem,idfase):
+def crearItem (nombre,estado,idtipoitem,idfase):
     """Funcion que crea un item y devuelve el iditem"""
     session1=Session()
     iditem=getMaxIdItem()+1
-    nuevo=Item(iditem,nombre,estado,idtipoitem,idfase)
+    nuevo=Item(iditem,nombre,estado,idtipoitem,idfase,0)
     session1.add(nuevo)
     session1.commit()
     return nuevo.iditem
+
+def cargarAtributos(idatributo,iditem,):
