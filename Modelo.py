@@ -12,7 +12,7 @@ __credits__ = 'none'
 __text__ = 'Modulo con las clases y las tablas relacionadas entre si'
 __file__ = 'Modelo.py' 
 
-engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgp')
+engine = create_engine('postgresql+psycopg2://admin:admin@localhost/newsgp')
 Base = declarative_base()
 
 """------------------------TABLAS DE RELACION---------------------------------------"""
@@ -39,10 +39,12 @@ ComiteCambios = Table('comitecambios', Base.metadata,
                                             primary_key=True)
 )
 
-TipoItemFase = Table('tipoitemfase',Base.metadata,
-    Column('idtipoitem', Integer, ForeignKey('tipoitem.idtipoitem'),primary_key=True),
-    Column('idfase', Integer, ForeignKey('fase.idfase'),primary_key=True)
-)
+TipoItemFase=Table('tipoitemfase', Base.metadata,
+                   Column('idtipoitem', Integer, ForeignKey('tipoitem.idtipoitem',
+                                                            ondelete='CASCADE'),primary_key=True),
+                   Column('idfase', Integer, ForeignKey('fase.idfase',
+                                                        ondelete='CASCADE'),primary_key=True))
+  
 
 """------------------------USUARIO---------------------------------------""" 
 class Usuario(Base):
@@ -141,19 +143,21 @@ class Fase(Base):
     posicionfase = Column(Integer)
     nombre = Column(String(45))
     descripcion = Column(String(45))
+    estado=Column(String(45))
     roles = relationship("Rol", secondary=RolFase)
     tipositems = relationship("TipoItem", secondary=TipoItemFase)
     
-    def __init__(self, idfase, idproyecto, posicionfase, nombre, descripcion):
+    def __init__(self, idfase, idproyecto, posicionfase, nombre, descripcion, estado):
         self.idfase = idfase
         self.idproyecto = idproyecto
         self.posicionfase = posicionfase
         self.nombre = nombre
         self.descripcion = descripcion
+        self.estado = estado
 
 
     def __repr__(self):
-        return "<Fase '%s' '%s' '%s' '%s' '%s' '%s' '%s'>" % self.idfase, self.idproyecto, self.posicionfase, self.nombre, self.descripcion 
+        return "<Fase '%s' '%s' '%s' '%s' '%s' '%s' '%s' '%s' >" % self.idfase, self.idproyecto, self.posicionfase, self.nombre, self.descripcion, self.estado 
 
 """------------------------TIPO DE ITEM---------------------------------------"""
 class TipoItem(Base):
@@ -285,5 +289,5 @@ class LineaBase(Base):
 
     def __repr__(self):
         return "<LineaBase'%s' '%s' '%s' '%s'>" % self.idlineabase, self.idfase, self.estado, self.numero
-        
+    
 Base.metadata.create_all(engine)  

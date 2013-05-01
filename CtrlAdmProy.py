@@ -1,8 +1,9 @@
-from CtrlAdmUsr import getIdByUsername
-from Modelo import Fase, Proyecto, Usuario, engine
-from sqlalchemy import create_engine
+from Modelo import Fase, Proyecto, Usuario, engine, TipoItemFase, TipoItem, Rol
+from sqlalchemy import create_engine, and_
 from sqlalchemy.orm import sessionmaker
 from datetime import *
+import CtrlAdmTipoItem
+import CtrlAdmUsr
 
 """Controlador de Administrador de Proyectos."""  
 __author__ = 'Grupo 5'
@@ -31,7 +32,7 @@ def getMayorIdProyecto():
 
 def crearProy (nombre,descripcion,presupuesto,liderusername):
     idproyectomax = getMayorIdProyecto()
-    usuariolider = getIdByUsername(liderusername)
+    usuariolider = CtrlAdmUsr.getIdByUsername(liderusername)
     fechaactual = date.today()
     proy_nuevo = Proyecto(idproyectomax+1,nombre,descripcion,fechaactual,0,'no-iniciado',usuariolider,presupuesto)
     lider = session.query(Usuario).filter(Usuario.idusuario==usuariolider).first()
@@ -79,19 +80,24 @@ def getMaxIdFase():
 
 def crearFase(nombre,descripcion,idproyecto):
     maxsecuencia = getMaxSeqProy(idproyecto)
+    estado='no-iniciada'
     maxidfase = getMaxIdFase()
-    nueva_fase = Fase(maxidfase+1,idproyecto,maxsecuencia+1,nombre,descripcion)
+    nueva_fase = Fase(maxidfase+1,idproyecto,maxsecuencia+1,nombre,descripcion,estado)
     session.add(nueva_fase)
     session.commit()
     
 def setProyIniciado(idproyecto):
-    proy = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
-    proy.estado = 'iniciado'
+    """Funcion que establece el estado de un proyecto como
+    'iniciado' y el estado de su primera fase como 'desarrollo'"""
+    proyecto = proy(idproyecto)
+    proyecto.estado = 'iniciado'
+    fase=getFase(getIdPrimeraFase(idproyecto))
+    fase.estado= 'desarrollo'
     session.commit() 
                     
 def getProyEstado(idproyecto):
-    proy = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
-    return proy.estado
+    proyecto = proy(idproyecto)
+    return proyecto.estado
 
 def asigComiteCamb(idproyecto, idusuarioList):
     proyecto = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
@@ -138,6 +144,52 @@ def getMiembrosList(idproyecto):
 def getliderProyecto(idproyecto):
     proy = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
     return proy.usuariolider
+
+def desasignarTiposFase(fase):
+    """Funcion que recibe una fase y desasigna todos
+    los tipos de item que estaban asignados a la fase"""
+    tiposasignados=fase.tipositems
+    for tipo in tiposasignados:
+        fase.tipositems.remove(tipo)
+
+def asignarTiposAFase(idfase,idtiposdeitem):
+    """Funcion que recibe un idfase y una lista de 
+    id de tipos de item. Primero desasigna los tipos
+    de item que estaban asignados a esa fase
+    y luego asigna los tipos que pertenecen a la
+    lista recibida"""
+    fase = getFase(idfase)
+    desasignarTiposFase(fase) 
+    tiposdeitem = session.query(TipoItem).filter(TipoItem.idtipoitem.in_(idtiposdeitem)).all()
+    fase.tipositems = tiposdeitem
+    session.commit()
+
+def faseTieneTipoItem(idfase):
+    fase=getFase(idfase)
+    if(len(fase.tipositems)>0):
+        return True
+    return False
+
+def getIdPrimeraFase(idproyecto):
+    fase=session.query(Fase).filter(and_(Fase.idproyecto==idproyecto, Fase.posicionfase==1)).first()
+    return fase.idfase
+
+def asignarRolesFase(idroles,idfase):
+    """Funcion que recibe un idfase y una lista de id de roles.
+    Primero desasigna los roles que estaban asignados a esa fase
+    y luego asigna los roles que pertenecen a la lista recibida"""
+    fase = getFase(idfase)
+    desasignarRolesFase(fase) 
+    roles = session.query(Rol).filter(Rol.idrol.in_(idroles)).all()
+    fase.roles = roles
+    session.commit()
+    
+def desasignarRolesFase(fase):
+    """Funcion que recibe una fase y desasigna todos
+    los roles que estaban asignados a la fase"""
+    rolesasignados=fase.roles
+    for rol in rolesasignados:
+        fase.roles.remove(rol)
 
 # def truncarProyecto():
 #     trans = conn.begin()

@@ -322,16 +322,48 @@ def defFases():
             else:
                  flash('Proyecto Iniciado, imposible definir mas fases')
                  return redirect(url_for('defFases'))
-        if (request.form['opcion']=="Volver a ADM Proyectos"):
-             global fasesCreadas
-             if(fasesCreadas != 0):
-                 CtrlAdmProy.setProyIniciado(proy)
-                 fasesCreadas = 0
-             return redirect(url_for('admProy'))
+        if (request.form['opcion']=="Listo"):
+            global fasesCreadas
+            if(fasesCreadas != 0):#si se creo al menos una fase
+                idfase=CtrlAdmProy.getIdPrimeraFase(proy)
+                if(CtrlAdmProy.faseTieneTipoItem(idfase)==False):
+                    flash('Debe asignar al menos un tipo de item a la primera fase')
+                    return redirect(url_for('defFases'))
+                CtrlAdmProy.setProyIniciado(proy)
+                fasesCreadas = 0
+            return redirect(url_for('admProy'))
+        idfase=int(request.form['select'])
         if (request.form['opcion']=="Asignar Roles"):
-               return render_template('asigRolesFase.html')
+            global owner
+            if(CtrlAdmUsr.tienePermisoEnFase(idfase,owner,205)==False):
+                flash('No tiene permisos para realizar esta operacion')
+                return redirect(url_for('defFases'))
+            listaRoles=CtrlAdmRol.getRolList()
+            idRolesEnFase=[]
+            rolesEnFase=CtrlAdmProy.getFase(idfase).roles
+            for rol in rolesEnFase:
+                idRolesEnFase.append(rol.idrol)
+            return render_template('asigRolesFase.html',
+                                   listRol=listaRoles,
+                                   idroles=idRolesEnFase,
+                                   idfase=idfase)
         if (request.form['opcion']=="Asignar Tipo de Item"):
-               return render_template('asigTipoItem.html')    
+            global owner
+            if(CtrlAdmUsr.tienePermisoEnFase(idfase,owner,204)==False):
+                flash('No tiene permisos para realizar esta operacion')
+                return redirect(url_for('defFases'))
+            if(CtrlAdmProy.getFase(idfase).estado !='no-iniciada'):
+                flash('No se permite asignar tipos de item a una fase que ha iniciado')
+                return redirect(url_for('defFases'))
+            listaTipos=CtrlAdmTipoItem.getTipoItemList()
+            idTiposEnFase=[]
+            tiposEnFase=CtrlAdmProy.getFase(idfase).tipositems
+            for tipo in tiposEnFase:
+                idTiposEnFase.append(tipo.idtipoitem)
+            return render_template('asigTipoItem.html',
+                                   listTipoItem=listaTipos,
+                                   idtipos=idTiposEnFase,
+                                   idfase=idfase)
         return redirect(url_for('defFases'))
            
 @app.route('/crearFase', methods=['GET','POST'])
@@ -404,17 +436,30 @@ def modCC():
 @app.route('/asigRolesFase', methods=['GET','POST'])
 def asigRolesFase():
     if request.method == 'POST':
-        project=int(request.form['idproyecto'])
+        idfase=int(request.form['idfase'])
+        idproyecto=CtrlAdmProy.getFase(idfase).idproyecto
         if request.form['opcion']=="Aceptar":
-            return render_template('defFases.html')
-        
+            idroles=request.form.getlist('roles')
+            CtrlAdmProy.asignarRolesFase(idroles,idfase)
+        listaFases = CtrlAdmProy.getFasesListByProy(idproyecto)
+        return render_template('defFases.html',listFases=listaFases,proyecto=idproyecto)    
+                
 @app.route('/asigTipoItem', methods=['GET','POST'])
 def asigTipoItem():
     if request.method == 'POST':
-        project=int(request.form['idproyecto'])
+        idfase=int(request.form['idfase'])
+        idproyecto=CtrlAdmProy.getFase(idfase).idproyecto
         if request.form['opcion']=="Aceptar":
-            return render_template('defFases.html')
-        
+            idtiposdeitem=request.form.getlist('tipos')
+            CtrlAdmProy.asignarTiposAFase(idfase,idtiposdeitem)
+            if(CtrlAdmProy.faseTieneTipoItem==False):
+                flash("Se debe asignar al menos un tipo de item a la fase")
+                listaTipos=CtrlAdmTipoItem.getTipoItemList()
+                return render_template('asigTipoItem.html',
+                                       listTipoItem=listaTipos,
+                                       idfase=idfase)
+        listaFases = CtrlAdmProy.getFasesListByProy(idproyecto)
+        return render_template('defFases.html',listFases=listaFases,proyecto=idproyecto)
         
 """-------------------------MODULO DE DESARROLLO---------------------------------------"""        
                                                            
@@ -547,6 +592,7 @@ def modTipoItem():
                                listAtribTipoItem=listaAtributosTipo,
                                nombre=nombre,descripcion=descripcion)
 
+"""---------------------Abrir Proyecto-----------------------------------"""
 @app.route('/abrirProyecto', methods=['GET','POST'])
 def abrirProyecto():
     """Funcion que presenta el menu para administrar Proyectos."""  

@@ -62,7 +62,7 @@ def permiso(idPermiso):
     return result
         
 def crearRol(nombre,descripcion,idPermisoList):
-    """Funcion que recibe los atributos de un usuario y lo persiste en la base de datos."""
+    """Funcion que recibe los atributos de un rol y lo persiste en la base de datos."""
     idrolmax=getMayorIdRol()
     nuevo_rol = Rol(idrolmax+1,nombre,descripcion)
     listapermisos = session.query(Permiso).filter(Permiso.idpermiso.in_(idPermisoList)).all()
