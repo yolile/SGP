@@ -6,18 +6,17 @@
           	<br>
           	<br>
           	
-          	<div><input type='hidden' name='idproyecto' value="{{ idproyecto }}"></div>
+          	{#<div><input type='hidden' name='idproyecto' value="{{ idproyecto }}"></div>#}
           	          	    
-            <div><label>Nombre:</label><input type='text' name=nombre></div>        
-            <div><label>Descripcion:</label><textarea rows='2	'name=descripcion></textarea></div>
-            <div><label>Complejidad</label><input type='password' name=complejidad></div>
-            <div><label>Prioridad:</label><input type='text' name=prioridad></div>
-            <div><label>Costo:</label><input type='text' name=costo></div>
-
+            <div><label>Nombre:</label><input type='text' name=nombre value='{{ item.nombre }}'></div>        
+            <div><label>Descripcion:</label><textarea rows='2' name=descripcion>{{ versionitem.descripcion }}</textarea></div>
+            <div><label>Complejidad:</label><input type='text' name=complejidad value='{{ versionitem.complejidad }}'></div>
+            <div><label>Prioridad:</label><input type='text' name=prioridad value='{{ versionitem.prioridad }}'></div>
+            <div><label>Costo:</label><input type='text' name=costo value='{{ versionitem.costo }}'></div>
 
        		 <div><label>Seleccionar Tipo de Item</label>
 				<div><br>	
-					<select name="tipoItem">
+					<select name=tipoItem>
 						{% for tipoItem in listTipoItem %}
 							<option value={{ tipoItem.idtipoitem }}>{{ tipoItem.nombre }}</option>
 					 	{% endfor %}						

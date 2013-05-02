@@ -23,9 +23,13 @@ app.config.from_envvar('SGP_SETTINGS', silent=True)
 
 owner=""
 proyecto=0
+item=None
+versionitem=None
+listaAtributoItemPorTipo=[]
 """fases creadas es una variable global que ayuda a saber si fueron creadas
 nuevas fases dentro de la llamada defFases"""
 fasesCreadas=0
+
 
 @app.route('/')
 def index():
@@ -616,15 +620,29 @@ def proyectoX():
     if request.method == 'GET':
         global proyecto
         listaFases = CtrlAdmProy.getFasesListByProy(proyecto)
-        return render_template('proyectoX.html',listFases=listaFases,proyecto=proyecto)
+        return render_template('proyectoX.html',listFases=listaFases)
     if request.method == 'POST':
-        proy=request.form['proyecto']
         if (request.form['opcion']=="Crear Item"):
-            idfase = request.form['fase']
-            tiposEnFase=CtrlAdmProy.getFase(idfase).tipositems
-            return render_template('crearItem.html',idproyecto=proy,listTipoItem=tiposEnFase)
+            idfase = int(request.form['fase'])
+            global item
+            global versionitem
+            item = CtrlFase.instanciarItem("","desaprobado",0,idfase)
+            versionitem = CtrlFase.instanciarVersionItem(item.iditem,
+                                                         CtrlAdmUsr.getIdByUsername(owner),
+                                                         "",
+                                                         0,
+                                                         0,
+                                                         0,
+                                                         1)
+            global listaAtributoItemPorTipo
+            listaAtributoItemPorTipo = []
+            return redirect(url_for('crearItem'))
         if (request.form['opcion']=="Relacionar"):
             return render_template('relacion.html',idproyecto=proy)
+        if (request.form['opcion']=="Mostrar Items"):
+            listItem = CtrlFase.getItemsFase(int(request.form['fase']))
+            listaFases = CtrlAdmProy.getFasesListByProy(proyecto)
+            return render_template('proyectoX.html',listFases=listaFases,listItem=listItem)
         if request.form['opcion'] == "Cerrar Proyecto":
             return render_template('main.html') 
 
@@ -633,22 +651,68 @@ def proyectoX():
 def crearItem():
     """Funcion para crear los items""" 
     if request.method == 'GET':
-        listaTiposItem=CtrlAdmTipoItem.getTipoItemList()
-        return render_template('admTipoItem.html',listTipoItem=listaTiposItem)
+        global item
+        global versionitem
+        tiposEnFase=CtrlAdmProy.getFase(item.idfase).tipositems
+        return render_template('crearItem.html',
+                               listTipoItem=tiposEnFase,
+                               item=item,
+                               versionitem=versionitem)
     if request.method == 'POST':
-        if request.form['opcion'] == "cargar Atributos":
-            return render_template('cargarAtributos.html')
-        if request.form['opcion'] == "Home":
-            return render_template('main.html')
+        if request.form['opcion'] == "Cargar Atributos":
+            item.nombre = request.form['nombre']
+            item.idtipoitem = int(request.form['tipoItem'])
+            versionitem.descripcion = request.form['descripcion']
+            versionitem.costo = int(request.form['costo'])
+            versionitem.prioridad = int(request.form['prioridad'])
+            versionitem.complejidad = int(request.form['complejidad'])
+            listaAtributos = CtrlAdmTipoItem.getAtributosTipo(item.idtipoitem)
+            return render_template('cargarAtributos.html',listaAtributos=listaAtributos)
+        if request.form['opcion'] == "Crear":
+            item.nombre = request.form['nombre']
+            versionitem.descripcion = request.form['descripcion']
+            versionitem.costo = int(request.form['costo'])
+            versionitem.prioridad = int(request.form['prioridad'])
+            versionitem.complejidad = int(request.form['complejidad'])
+            global listaAtributoItemPorTipo
+            if listaAtributoItemPorTipo:
+                if(versionitem.costo <= CtrlAdmProy.proy(proyecto).presupuesto):
+                    CtrlFase.crearItem(item,versionitem,listaAtributoItemPorTipo)
+                    flash("Item Creado")
+                else:
+                    tiposEnFase=CtrlAdmProy.getFase(item.idfase).tipositems
+                    return render_template('crearItem.html',
+                                           listTipoItem=tiposEnFase,
+                                           item=item,
+                                           versionitem=versionitem,
+                                           error="El costo del item sobrepasa el presupuesto de "+
+                                           str(CtrlAdmProy.proy(proyecto).presupuesto))
+            else:
+                tiposEnFase=CtrlAdmProy.getFase(item.idfase).tipositems
+                return render_template('crearItem.html',
+                               listTipoItem=tiposEnFase,
+                               item=item,
+                               versionitem=versionitem,
+                               error="Debe Cargar Valores a los Atributos de Tipo de Item")
+        return redirect(url_for('proyectoX'))
         
 """----------------------Agregar Atributos de Tipo de Item por Item-------------------"""        
 @app.route('/cargarAtributos', methods=['GET','POST'])
 def cargarAtributos():
+    "Funcion que carga los valores de los atributos de los tipos de items en los items"
     if request.method == 'POST':
-        return render_template('cargarAtributos.html')
-    if request.method == 'POST':
-        if request.form['opcion'] == "Home":
-            return render_template('main.html')    
+        if request.form['opcion'] == "Aceptar":
+            global item
+            global listaAtributoItemPorTipo
+            listaAtributoItemPorTipo = []
+            listaAtributos = CtrlAdmTipoItem.getAtributosTipo(item.idtipoitem)
+            for atributo in listaAtributos:
+                nuevo = CtrlFase.instanciarAtributoItemPorTipo(item.iditem,
+                                                               atributo.idatributo,
+                                                               request.form[atributo.nombre])
+                listaAtributoItemPorTipo.append(nuevo)
+        return redirect(url_for('crearItem'))
+        
 
 """-----------------------Relacion entre Items---------------------------------------"""
 @app.route('/relacion', methods=['GET','POST'])
