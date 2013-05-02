@@ -220,19 +220,19 @@ class Item(Base):
     estado = Column(String(45))
     idtipoitem = Column(Integer, ForeignKey('tipoitem.idtipoitem'))
     idfase = Column(Integer, ForeignKey('fase.idfase'))        
-    idlineabase = Column (Integer,ForeignKey ('lineabase.idlineabase'))
- 
+    #idlineabase = Column (Integer,ForeignKey ('lineabase.idlineabase'))
+    
     def __init__(self, iditem, nombre, estado, idtipoitem,idfase):
         self.iditem = iditem
         self.nombre = nombre 
         self.estado = estado
         self.idtipoitem = idtipoitem
         self.idfase = idfase
-        self.idlineabase = idlineabase               
+        #self.idlineabase = idlineabase               
  
  
     def __repr__(self):
-        return "<Item '%s' '%s' '%s' '%s' '%s' '%s' '%s'>" % self.idtipoitem, self.nombre,self.estado, self.idtipoitem, self.idfase, self.lineabase
+        return "<Item '%s' '%s' '%s' '%s' '%s' '%s' '%s'>" % self.idtipoitem, self.nombre,self.estado, self.idtipoitem, self.idfase, self.idlineabase
         
 """------------------------VERSION DEL ITEM---------------------------------------"""
 class VersionItem(Base):
@@ -244,8 +244,9 @@ class VersionItem(Base):
     complejidad = Column(Integer)
     prioridad = Column(Integer)
     costo = Column(Integer)                   
+    version = Column(Integer)
 
-    def __init__(self, idversionitem, iditem, idusuario,descripcion,complejidad,prioridad,costo):
+    def __init__(self, idversionitem, iditem, idusuario,descripcion,complejidad,prioridad,costo,version):
         self.idversionitem = idversionitem
         self.iditem = iditem
         self.idusuario = idusuario
@@ -253,9 +254,9 @@ class VersionItem(Base):
         self.complejidad = complejidad
         self.prioridad = prioridad
         self.costo = costo        
-
+        self.version = version
     def __repr__(self):
-        return "<Item '%s' '%s' '%s' '%s' '%s' '%s' '%s'>" % self.idversionitem, self.iditem, self.idusuario, self.descripcion, self.complejidad, self.prioridad, self.costo
+        return "<Item '%s' '%s' '%s' '%s' '%s' '%s' '%s' '%s'>" % self.idversionitem, self.iditem, self.idusuario, self.descripcion, self.complejidad, self.prioridad, self.costo, self.version
     
 """------------------------RELACION ENTRE ITEMS---------------------------------------"""
 class Relacion(Base):

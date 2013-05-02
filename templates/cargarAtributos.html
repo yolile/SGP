@@ -3,9 +3,9 @@
 
 <body class = formato2>
 	<form class='estilos' action="{{ url_for('cargarAtributos')}}" method="post">
+	
 		<H1><CENTER>Definicion atributos</CENTER></H1>
 
-	 <div><label>Atributos segun Tipo de Item:</label>
 	            	<br>
 	            	<div style="height:150px;width:430px;overflow:auto;">	
 	            	<table width="50%" border="1">
@@ -13,17 +13,20 @@
 					<th scope="col">NOMBRE</th>
 					<th scope="col">VALOR</th>
 					</tr>
-					{% for atributotipo in listAtributoTipo %}
-								<td><label>{{ atributotipo.nombre }}</label></td>
-								<td><input type='text' name={{ atributotipo.nombre }}</td>
-					
+					{% for atributo in listaAtributos %}
+							<tr>
+								<td>{{ atributo.nombre }}</td>
+								<td><input type='text' name={{ atributo.nombre }} value="{{ atributo.valordefecto }}"/></td>
+							</tr>
+					{% endfor %}
 					</table>
 				    <br>        
             </div>
 
 	    <center>
-	    <input type="submit" name="opcion" value="Definir"/>
+	    <input type="submit" name="opcion" value="Aceptar"/>
 	<br><br>	
+	    <input type="submit" name="opcion" value="Cancelar"/>
 
 	
 		<br>
