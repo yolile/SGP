@@ -10,7 +10,9 @@
 						<option value="padre-hijo">Padre-Hijo</option>
 						<option value="sucesor-antecesor">Sucesor-Antecesor</option>						
 				</select>
-            <br> <br>         
+            <br> <br>
+            <input name='opcion' type='submit' value='Mostrar Item'>         
+            <br> <br>
             <div><label>Lista de Items<label></div>
 		<div style="height:150px;width:150px;overflow:scroll;">	
 		<TABLE BORDER WIDTH="70%">
@@ -20,10 +22,12 @@
 			<th scope="col">OK</th>
 			</tr>
             	{% for item in listItem %}
+            		{% if item.iditem != iditem %}
 						<tr>
-						<td>{{ permiso.nombre }}</td>
-						<td><INPUT TYPE="checkbox" NAME="permisos" VALUE={{ item.iditem }}></td>
+						<td>{{ item.nombre }}</td>
+						<td><INPUT TYPE="checkbox" NAME="iditemList" VALUE={{ item.iditem }}></td>
 						</tr>  	
+					{% endif %}
   				{% endfor %}
 			</table>
 			</div>

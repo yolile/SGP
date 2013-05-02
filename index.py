@@ -15,7 +15,7 @@ __credits__ = 'none'
 __text__ = 'indice principal que conmuta con las diferentes funcionalidades de SGP'
 __file__ = 'index.py' 
 
-app = Flask(__name__)
+app = Flask(__name__,template_folder='/home/juan/git/SGP/templates')
 app.debug = True
 app.secret_key = 'secreto'
 app.config.from_object(__name__)
@@ -26,6 +26,9 @@ proyecto=0
 item=None
 versionitem=None
 listaAtributoItemPorTipo=[]
+
+iditem=0
+
 """fases creadas es una variable global que ayuda a saber si fueron creadas
 nuevas fases dentro de la llamada defFases"""
 fasesCreadas=0
@@ -638,7 +641,9 @@ def proyectoX():
             listaAtributoItemPorTipo = []
             return redirect(url_for('crearItem'))
         if (request.form['opcion']=="Relacionar"):
-            return render_template('relacion.html',idproyecto=proy)
+            global iditem
+            iditem = int(request.form['iditem'])
+            return redirect(url_for('relacion'))
         if (request.form['opcion']=="Mostrar Items"):
             listItem = CtrlFase.getItemsFase(int(request.form['fase']))
             listaFases = CtrlAdmProy.getFasesListByProy(proyecto)
@@ -721,8 +726,23 @@ def relacion():
     if request.method == 'GET':
         return render_template('relacion.html')
     if request.method == 'POST':
+        if request.form['opcion'] == "Mostrar Item":
+            if request.form['tipo']== "padre-hijo":
+                global iditem
+                item = CtrlFase.getItem(iditem)
+                listItem = CtrlFase.getItemsFase(item.idfase)
+                return render_template('relacion.html',listItem=listItem,iditem=iditem)
+            if request.form['tipo']== "sucesor-antecesor":
+                item = CtrlFase.getItem(iditem)
+                listItem = CtrlFase.getItemsFaseAnterior(item.idfase)
+                return render_template('relacion.html',listItem=listItem)
+        if request.form['opcion'] == "Crear":
+            CtrlFase.relacionar(iditem,
+                                request.form.getlist('iditemList'),
+                                request.form['tipo'])
         if request.form['opcion'] == "Home":
             return render_template('main.html')
+    return redirect(url_for('proyectoX'))
                             
 if __name__=='__main__':
     app.run()             

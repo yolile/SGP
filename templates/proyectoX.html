@@ -19,15 +19,15 @@
 	            	<div style="height:150px;width:200px;overflow:auto;">	
 	            	<table width="50%" border="1">
 					<tr>
-					<th scope="col"> </th>
-					<th scope="col">Nro</th>
-					<th scope="col">NOMBRE</th>					
+					<th scope="col">OK</th>
+					<th scope="col">NOMBRE</th>
+					<th scope="col">ESTADO</th>					
 					</tr>
 						{% for item in listItem %}
 						<tr>
-						<td><input name="select" type="radio" value={{ item.iditem }} checked /></td>	
-						<td>{{ item.numero }}</td>	
-						<td>{{ item.nombre}}</td>
+						<td><input name="iditem" type="radio" value={{ item.iditem }} checked /></td>	
+						<td>{{ item.nombre }}</td>	
+						<td>{{ item.estado}}</td>
 						</tr>  	
 						  	{% endfor %}
 					</table>
