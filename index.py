@@ -741,9 +741,23 @@ def relacion():
                 listItem = CtrlFase.getItemsFaseAnterior(item.idfase)
                 return render_template('relacion.html',listItem=listItem)
         if request.form['opcion'] == "Crear":
+            if request.form['tipo']== "padre-hijo":
+                for idItemB in request.form.getlist('iditemList'):
+                    if CtrlFase.ciclo(iditem,int(idItemB)):
+                        item = CtrlFase.getItem(iditem)
+                        listItem = CtrlFase.getItemsFase(item.idfase)
+                        itemB = CtrlFase.getItem(idItemB)
+                        return render_template('relacion.html',
+                                               listItem=listItem,
+                                               iditem=iditem,
+                                               error='Imposible crear relacion '+
+                                               item.nombre+
+                                               " - "+
+                                               itemB.nombre)
             CtrlFase.relacionar(iditem,
                                 request.form.getlist('iditemList'),
                                 request.form['tipo'])
+                    
         if request.form['opcion'] == "Home":
             return render_template('main.html')
     return redirect(url_for('proyectoX'))
