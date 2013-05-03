@@ -5,14 +5,6 @@ import tempfile
 import CtrlAdmProy
 import CtrlAdmRol
 import CtrlAdmUsr
-
-def tearDown():
-    CtrlAdmUsr.truncarUsuario()
-    CtrlAdmRol.truncarRol()
-    CtrlAdmUsr.truncarRolUsuario()
-    CtrlAdmRol.truncarRolPermiso()
-    CtrlAdmProy.truncarProyecto()
-    CtrlAdmProy.truncarFase()
         
 class SGPTestCase(unittest.TestCase):
 
@@ -106,7 +98,7 @@ class SGPTestCase(unittest.TestCase):
 
     """---------Test---------"""
     def test_crearUsr(self):
-        tearDown()
+        CtrlAdmUsr.cleanScenarioUser('prueba')
         rv = self.crearUsr('Crear',
                             'prueba', 
                             'prueba', 
@@ -115,72 +107,97 @@ class SGPTestCase(unittest.TestCase):
                             '99999999', 
                             '9999999')
         assert 'Usuario creado' in rv.data
-        tearDown()
+        CtrlAdmUsr.cleanScenarioUser('prueba')
 
     def test_login(self):
-        tearDown()
-        CtrlAdmUsr.insertarUsuario('1','prueba','prueba','nombre','apellido','111','222')
+        #limpiando escenario
+        CtrlAdmUsr.cleanScenarioUser('prueba')
+        #creando escenario
+        CtrlAdmUsr.createScenarioUser('1','prueba','prueba','nombre','apellido','111','222')
+        #prueba
         rv = self.login('prueba', 'prueba')
         assert 'Estas logueado' in rv.data
-        tearDown()
+        #limpiando escenario
+        CtrlAdmUsr.cleanScenarioUser('prueba')
         
     def test_logout(self):
         rv = self.logout()
         assert 'Estas deslogueado' in rv.data
     
     def test_modUsr(self):
-        tearDown()
+        #limpiando escenario
+        CtrlAdmUsr.cleanScenarioUser('prueba')
+        #creando escenario
+        CtrlAdmUsr.createScenarioUser('2','prueba','prueba','Usuario','Prueba','88888888','8888888')
+        #el test
         rv = self.modUsr('Modificar', 
                          '2',
-                         'prueba', 
+                         'prueba',
                          'prueba', 
                          'Usuario', 
                          'Prueba', 
                          '88888888', 
                          '8888888')
         assert 'Usuario modificado' in rv.data
-        tearDown()
+        #limpiando escenario
+        CtrlAdmUsr.cleanScenarioUser('prueba')
         
     def test_crearRol(self):
-        tearDown()
         rv = self.crearRol('Crear', 
                          "Rol Prueba",
                          "Este rol fue creado con la intencion de hacer pruebas en el caso de uso crear rol",
                          ['201','202','203'])
         assert 'Rol creado' in rv.data
-        tearDown()
+        #limpiar escenario borrando el rol creado
+        CtrlAdmRol.elimRol(CtrlAdmRol.getMayorIdRol())
     
     def test_asigRoles(self):
-        tearDown()
-        permisos=[200,201]
-        CtrlAdmRol.insertarRol('101','rol de prueba','rol de prueba',permisos)
-        CtrlAdmUsr.insertarUsuario('2','prueb','123','prueba','unitaria','1','3000')
+        #creando escenario
+        if (CtrlAdmRol.idPermisoExiste(200)==False):
+            CtrlAdmRol.insertarPermiso(200)
+        if (CtrlAdmRol.idPermisoExiste(201)==False):
+            CtrlAdmRol.insertarPermiso(201)
+        if(CtrlAdmRol.idRolExiste==False):
+            permisos=[200,201]
+            CtrlAdmRol.insertarRol('101','rol de prueba','rol de prueba',permisos)
+        if(CtrlAdmUsr.idUsuarioExiste==False):
+            CtrlAdmUsr.createScenarioUser('2','prueb','123','prueba','unitaria','1','3000')
+        #prueba
         rv = self.asigRoles('Aceptar', 
                          "2",
                          ['101'])
         assert 'Roles asignados al usuario' in rv.data
-        tearDown()
+        #limpiando escenario
+        CtrlAdmRol.elimRol(101)
+        CtrlAdmUsr.elimUsr(2)      
        
     def test_modRol(self):
-        tearDown()
+        # creando escenario
+        if not(CtrlAdmRol.idRolExiste(101)):
+            CtrlAdmRol.crearRol('101','','',[])
+        if not(CtrlAdmRol.idPermisoExiste(202)):
+            CtrlAdmRol.crearPermiso('202','','')
+        if not(CtrlAdmRol.idPermisoExiste(203)):
+            CtrlAdmRol.crearPermiso('203','','') 
+        # prueba      
         rv = self.modRol('Modificar', 
                            "101",
                          "Rol Prueba Modificado",
                          "Este rol fue creado con la intencion de hacer pruebas en el caso de uso modificar rol",
                          ['202','203'])
         assert 'Rol modificado' in rv.data   
-        tearDown()
     
     def test_crearProy(self):
-        tearDown()
-        CtrlAdmUsr.insertarUsuario('2','prueba','prueba','prueba','unitaria','1','3000')
+        #creando escenario
+        CtrlAdmUsr.cleanScenarioUser('prueba')
+        CtrlAdmUsr.createScenarioUser('2','prueba','prueba','prueba','unitaria','1','3000')
+        #prueba
         rv = self.login('prueba', 'prueba')
         rv = self.crearProy('Crear', 
                            "Proyecto prueba",
                          "Este proyecto fue creado con la intencion de hacer pruebas en el caso de uso crear proyecto",
                          '1000')
         assert 'Proyecto creado' in rv.data 
-        tearDown()
 
 if __name__ == '__main__':
     unittest.main()

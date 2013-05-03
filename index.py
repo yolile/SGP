@@ -478,6 +478,10 @@ def admTipoItem():
         listaTiposItem=CtrlAdmTipoItem.getTipoItemList()
         return render_template('admTipoItem.html',listTipoItem=listaTiposItem)
     if request.method == 'POST':
+        if request.form['opcion'] == "Buscar":
+            listTipo = CtrlAdmTipoItem.busquedaTipo(request.form['buscar'])
+            flash('Resultado de la busqueda')
+            return render_template('admTipoItem.html',listTipoItem=listTipo)
         if request.form['opcion'] == "Crear":
             #se crea un tipo de item para poder crearle atributos,
             #al cancelar la operacion el item sera eliminado

@@ -55,7 +55,7 @@ def crearUsr(username,passwrd,nombre,apellido,telefono,ci):
     nuevo = Usuario(idusuariomax+1,username,passwrd,nombre,apellido,telefono,ci)
     session.add(nuevo)
     session.commit()
-        
+    return idusuario
 
 def elimUsr(iduser):
     """Funcion que recibe el Id de un Usuario y elimina de la base de datos"""
@@ -172,28 +172,19 @@ def tienePermisoEnFase(idfase,username,idpermiso):
                         return True
     return False
 
-# def truncarUsuario():
-#     trans = conn.begin()
-#     try:
-#         conn.execute('truncate table "public"."usuario" cascade')
-#         trans.commit()
-#     except :
-#         trans.rollback()
-# 
-# def truncarRolUsuario():
-#     trans = conn.begin()
-#     try:
-#         conn.execute('truncate table "public"."rolusuario" cascade')
-#         trans.commit()
-#     except :
-#         trans.rollback()
-# 
-# def insertarUsuario(idusuario,username,passwrd,nombre,apellido,telefono,ci):
-#     """Funcion utilizada en pruebas"""
-#     result = usuario_table.insert().execute(idusuario=idusuario,
-#                                              username=username, 
-#                                              passwrd=passwrd,
-#                                              nombre=nombre, 
-#                                              apellido=apellido, 
-#                                              telefono=telefono, 
-#                                              ci=ci)
+#===============================================================================
+# Funciones utilizadas en test
+#===============================================================================
+    
+def cleanScenarioUser(username):
+    try:
+        iduser=CtrlAdmUsr.getIdByUsername(username)
+    except:
+        iduser=None
+    if(iduser!=None):
+        CtrlAdmUsr.elimUsr(username)
+        
+def createScenarioUser(idusuario,username,passwrd,nombre,apellido,telefono,ci):
+    nuevo=Usuario(idusuario,username,passwrd,nombre,apellido,telefono,ci)
+    session.add(nuevo)
+    session.commit()

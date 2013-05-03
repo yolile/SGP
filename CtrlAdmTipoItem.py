@@ -119,6 +119,9 @@ def tipoDeItemNoInstanciado(idtipoitem):
     #no fue utilizado en un proyecto, o sea si se puede redefinir
     return True
 
+def busquedaTipo(texto):
+    return session.query(TipoItem).filter(TipoItem.nombre.like(texto+'%')).all()
+
 def descartarCambios():
     """Funcion que realiza un rollback a la sesion 'session' """
     session.rollback()
