@@ -6,10 +6,17 @@
           <br>
           <br>
             <div><label>Tipo de Relacion:</label><br>
-				<select name="tipo">
-						<option value="padre-hijo">Padre-Hijo</option>
-						<option value="sucesor-antecesor">Sucesor-Antecesor</option>						
-				</select>
+				{% if bool %}
+					<select name="tipo">
+							<option value="padre-hijo">Padre-Hijo</option>
+							<option value="sucesor-antecesor">Sucesor-Antecesor</option>
+					</select>
+				{% else %}
+					<select name="tipo">
+							<option value="sucesor-antecesor">Sucesor-Antecesor</option>
+							<option value="padre-hijo">Padre-Hijo</option>
+					</select>
+				{% endif %}
             <br> <br>
             <input name='opcion' type='submit' value='Mostrar Item'>         
             <br> <br>
@@ -25,7 +32,11 @@
             		{% if item.iditem != iditem %}
 						<tr>
 						<td>{{ item.nombre }}</td>
-						<td><INPUT TYPE="checkbox" NAME="iditemList" VALUE={{ item.iditem }}></td>
+						{% if item.iditem in relacionadoList %}
+							<td><INPUT TYPE="checkbox" NAME="iditemList" checked="checked" VALUE={{ item.iditem }}></td>
+						{% else %}
+							<td><INPUT TYPE="checkbox" NAME="iditemList" VALUE={{ item.iditem }}></td>
+						{% endif %}
 						</tr>  	
 					{% endif %}
   				{% endfor %}
@@ -33,7 +44,7 @@
 			</div>
 			
 		    <div><center>
-		    <input name='opcion' type='submit' value='Crear'>
+		    <input name='opcion' type='submit' value='Guardar'>
 		    <input name='opcion' type='submit' value='Cancelar'>		    	     
 			</center></div>
         </form>

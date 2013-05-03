@@ -87,9 +87,14 @@ def getItemsFaseAnterior(idfase):
     return getItemsFase(fase_anterior.idfase)
 
 def relacionar(idItem, idItemList, tipo):
-    relaciones = []
+    relacioneliminarList = session.query(Relacion).filter(Relacion.alitem==idItem).all()
+    for relacion in relacioneliminarList:
+        session.delete(relacion)
+    session.commit()
+    relaciones = []    
     for id in idItemList:
-        nuevo = Relacion(int(idItem),int(id),tipo)
+        #Relacion(delitem,alitem)
+        nuevo = Relacion(int(id),int(idItem),tipo)
         relaciones.append(nuevo)
     session.add_all(relaciones)
     session.commit()
@@ -110,3 +115,21 @@ def ciclo(idItemA,idItemB):
             return True
     #print False
     return False
+
+def getListPadreHijo(idItem):
+    relacionList = session.query(Relacion).filter(and_(Relacion.alitem==idItem,Relacion.tipo=='padre-hijo')).all()
+    idItemList = []
+    for relacion in relacionList:
+        idItemList.append(relacion.delitem)
+    return idItemList
+
+
+def getListAntecesorSucesor(idItem):
+    item = session.query(Item).filter(Item.iditem==idItem).first()
+    relacionList = session.query(Relacion).filter(and_(Relacion.alitem==idItem,Relacion.tipo=='sucesor-antecesor')).all()
+    idItemList = []
+    for relacion in relacionList:
+        idItemList.append(relacion.delitem)
+    return idItemList
+    
+     
