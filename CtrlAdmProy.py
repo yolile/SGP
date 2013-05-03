@@ -2,6 +2,7 @@ from Modelo import Fase, Proyecto, Usuario, engine, TipoItemFase, TipoItem, Rol
 from sqlalchemy import create_engine, and_
 from sqlalchemy.orm import sessionmaker
 from datetime import *
+import sqlalchemy.exc
 import CtrlAdmTipoItem
 import CtrlAdmUsr
 
@@ -111,7 +112,10 @@ def busquedaProy(parametro,atributo):
     if atributo == 'nombre':
         result = session.query(Proyecto).filter(Proyecto.nombre.like(parametro+'%')).all()
     if atributo == 'fechaCreacion':
-        result = session.query(Proyecto).filter(Proyecto.fechacreacion.like(parametro+'%')).all()
+        try:
+            result = session.query(Proyecto).filter(Proyecto.fechacreacion.like(parametro+'%')).all()
+        except sqlalchemy.exc.ProgrammingError:
+            result=[]
     if atributo == 'lider':
         result = session.query(Proyecto).join((Usuario,Proyecto.usuario)).filter(Usuario.username.like(parametro+'%')).all()
     return result
