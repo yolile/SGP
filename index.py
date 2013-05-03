@@ -633,7 +633,7 @@ def proyectoX():
             idfase = int(request.form['fase'])
             global item
             global versionitem
-            item = CtrlFase.instanciarItem("","desaprobado",0,idfase)
+            item = CtrlFase.instanciarItem("","desarrollo",0,idfase)
             versionitem = CtrlFase.instanciarVersionItem(item.iditem,
                                                          CtrlAdmUsr.getIdByUsername(owner),
                                                          "",
@@ -735,29 +735,42 @@ def relacion():
                 global iditem
                 item = CtrlFase.getItem(iditem)
                 listItem = CtrlFase.getItemsFase(item.idfase)
-                return render_template('relacion.html',listItem=listItem,iditem=iditem)
+                relacionadoList = CtrlFase.getListPadreHijo(iditem)
+                return render_template('relacion.html',
+                                       bool = True,
+                                       listItem=listItem,
+                                       iditem=iditem,
+                                       relacionadoList = relacionadoList)
             if request.form['tipo']== "sucesor-antecesor":
                 item = CtrlFase.getItem(iditem)
                 listItem = CtrlFase.getItemsFaseAnterior(item.idfase)
-                return render_template('relacion.html',listItem=listItem)
-        if request.form['opcion'] == "Crear":
+                relacionadoList = CtrlFase.getListAntecesorSucesor(iditem)
+                return render_template('relacion.html',
+                                       bool = False,
+                                       listItem=listItem,
+                                       iditem=iditem,
+                                       relacionadoList = relacionadoList)
+        if request.form['opcion'] == "Guardar":
             if request.form['tipo']== "padre-hijo":
                 for idItemB in request.form.getlist('iditemList'):
-                    if CtrlFase.ciclo(iditem,int(idItemB)):
+                    if CtrlFase.ciclo(int(idItemB),iditem):
                         item = CtrlFase.getItem(iditem)
                         listItem = CtrlFase.getItemsFase(item.idfase)
                         itemB = CtrlFase.getItem(idItemB)
+                        relacionadoList = [int(r) for r in request.form.getlist('iditemList')]
                         return render_template('relacion.html',
+                                               bool = True,
                                                listItem=listItem,
                                                iditem=iditem,
-                                               error='Imposible crear relacion '+
-                                               item.nombre+
+                                               relacionadoList = relacionadoList,
+                                               error='Imposible crear relacion Padre-Hijo entre '+
+                                               itemB.nombre+
                                                " - "+
-                                               itemB.nombre)
+                                               item.nombre)
             CtrlFase.relacionar(iditem,
                                 request.form.getlist('iditemList'),
                                 request.form['tipo'])
-                    
+            flash("Se han guardado los cambios exitosamente")
         if request.form['opcion'] == "Home":
             return render_template('main.html')
     return redirect(url_for('proyectoX'))
