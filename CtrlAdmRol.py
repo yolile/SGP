@@ -62,6 +62,7 @@ def permiso(idPermiso):
     return result
 
 def buscarPermiso(texto):
+    """Funcion que realiza la busqueda de un permiso segun el nombre de este"""
     return session.query(Permiso).filter(Permiso.nombre.like('%'+texto+'%')).all()
         
 def crearRol(nombre,descripcion,idPermisoList):
@@ -82,7 +83,7 @@ def idPermisoList(idRol):
     return idPermisoList
 
 def modRol(idrol,nombre,descripcion,idPermisoList):
-    """Funcion que recibe los atributos de un usuario y lo modifica en la base de datos"""
+    """Funcion que recibe los atributos de un rol y lo modifica en la base de datos"""
     rol = session.query(Rol).filter(Rol.idrol==idrol).first()
     rol.nombre = nombre
     rol.descripcion = descripcion
@@ -91,11 +92,13 @@ def modRol(idrol,nombre,descripcion,idPermisoList):
     session.commit()
         
 def elimRol(idrol):
+    """Funcion que recibe el id de un rol  y lo elimina en la base de datos"""    
     res = session.query(Rol).filter(Rol.idrol==idrol).first()
     session.delete(res)
     session.commit()
     
 def busquedaRol(parametro,atributo):
+    """Funcion que recibe el parametro de busqueda y el atributo a buscar de un rol"""    
     if atributo == 'nombre':
         result = session.query(Rol).filter(Rol.nombre.like(parametro+'%')).all()
     return result
@@ -107,14 +110,17 @@ def busquedaRol(parametro,atributo):
 # db_session=Session()
 
 def idPermisoExiste(idpermiso):
+    """Funcion qeu verifica si existe un permiso en la Base de datos"""
     result=bool(session.query(Permiso).filter(Permiso.idpermiso==idpermiso).count())
     return result
 
 def insertarPermiso(idpermiso,nombre,descripcion):
+    """Funcion que inserta un permiso en la Base de Datos"""
     nuevo=Permiso(idpermiso,nombre,descripcion)
     session.add(nuevo)
     session.commit()
 def insertarRol(nombre,descripcion,idPermisoList):
+    """Funcion que inserta un Rol en la Base de Datos"""    
     idrol=getMayorIdRol()+1
     nuevo_rol = Rol(idrol,nombre,descripcion)
     listapermisos = session.query(Permiso).filter(Permiso.idpermiso.in_(idPermisoList)).all()

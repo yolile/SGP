@@ -32,6 +32,8 @@ def getMayorIdProyecto():
     return idproyectomax 
 
 def crearProy (nombre,descripcion,presupuesto,liderusername):
+    """Funcion que recibe como parametro los atributos ingresados por el usuario y id del usuario que crea el proyecto"""
+    """Guarda en la Base de Datos y coloca el proyecto como no iniciado"""
     idproyectomax = getMayorIdProyecto()
     usuariolider = CtrlAdmUsr.getIdByUsername(liderusername)
     fechaactual = date.today()
@@ -67,6 +69,7 @@ def getMaxSeqProy(idproyecto):
     return result
 
 def getFase(idfase):
+    """Funcion que recibe el id de una fase y retorna el objeto Fase"""
     fase = session.query(Fase).filter(Fase.idfase==idfase).first()
     return fase
     
@@ -80,6 +83,8 @@ def getMaxIdFase():
     return idfasemax 
 
 def crearFase(nombre,descripcion,idproyecto):
+    """Funcion que recibe los datos introducidos por el usuario genera un id 
+    y secuencia y luego pone el estado de la fase en no iniciado y guarda el objeto"""
     maxsecuencia = getMaxSeqProy(idproyecto)
     estado='no-iniciada'
     maxidfase = getMaxIdFase()
@@ -97,10 +102,13 @@ def setProyIniciado(idproyecto):
     session.commit() 
                     
 def getProyEstado(idproyecto):
+    """Funcion que recibe un id proyecto y retorna el estado en que se encuentra el mismo"""
     proyecto = proy(idproyecto)
     return proyecto.estado
 
 def asigComiteCamb(idproyecto, idusuarioList):
+    """Funcion que recibe el id proyecto y la lista de usuarios asignados para ser miembro de 
+    comite de cambio para luego guardar y generar el nuevo comite de cambios"""
     proyecto = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
     listausuario = session.query(Usuario).filter(Usuario.idusuario.in_(idusuarioList)).all()
     lider = proyecto.usuario
@@ -109,6 +117,7 @@ def asigComiteCamb(idproyecto, idusuarioList):
     session.commit()
     
 def busquedaProy(parametro,atributo):
+    """Funcion que recibe el parametro a buscar y cual es el atributo a ser buscado"""
     if atributo == 'nombre':
         result = session.query(Proyecto).filter(Proyecto.nombre.like('%'+parametro+'%')).all()
     if atributo == 'fechaCreacion':
@@ -121,10 +130,11 @@ def busquedaProy(parametro,atributo):
     return result
 
 def elimProy(idproyecto):
-    """Funcion que recibe el Id de un Proyecto y elimina de la base de datos"""
-    res = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
-    session.delete(res)
-    session.commit()
+    """Funcion que establece el estado de un proyecto como 'eliminado''
+    para que este ya no sea mostrado en el sistema y solo exista a nivel de BD"""
+    proyecto = proy(idproyecto)
+    proyecto.estado = 'eliminado'
+    session.commit() 
 
 def modProy(idproyecto,nombre,descripcion,presupuesto):
     """Funcion que recibe los atributos de un proyecto y lo modifica en la base de datos"""
@@ -135,6 +145,8 @@ def modProy(idproyecto,nombre,descripcion,presupuesto):
     session.commit()
 
 def getidMiembrosList(idproyecto):
+    """Funcion que recibe el idproyecto y retorna la lista de identificadores de los
+    diferentes miembros del comite"""
     proy = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
     listidmiembros=[]
     for usr in proy.comitecambios:
@@ -142,10 +154,13 @@ def getidMiembrosList(idproyecto):
     return listidmiembros
 
 def getMiembrosList(idproyecto):
+    """Funcion que recibe el idproyecto y retorna la lista de los
+    diferentes miembros del comite"""
     proy = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
     return proy.comitecambios
 
 def getliderProyecto(idproyecto):
+    """Funcion que recibe el idproyecto y retorna el usuario lider de dicho proyecto"""
     proy = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
     return proy.usuariolider
 
@@ -169,12 +184,14 @@ def asignarTiposAFase(idfase,idtiposdeitem):
     session.commit()
 
 def faseTieneTipoItem(idfase):
+    """Funcion que verifica si la fase posee un tipo de item asignado"""
     fase=getFase(idfase)
     if(len(fase.tipositems)>0):
         return True
     return False
 
 def getIdPrimeraFase(idproyecto):
+    """Funcion que retorna la primera fase de un proyecto"""
     fase=session.query(Fase).filter(and_(Fase.idproyecto==idproyecto, Fase.posicionfase==1)).first()
     return fase.idfase
 

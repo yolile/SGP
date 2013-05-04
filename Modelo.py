@@ -7,17 +7,17 @@ from sqlalchemy.ext.declarative import declarative_base
 
 """Modulo contenedor de las clases de las entidades"""  
 __author__ = 'Grupo 5'
-__date__ = '23/04/13'
-__version__ = '1.0'
+__date__ = '04/05/13'
+__version__ = '3.0'
 __credits__ = 'none'
 __text__ = 'Modulo con las clases y las tablas relacionadas entre si'
 __file__ = 'Modelo.py' 
 
-"""Para usar la base de datos de prueba descomentar la linea 19
-y comentar la linea 20"""
+#---------------------Atencion!!!!!!!-----------------------------------
+#Para usar la base de datos de prueba descomentar la linea 19 y comentar la linea 20
 
 #rutaBD='postgresql+psycopg2://admin:admin@localhost/BDDEPRUEBA'
-rutaBD='postgresql+psycopg2://admin:admin@localhost/newsgp'
+rutaBD='postgresql+psycopg2://admin:admin@localhost/sgptest'
 
 engine=create_engine(rutaBD)
 Base= declarative_base()

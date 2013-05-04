@@ -29,10 +29,12 @@ def getMaxIdItem():
     return iditemmax
 
 def getVersionItemList():
+    """Funcion que retorna la version de un tipo de item"""
     result = session.query(VersionItem).all()
     return result     
  
 def getMaxIdVersionItem():
+    """Funcion que retorna el maximo valor de la idVersion de un item"""
     lista = getVersionItemList()
     idversionitemmax =0
     for versionitem in lista:
@@ -77,16 +79,19 @@ def instanciarVersionItem(iditem,idusuario,descripcion,complejidad,prioridad,cos
     return nuevo
 
 def getItem(iditem):
+    """Funcion que recibe un iditem y retorna el objeto iditem"""
     item = session.query(Item).filter(Item.iditem==iditem).first()
     return item
 
 def getItemsFaseAnterior(idfase):
+    """Funcion que recibe una idfase y retorna los items de la  fase anterior"""
     fase_actual = session.query(Fase).filter(Fase.idfase==idfase).first()
     fase_anterior = session.query(Fase).filter(and_(Fase.posicionfase==fase_actual.posicionfase-1,
                                                 Fase.idproyecto==fase_actual.idproyecto)).first()
     return getItemsFase(fase_anterior.idfase)
 
 def relacionar(idItem, idItemList, tipo):
+    """Funcion que guarda la relacion en la Base de datos"""
     relacioneliminarList = session.query(Relacion).filter(Relacion.alitem==idItem).all()
     for relacion in relacioneliminarList:
         session.delete(relacion)
@@ -100,11 +105,12 @@ def relacionar(idItem, idItemList, tipo):
     session.commit()
 
 def getRelaciones(idItem):
+    """Funcion que retorna las relaciones de un Item segun su id"""
     result = session.query(Relacion).filter(Relacion.delitem==idItem).all()
     return result
 
 def ciclo(idItemA,idItemB):
-    """Funcion par determinar si al itroducir el vertice A---->B no se formara ningun ciclo"""
+    """Funcion para determinar si al itroducir el vertice A---->B no se formara ningun ciclo"""
     #print '('+str(idItemA)+" "+str(idItemB)+')'
     if(idItemA == idItemB):
         #print True
@@ -117,6 +123,7 @@ def ciclo(idItemA,idItemB):
     return False
 
 def getListPadreHijo(idItem):
+    """Funcion que retorna la el idlist de los items que estan en relacion padre-hijo"""
     relacionList = session.query(Relacion).filter(and_(Relacion.alitem==idItem,Relacion.tipo=='padre-hijo')).all()
     idItemList = []
     for relacion in relacionList:
@@ -125,6 +132,7 @@ def getListPadreHijo(idItem):
 
 
 def getListAntecesorSucesor(idItem):
+    """Funcion que retorna la el idlist de los items que estan en relacion sucesor-antecesor"""    
     item = session.query(Item).filter(Item.iditem==idItem).first()
     relacionList = session.query(Relacion).filter(and_(Relacion.alitem==idItem,Relacion.tipo=='sucesor-antecesor')).all()
     idItemList = []

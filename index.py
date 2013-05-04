@@ -1,6 +1,6 @@
 from __future__ import with_statement
 from flask import Flask, request, session, g, redirect, url_for, abort, \
-     render_template, flash, _app_ctx_stack
+render_template, flash, _app_ctx_stack
 import CtrlAdmUsr
 import CtrlAdmRol
 import CtrlAdmProy
@@ -398,7 +398,7 @@ def crearFase():
 
 @app.route('/admCC', methods=['GET','POST'])
 def admCC():
-    """Funcion que presenta el menu para administrar usuarios."""  
+    """Funcion que presenta el menu para administrar los usuarios de un comite de cambio para un proyecto"""  
     if request.method == 'GET':
         global proyecto
         listMiembros = CtrlAdmProy.getMiembrosList(proyecto)
@@ -430,6 +430,7 @@ def admCC():
 
 @app.route('/modCC', methods=['GET','POST'])
 def modCC():
+    """Funcion que presenta la opcion de asignar/desasignar miembros de un comite de cambio"""
     if request.method == 'POST':
         if request.form['opcion']=="Modificar":
             listSeleccionados = []
@@ -450,6 +451,7 @@ def modCC():
         
 @app.route('/asigRolesFase', methods=['GET','POST'])
 def asigRolesFase():
+    """Funcion que presenta la opcion para asignar roles a las fases de un proyecto dado"""
     if request.method == 'POST':
         idfase=int(request.form['idfase'])
         idproyecto=CtrlAdmProy.getFase(idfase).idproyecto
@@ -461,6 +463,7 @@ def asigRolesFase():
                 
 @app.route('/asigTipoItem', methods=['GET','POST'])
 def asigTipoItem():
+    """Funcion que presenta la opcion para asignar los tipos de items que podran se utilizados en la fase de un proyecto dado"""
     if request.method == 'POST':
         idfase=int(request.form['idfase'])
         idproyecto=CtrlAdmProy.getFase(idfase).idproyecto
@@ -520,6 +523,7 @@ def admTipoItem():
         
 @app.route('/crearTipoItem', methods=['GET','POST'])
 def crearTipoItem():
+    """Funcion que permite la creacion de un nuevo tipo de item en el sistema"""
     if request.method == 'GET':
         idtipoitem=request.form['idtipoitemtemp']
         listaAtributosTipo=CtrlAdmTipoItem.getAtributosTipo(idtipoitem)
@@ -550,6 +554,7 @@ def crearTipoItem():
 
 @app.route('/addAtribTipoItem', methods=['GET','POST'])
 def addAtribTipoItem():
+    """Funcion que permite dentro de la creacion de un tipo de item ir agregando nuevos atributos para un tipo de item a ser creado"""
     if request.method == 'POST':
         idtipoitem=int(request.form['idtipoitem'])
         operacion=request.form['operacion']
@@ -577,11 +582,13 @@ def addAtribTipoItem():
             
 @app.route('/conTipoItem', methods=['GET','POST'])
 def conTipoItem():
+    """Funcion que presenta la opcion de consultar un tipo de item ya creado"""
     if request.method == 'POST':
         return redirect(url_for('admTipoItem'))
 
 @app.route('/modTipoItem', methods=['GET','POST'])
 def modTipoItem():
+    """Funcion que presenta la opcion de modificar un tipo de item ya creado"""
     if request.method == 'GET':
         idtipoitem=request.form['idtipoitem']
         listaAtributosTipo=CtrlAdmTipoItem.getAtributosTipo(idtipoitem)
@@ -611,10 +618,10 @@ def modTipoItem():
                                listAtribTipoItem=listaAtributosTipo,
                                nombre=nombre,descripcion=descripcion)
 
-"""---------------------Abrir Proyecto----------------------------http://localhost:5000/login-------"""
+"""---------------------Abrir Proyecto--------------------------------"""
 @app.route('/abrirProyecto', methods=['GET','POST'])
 def abrirProyecto():
-    """Funcion que presenta el menu para administrar Proyectos."""  
+    """Funcion que presenta el menu para abrir proyectos en modo de desarrollo"""  
     if request.method == 'GET':
         global owner
         if CtrlAdmUsr.havePermission(owner,206):
@@ -640,7 +647,7 @@ def abrirProyecto():
 
 @app.route('/proyectoX', methods=['GET','POST'])
 def proyectoX():
-    """Funcion que permite administrar fases dentro de un proyecto"""
+    """Funcion que muestra las fases de un proyecto Elegido donde se pueden acceder a las diferentes opciones del modulo de desarrollo como crear consultar items y relacionarlos"""
     if request.method == 'GET':
         global proyecto
         listaFases = CtrlAdmProy.getFasesListByProy(proyecto)
@@ -676,7 +683,7 @@ def proyectoX():
 """-----------------------Crear Items---------------------------------------"""
 @app.route('/crearItem', methods=['GET','POST'])
 def crearItem():
-    """Funcion para crear los items""" 
+    """Funcion para crear los items para una fase dada, dentro de un proyecto elejido""" 
     if request.method == 'GET':
         global item
         global versionitem
@@ -726,9 +733,9 @@ def crearItem():
 """----------------------Agregar Atributos de Tipo de Item por Item-------------------"""        
 @app.route('/cargarAtributos', methods=['GET','POST'])
 def cargarAtributos():
-    "Funcion que carga los valores de los atributos de los tipos de items en los items"
+    "Funcion que carga los valores de los atributos segun el tipo de item elegido para cierto item a ser creado"
     if request.method == 'POST':
-        if request.form['opcion'] == "Aceptar":
+        if request.form['opcion'] == "Aceptar": 
             global item
             global listaAtributoItemPorTipo
             listaAtributoItemPorTipo = []
