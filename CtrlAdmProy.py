@@ -194,19 +194,3 @@ def desasignarRolesFase(fase):
     rolesasignados=fase.roles
     for rol in rolesasignados:
         fase.roles.remove(rol)
-
-# def truncarProyecto():
-#     trans = conn.begin()
-#     try:
-#         conn.execute('truncate table "public"."proyecto" cascade')
-#         trans.commit()
-#     except :
-#         trans.rollback()
-#         
-# def truncarFase():
-#     trans = connfase.begin()
-#     try:
-#         connfase.execute('truncate table "public"."fase" cascade')
-#         trans.commit()
-#     except :
-#         trans.rollback()

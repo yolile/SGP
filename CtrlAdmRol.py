@@ -98,35 +98,24 @@ def busquedaRol(parametro,atributo):
     return result
 
     
-# def truncarPermiso():
-#     trans = conn.begin()
-#     try:
-#         conn.execute('truncate table "public"."permiso" cascade')
-#         trans.commit()
-#     except :
-#         trans.rollback()
-#         
-# def truncarRol():
-#     trans = conn.begin()
-#     try:
-#         conn.execute('truncate table "public"."rol" cascade')
-#         trans.commit()
-#     except :
-#         trans.rollback()
-#         
-# def truncarRolPermiso():
-#     trans = conn.begin()
-#     try:
-#         conn.execute('truncate table "public"."rolpermiso" cascade')
-#         trans.commit()
-#     except :
-#         trans.rollback()
-# 
-# def insertarRol(idrol,nombre,descripcion,idPermisoList):
-#     """Funcion utilizada solo en tests"""
-#     result = rol_table.insert().execute(idrol=idrol,
-#                                              nombre=nombre,
-#                                              descripcion=descripcion)   
-#     for idpermiso in idPermisoList:
-#         result = rolpermiso_table.insert().execute(idrol=idrol,
-#                                              idpermiso = int(idpermiso))
+#===============================================================================
+# Funciones utilizadas en tests
+#===============================================================================
+# db_session=Session()
+
+def idPermisoExiste(idpermiso):
+    result=bool(session.query(Permiso).filter(Permiso.idpermiso==idpermiso).count())
+    return result
+
+def insertarPermiso(idpermiso,nombre,descripcion):
+    nuevo=Permiso(idpermiso,nombre,descripcion)
+    session.add(nuevo)
+    session.commit()
+def insertarRol(nombre,descripcion,idPermisoList):
+    idrol=getMayorIdRol()+1
+    nuevo_rol = Rol(idrol,nombre,descripcion)
+    listapermisos = session.query(Permiso).filter(Permiso.idpermiso.in_(idPermisoList)).all()
+    nuevo_rol.permisos = listapermisos
+    session.add(nuevo_rol)
+    session.commit()
+    return idrol

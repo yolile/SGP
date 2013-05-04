@@ -51,10 +51,10 @@ def getMayorIdUsuario():
 
 def crearUsr(username,passwrd,nombre,apellido,telefono,ci):
     """Funcion que recibe los atributos de un usuario y lo periste en la base de datos."""
-    idusuariomax=getMayorIdUsuario()
-    nuevo = Usuario(idusuariomax+1,username,passwrd,nombre,apellido,telefono,ci)
-    session.add(nuevo)
-    session.commit()
+    idusuario=getMayorIdUsuario()+1
+    nuevo = Usuario(idusuario,username,passwrd,nombre,apellido,telefono,ci)    session.add(nuevo)
+	session.add(nuevo)    
+	session.commit()
     return idusuario
 
 def elimUsr(iduser):
@@ -79,7 +79,8 @@ def asigRoles(iduser,idRolList):
     """Funcion que recibe los roles a asignarse a un usuario """
     usr = session.query(Usuario).filter(Usuario.idusuario==iduser).first()
     listaroles = session.query(Rol).filter(Rol.idrol.in_(idRolList)).all()
-    usr.roles = listaroles
+    if(usr != None):
+        usr.roles = listaroles
     session.commit()
 # 
 # def getId(iduser):
@@ -175,16 +176,24 @@ def tienePermisoEnFase(idfase,username,idpermiso):
 #===============================================================================
 # Funciones utilizadas en test
 #===============================================================================
+
+# db_session=Session()
     
-def cleanScenarioUser(username):
-    try:
-        iduser=CtrlAdmUsr.getIdByUsername(username)
-    except:
-        iduser=None
-    if(iduser!=None):
-        CtrlAdmUsr.elimUsr(username)
-        
-def createScenarioUser(idusuario,username,passwrd,nombre,apellido,telefono,ci):
-    nuevo=Usuario(idusuario,username,passwrd,nombre,apellido,telefono,ci)
+def insertarUsr(username,passwrd,nombre,apellido,telefono,ci):
+    """Funcion que recibe los atributos de un usuario y lo periste en la base de datos."""
+    idusuario=getMayorIdUsuario()+1
+    nuevo = Usuario(idusuario,username,passwrd,nombre,apellido,telefono,ci)
     session.add(nuevo)
+    session.commit()
+    return idusuario
+
+def modificarUsr(iduser,username,passwrd,nombre,apellido,telefono,ci):
+    """Funcion que recibe los atributos de un usuario y lo modifica en la base de datos"""
+    usr = db_session.query(Usuario).filter(Usuario.idusuario==iduser).first()
+    usr.username = username
+    usr.passwrd = passwrd
+    usr.nombre = nombre
+    usr.apellido = apellido
+    usr.telefono = telefono
+    usr.ci = ci
     session.commit()

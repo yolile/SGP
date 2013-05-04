@@ -1,8 +1,9 @@
-from sqlalchemy import Table, Integer, ForeignKey, String, Column, Date, create_engine
+from sqlalchemy import Table, Integer, ForeignKey, String, Column, Date
 from sqlalchemy import Sequence
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
-
+from sqlalchemy.orm.session import _SessionClassMethods
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
 
 """Modulo contenedor de las clases de las entidades"""  
 __author__ = 'Grupo 5'
@@ -12,8 +13,14 @@ __credits__ = 'none'
 __text__ = 'Modulo con las clases y las tablas relacionadas entre si'
 __file__ = 'Modelo.py' 
 
-engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgptest')
-Base = declarative_base()
+"""Para usar la base de datos de prueba descomentar la linea 19
+y comentar la linea 20"""
+
+#rutaBD='postgresql+psycopg2://admin:admin@localhost/BDDEPRUEBA'
+rutaBD='postgresql+psycopg2://admin:admin@localhost/newsgp'
+
+engine=create_engine(rutaBD)
+Base= declarative_base()
 
 """------------------------TABLAS DE RELACION---------------------------------------"""
 RolPermiso = Table('rolpermiso', Base.metadata,

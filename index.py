@@ -47,7 +47,7 @@ def login():
     if request.method == 'POST':
         valido = CtrlAdmUsr.validarUsuario(request.form['username'], request.form['password'])
         if valido:
-            global owner 
+            global owner
             owner = request.form['username']
             session['logged_in'] = True
             flash('Estas logueado')
@@ -71,6 +71,7 @@ def menu():
 @app.route('/confCnt', methods=['GET','POST'])
 def confCnt():
     if request.method == 'GET':
+            global owner
             idusuario = CtrlAdmUsr.getIdByUsername(owner)        
             usr = CtrlAdmUsr.usr(idusuario) 
             return render_template('confCnt.html', usr=usr)  
@@ -91,6 +92,7 @@ def confCnt():
 def admUsr():
     """Funcion que presenta el menu para administrar usuarios."""  
     if request.method == 'GET':
+         global owner
          if CtrlAdmUsr.havePermission(owner,200):
              listUser = CtrlAdmUsr.getUsuarioList()
              return render_template('admUsr.html', listUser=listUser, owner=owner)
@@ -172,6 +174,7 @@ def asigRoles():
 def admRol():
     """Funcion que presenta el menu para administrar Roles."""  
     if request.method == 'GET':
+        global owner
         if CtrlAdmUsr.havePermission(owner,201):
             listRol = CtrlAdmRol.getRolList()
             return render_template('admRol.html', listRol = listRol)
@@ -249,6 +252,7 @@ def conPerm():
 def admProy():
     """Funcion que presenta el menu para administrar Proyectos."""  
     if request.method == 'GET':
+        global owner
         if CtrlAdmUsr.havePermission(owner,202):
             listaProy = CtrlAdmProy.getProyectoList()
             return render_template('admProy.html',listProy=listaProy)
@@ -293,6 +297,7 @@ def admProy():
 def crearProy():
     """Funcion que permite crear proyectos"""
     if request.method == 'POST':
+        global owner
         if request.form['opcion'] == "Crear":
             CtrlAdmProy.crearProy(request.form['nombre'], 
                                 request.form['descripcion'], 
@@ -323,6 +328,7 @@ def defFases():
         listaFases = CtrlAdmProy.getFasesListByProy(proyecto)
         return render_template('defFases.html',listFases=listaFases,proyecto=proyecto)
     if request.method == 'POST':
+        global owner
         proy=request.form['proyecto']
         if (request.form['opcion']=="Definir"):
             if(CtrlAdmProy.getProyEstado(proy)=='no-iniciado'):
@@ -342,7 +348,6 @@ def defFases():
             return redirect(url_for('admProy'))
         idfase=int(request.form['select'])
         if (request.form['opcion']=="Asignar Roles"):
-            global owner
             if(CtrlAdmUsr.tienePermisoEnFase(idfase,owner,205)==False):
                 flash('No tiene permisos para realizar esta operacion')
                 return redirect(url_for('defFases'))
@@ -603,11 +608,12 @@ def modTipoItem():
                                listAtribTipoItem=listaAtributosTipo,
                                nombre=nombre,descripcion=descripcion)
 
-"""---------------------Abrir Proyecto-----------------------------------"""
+"""---------------------Abrir Proyecto----------------------------http://localhost:5000/login-------"""
 @app.route('/abrirProyecto', methods=['GET','POST'])
 def abrirProyecto():
     """Funcion que presenta el menu para administrar Proyectos."""  
     if request.method == 'GET':
+        global owner
         if CtrlAdmUsr.havePermission(owner,206):
             listaProy = CtrlAdmProy.getProyectoList()
             return render_template('abrirProyecto.html',listProy=listaProy)
@@ -629,6 +635,7 @@ def proyectoX():
         listaFases = CtrlAdmProy.getFasesListByProy(proyecto)
         return render_template('proyectoX.html',listFases=listaFases)
     if request.method == 'POST':
+        global owner
         if (request.form['opcion']=="Crear Item"):
             idfase = int(request.form['fase'])
             global item
