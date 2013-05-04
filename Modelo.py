@@ -298,4 +298,12 @@ class LineaBase(Base):
     def __repr__(self):
         return "<LineaBase'%s' '%s' '%s' '%s'>" % self.idlineabase, self.idfase, self.estado, self.numero
     
-Base.metadata.create_all(engine)  
+"""-----------Metodos para crear y eliminar todas las tablas definidas---------------------------------------"""
+def init_db():
+    Base.metadata.create_all(engine) 
+    
+def drop_db():
+    _SessionClassMethods.close_all()
+    Base.metadata.drop_all(engine)
+   
+init_db()
