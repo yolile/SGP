@@ -86,15 +86,17 @@ def getNombre(idtipoitem):
     return result.nombre
 
 def getTipoItem(idtipoitem):
+    """Funcion que recibe un identificador de un tipo de item y retorna  el objeto Tipo de Item"""
     result = session.query(TipoItem).filter(TipoItem.idtipoitem==idtipoitem).first()
     return result
 
 def getDescripcion(idtipoitem):
-    """Devuelve la descripcion de un tipo de item dado su id"""
+    """Funcion que devuelve la descripcion de un tipo de item dado su id"""
     result = session.query(TipoItem).filter(TipoItem.idtipoitem==idtipoitem).first()
     return result.descripcion
 
 def valorPorDefectoValido(datatype,valor):
+    """Funcion que verifica si el valor por defecto de un tipo de dato es valido"""
     if valor=="":
         return True
     if datatype=="DATE":
@@ -115,11 +117,14 @@ def borrarAtributo(idatributo):
     session1.commit()
     
 def tipoDeItemNoInstanciado(idtipoitem):
+    """Funcion que verifica si un tipo id item esta instanciado 
+    es decir si ya esta en uso en un item para no modificar si ya esta"""
     #Falta implementar. Funcion que retorna si un tipo de item
     #no fue utilizado en un proyecto, o sea si se puede redefinir
     return True
 
 def busquedaTipo(texto):
+    """Funcion que recibe el un parametro de busqueda y retorna sus coincidencias"""
     return session.query(TipoItem).filter(TipoItem.nombre.like(texto+'%')).all()
 
 def descartarCambios():

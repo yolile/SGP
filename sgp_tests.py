@@ -4,13 +4,12 @@ import unittest
 import tempfile
 import CtrlAdmRol
 import CtrlAdmUsr
-from Modelo import init_db, drop_db
+from Modelo import init_db, drop_db, engine
  
 class SGPTestCase(unittest.TestCase):
 
     """----------Funciones para las pruebas---------"""
     def setUp(self):
-        setupTestDB()
         self.engine = engine
         drop_db()
         init_db()

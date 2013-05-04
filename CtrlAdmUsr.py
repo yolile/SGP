@@ -52,9 +52,9 @@ def getMayorIdUsuario():
 def crearUsr(username,passwrd,nombre,apellido,telefono,ci):
     """Funcion que recibe los atributos de un usuario y lo periste en la base de datos."""
     idusuario=getMayorIdUsuario()+1
-    nuevo = Usuario(idusuario,username,passwrd,nombre,apellido,telefono,ci)    session.add(nuevo)
-	session.add(nuevo)    
-	session.commit()
+    nuevo = Usuario(idusuario,username,passwrd,nombre,apellido,telefono,ci)
+    session.add(nuevo)    
+    session.commit()
     return idusuario
 
 def elimUsr(iduser):
@@ -120,6 +120,7 @@ def asigRoles(iduser,idRolList):
 #     return row['ci']
 
 def busquedaUsr(parametro,atributo):
+    """Funcion que recibe un parametro de busqueda y el atributo por el cual buscar y retorna coincidencias"""
     if atributo == 'nombre':
         result = session.query(Usuario).filter(Usuario.nombre.like(parametro+'%')).all()
     if atributo == 'apellido':
