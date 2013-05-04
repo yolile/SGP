@@ -1,9 +1,11 @@
 import os
+os.environ['DATABASE_URI']='postgresql+psycopg2://admin:admin@localhost/sgptest'
 import index
 import unittest
 import tempfile
 import CtrlAdmRol
 import CtrlAdmUsr
+import CtrlAdmTipoItem
 from Modelo import init_db, drop_db, engine
  
 class SGPTestCase(unittest.TestCase):
@@ -99,6 +101,27 @@ class SGPTestCase(unittest.TestCase):
                                        nombre=nombre,
                                        descripcion=descripcion), 
                             follow_redirects=True)
+        
+    def crearTipoItem(self, opcion, nombre, descripcion, idtipoitem):
+        return self.app.post('/crearTipoItem',
+                             data=dict(
+                                       opcion=opcion,
+                                       nombre=nombre,
+                                       descripcion=descripcion,
+                                       idtipoitemtemp=idtipoitem),
+                             follow_redirects=True)
+        
+    def crearItem(self, opcion, nombre, tipoItem, descripcion, costo, prioridad, complejidad):
+        return self.app.post('/crearItem',
+                             data=dict(
+                                       opcion=opcion,
+                                       nombre=nombre,
+                                       tipoItem=tipoItem,
+                                       descripcion=descripcion,
+                                       costo=costo,
+                                       prioridad=prioridad,
+                                       complejidad=complejidad),
+                             follow_redirects=True)
 
     """---------Test---------"""
     def test_insertarUsr(self):
@@ -187,7 +210,7 @@ class SGPTestCase(unittest.TestCase):
                          "test7-nombre-modificado",
                          "test7-descripcion=-modificado",
                          ['202','203'])
-        assert 'Rol modificado' in rv.data   
+        assert 'Rol modificado' in rv.data
         
     def test_crearProy(self):
         #crear escenario
@@ -203,7 +226,42 @@ class SGPTestCase(unittest.TestCase):
                            "test8-nombre",
                          "test8-descripcion",
                          '1000')
-        assert 'Proyecto creado' in rv.data 
+        assert 'Proyecto creado' in rv.data
+        
+    def test_crearTipoItem(self):
+        #crear escenario
+        idusuario=CtrlAdmUsr.insertarUsr('test9-username',
+                                 'test9-password',
+                                 'test9-nombre',
+                                 'test9-apellido',
+                                 'test9-telefono',
+                                 '1000')
+        idtipoitem=CtrlAdmTipoItem.crearTipoItem('test9-nombre',
+                                                 'test9-descripcion')
+        #prueba
+        rv = self.login('test9-username', 'test9-password')
+        rv = self.crearTipoItem('Crear',
+                              'test9-nombre',
+                              'test9-descripcion',
+                              idtipoitem)
+        assert 'Tipo de Item Creado' in rv.data
+        
+    def crearItem(self):
+        #crear escenario
+        idusuario=CtrlAdmUsr.insertarUsr('test10-username',
+                                 'test10-password',
+                                 'test10-nombre',
+                                 'test10-apellido',
+                                 'test10-telefono',
+                                 '1000')
+        idtipoitem=CtrlAdmTipoItem.crearTipoItem('test10-nombre',
+                                                 'test10-descripcion')
+        #prueba
+        rv=self.crearItem('Crear', 'nombre', idtipoitem, 'descripcion', '1', '1', '1')
+        assert 'Debe Cargar Valores a los Atributos de Tipo de Item' in rv.data
+    
+        
+        
         
 if __name__ == '__main__':
     unittest.main()

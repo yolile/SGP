@@ -1,3 +1,4 @@
+import os
 from sqlalchemy import Table, Integer, ForeignKey, String, Column, Date
 from sqlalchemy import Sequence
 from sqlalchemy.orm import relationship
@@ -19,7 +20,8 @@ __file__ = 'Modelo.py'
 #rutaBD='postgresql+psycopg2://admin:admin@localhost/BDDEPRUEBA'
 rutaBD='postgresql+psycopg2://admin:admin@localhost/sgptest'
 
-engine=create_engine(rutaBD)
+engine = create_engine(os.environ['DATABASE_URI'])
+#engine=create_engine(rutaBD)//asi era antes
 Base= declarative_base()
 
 """------------------------TABLAS DE RELACION---------------------------------------"""
@@ -300,7 +302,7 @@ class LineaBase(Base):
     
 """-----------Metodos para crear y eliminar todas las tablas definidas---------------------------------------"""
 def init_db():
-    Base.metadata.create_all(engine) 
+    Base.metadata.create_all(engine)
     
 def drop_db():
     _SessionClassMethods.close_all()

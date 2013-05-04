@@ -541,6 +541,7 @@ def crearTipoItem():
                                    operacion='crear')
         if(request.form['opcion']=="Crear"):
             CtrlAdmTipoItem.modTipoItem(idtipoitem,nombre,descripcion)
+            flash('Tipo de Item Creado')            
             return redirect(url_for('admTipoItem'))
         if(request.form['opcion']=="Cancelar"):
             CtrlAdmTipoItem.borrarTipoItem(idtipoitem)
@@ -677,6 +678,12 @@ def proyectoX():
             listItem = CtrlFase.getItemsFase(int(request.form['fase']))
             listaFases = CtrlAdmProy.getFasesListByProy(proyecto)
             return render_template('proyectoX.html',listFases=listaFases,listItem=listItem)
+        if request.form['opcion'] == "Buscar":
+            global iditem
+            iditem=int(request.form['iditem'])            
+            return render_template('proyectoX.html')
+        if request.form['opcion'] == "Consultar":
+            return render_template('conItem.html')        
         if request.form['opcion'] == "Cerrar Proyecto":
             return render_template('main.html') 
 
