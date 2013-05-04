@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block body %}
+<body class=formato4>
+        <form class='estilos' action="{{ url_for('proyectoX') }}" method=get>
+             <center><h1>CREACION DE ITEM</h1></center>
+          	<br>
+          	<br>
+          	
+          	<div><label>Nombre:</label><input type='text' name=nombre value='{{ item.nombre }}' disabled></div>        
+            <div><label>Descripcion:</label><textarea rows='2' name=descripcion readonly>{{ versionitem.descripcion }}</textarea></div>
+            <div><label>Complejidad:</label><input type='text' name=complejidad value='{{ versionitem.complejidad }}' disabled></div>
+            <div><label>Prioridad:</label><input type='text' name=prioridad value='{{ versionitem.prioridad }}' disabled></div>
+            <div><label>Costo:</label><input type='text' name=costo value='{{ versionitem.costo }}' disabled></div>
+
+            <div><center><input type='submit' name="opcion" value='Aceptar'></center></div>
+
+        </form>
+    </body>
+{% endblock %}
