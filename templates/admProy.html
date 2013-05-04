@@ -20,13 +20,15 @@
 	</tr>
 
 		  {% for proyecto in listProy %}
-	<tr>
-	<td><input name="select" type="radio" value={{ proyecto.idproyecto }} checked /></td>	
-	<td>{{ proyecto.nombre }}</td>
-	<td>{{ proyecto.fechacreacion}}</td>	
-	<td>{{ proyecto.usuario.username }}</td>
-	<td>{{ proyecto.estado }}</td>
-	</tr>  	
+		  		 {% if proyecto.estado != 'eliminado' %}
+						<tr>
+						<td><input name="select" type="radio" value={{ proyecto.idproyecto }} checked /></td>	
+						<td>{{ proyecto.nombre }}</td>
+						<td>{{ proyecto.fechacreacion}}</td>	
+						<td>{{ proyecto.usuario.username }}</td>
+						<td>{{ proyecto.estado }}</td>
+						</tr> 
+					{% endif %}	 	
 	  	{% endfor %}
 	  	
 
