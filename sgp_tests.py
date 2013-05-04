@@ -2,16 +2,21 @@ import os
 import index
 import unittest
 import tempfile
-import CtrlAdmProy
 import CtrlAdmRol
 import CtrlAdmUsr
-        
+from Modelo import init_db, drop_db
+ 
 class SGPTestCase(unittest.TestCase):
 
     """----------Funciones para las pruebas---------"""
     def setUp(self):
+        setupTestDB()
+        self.engine = engine
+        drop_db()
+        init_db()
         index.app.config['TESTING'] = True
-        self.app = index.app.test_client()
+        self.app = index.app.test_client()       
+       
         
     def login(self, username, password):
         return self.app.post('/login', 
@@ -23,7 +28,7 @@ class SGPTestCase(unittest.TestCase):
     def logout(self):
         return self.app.get('/logout', follow_redirects=True)
 
-    def crearUsr(self, opcion, username, passwrd, nombre, apellido, telefono, ci):
+    def insertarUsr(self, opcion, username, passwrd, nombre, apellido, telefono, ci):
         return self.app.post('/crearUsr', 
                              data=dict(
                                        opcion=opcion,
@@ -77,7 +82,7 @@ class SGPTestCase(unittest.TestCase):
                                        permisos=permisos
                                        ), 
                             follow_redirects=True)
-
+        
     def crearProy(self, opcion, nombre, descripcion, presupuesto):
         return self.app.post('/crearProy', 
                              data=dict(
@@ -97,108 +102,112 @@ class SGPTestCase(unittest.TestCase):
                             follow_redirects=True)
 
     """---------Test---------"""
-    def test_crearUsr(self):
-        CtrlAdmUsr.cleanScenarioUser('prueba')
-        rv = self.crearUsr('Crear',
-                            'prueba', 
-                            'prueba', 
-                            'Usuario', 
-                            'Prueba', 
-                            '99999999', 
-                            '9999999')
+    def test_insertarUsr(self):
+        rv = self.insertarUsr('Crear',
+                            'test1-username', 
+                            'test1-password', 
+                            'test1-nombre', 
+                            'test1-apellido', 
+                            'test1-telefono', 
+                            '1000')
         assert 'Usuario creado' in rv.data
-        CtrlAdmUsr.cleanScenarioUser('prueba')
-
+        
     def test_login(self):
-        #limpiando escenario
-        CtrlAdmUsr.cleanScenarioUser('prueba')
         #creando escenario
-        CtrlAdmUsr.createScenarioUser('1','prueba','prueba','nombre','apellido','111','222')
+        idusuario=CtrlAdmUsr.insertarUsr('test2-username',
+                                         'test2-password',
+                                         'test2-nombre',
+                                         'test2-apellido',
+                                         'test2-telefono',
+                                         '1000')
         #prueba
-        rv = self.login('prueba', 'prueba')
+        rv = self.login('test2-username', 'test2-password')
         assert 'Estas logueado' in rv.data
-        #limpiando escenario
-        CtrlAdmUsr.cleanScenarioUser('prueba')
         
     def test_logout(self):
         rv = self.logout()
         assert 'Estas deslogueado' in rv.data
-    
+
+
     def test_modUsr(self):
-        #limpiando escenario
-        CtrlAdmUsr.cleanScenarioUser('prueba')
         #creando escenario
-        CtrlAdmUsr.createScenarioUser('2','prueba','prueba','Usuario','Prueba','88888888','8888888')
-        #el test
+        idusuario=CtrlAdmUsr.insertarUsr('test4-username',
+                                         'test4-password',
+                                         'test4-nombre',
+                                         'test4-apellido',
+                                         'test4-telefono',
+                                         '1000')
         rv = self.modUsr('Modificar', 
-                         '2',
-                         'prueba',
-                         'prueba', 
-                         'Usuario', 
-                         'Prueba', 
-                         '88888888', 
-                         '8888888')
+                         idusuario,
+                         'test4-usernamemod',
+                         'test4-passwordmod',
+                         'test4-nombremdo', 
+                         'test4-apellidomod', 
+                         'test4-telefonomod', 
+                         '1000')
         assert 'Usuario modificado' in rv.data
-        #limpiando escenario
-        CtrlAdmUsr.cleanScenarioUser('prueba')
         
     def test_crearRol(self):
+        #creando escenario, se crean los permisos 200,201,202 y 203
+        CtrlAdmRol.insertarPermiso(200,'','')
+        CtrlAdmRol.insertarPermiso(201,'','')
+        CtrlAdmRol.insertarPermiso(202,'','')
+        CtrlAdmRol.insertarPermiso(203,'','')
+        #pruebara no tenemos tiempo para eso :( ... creo que yo le toque en bus
         rv = self.crearRol('Crear', 
-                         "Rol Prueba",
-                         "Este rol fue creado con la intencion de hacer pruebas en el caso de uso crear rol",
+                         "test5-nombre",
+                         "test5-descripcion",
                          ['201','202','203'])
         assert 'Rol creado' in rv.data
-        #limpiar escenario borrando el rol creado
-        CtrlAdmRol.elimRol(CtrlAdmRol.getMayorIdRol())
-    
+                
     def test_asigRoles(self):
-        #creando escenario
-        if (CtrlAdmRol.idPermisoExiste(200)==False):
-            CtrlAdmRol.insertarPermiso(200)
-        if (CtrlAdmRol.idPermisoExiste(201)==False):
-            CtrlAdmRol.insertarPermiso(201)
-        if(CtrlAdmRol.idRolExiste==False):
-            permisos=[200,201]
-            CtrlAdmRol.insertarRol('101','rol de prueba','rol de prueba',permisos)
-        if(CtrlAdmUsr.idUsuarioExiste==False):
-            CtrlAdmUsr.createScenarioUser('2','prueb','123','prueba','unitaria','1','3000')
-        #prueba
+        # creando escenario
+        idusuario=CtrlAdmUsr.insertarUsr('test6-username',
+                                         'test6-password',
+                                         'test6-nombre',
+                                         'test6-apellido',
+                                         'test6-telefono',
+                                         '1000')
+        idrol=CtrlAdmRol.insertarRol('test6-nombre',
+                    'test6-descripcion',
+                    ['200','201','202'])
+        #pruebas
         rv = self.asigRoles('Aceptar', 
-                         "2",
-                         ['101'])
+                         idusuario,
+                         [idrol])
         assert 'Roles asignados al usuario' in rv.data
-        #limpiando escenario
-        CtrlAdmRol.elimRol(101)
-        CtrlAdmUsr.elimUsr(2)      
        
     def test_modRol(self):
-        # creando escenario
-        if not(CtrlAdmRol.idRolExiste(101)):
-            CtrlAdmRol.crearRol('101','','',[])
-        if not(CtrlAdmRol.idPermisoExiste(202)):
-            CtrlAdmRol.crearPermiso('202','','')
-        if not(CtrlAdmRol.idPermisoExiste(203)):
-            CtrlAdmRol.crearPermiso('203','','') 
-        # prueba      
+        # crear escenario
+        idrol=CtrlAdmRol.insertarRol('test7-nombre',
+                    'test7-descripcion',
+                    ['200','201','202'])
+        # prueba      setupTestDB()
         rv = self.modRol('Modificar', 
-                           "101",
-                         "Rol Prueba Modificado",
-                         "Este rol fue creado con la intencion de hacer pruebas en el caso de uso modificar rol",
+                           idrol,
+                         "test7-nombre-modificado",
+                         "test7-descripcion=-modificado",
                          ['202','203'])
         assert 'Rol modificado' in rv.data   
-    
+        
     def test_crearProy(self):
-        #creando escenario
-        CtrlAdmUsr.cleanScenarioUser('prueba')
-        CtrlAdmUsr.createScenarioUser('2','prueba','prueba','prueba','unitaria','1','3000')
+        #crear escenario
+        idusuario=CtrlAdmUsr.insertarUsr('test8-username',
+                                 'test8-password',
+                                 'test8-nombre',
+                                 'test8-apellido',
+                                 'test8-telefono',
+                                 '1000')
         #prueba
-        rv = self.login('prueba', 'prueba')
+        rv = self.login('test8-username', 'test8-password')
         rv = self.crearProy('Crear', 
-                           "Proyecto prueba",
-                         "Este proyecto fue creado con la intencion de hacer pruebas en el caso de uso crear proyecto",
+                           "test8-nombre",
+                         "test8-descripcion",
                          '1000')
         assert 'Proyecto creado' in rv.data 
-
+        
 if __name__ == '__main__':
     unittest.main()
+
+    
     
