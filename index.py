@@ -9,13 +9,13 @@ import CtrlFase
 
 """Modulo de ejecucion principal de SGP"""  
 __author__ = 'Grupo 5'
-__date__ = '03/04/13'
-__version__ = '1.0'
+__date__ = '04/05/13'
+__version__ = '3.0'
 __credits__ = 'none'
 __text__ = 'indice principal que conmuta con las diferentes funcionalidades de SGP'
 __file__ = 'index.py' 
 
-app = Flask(__name__,template_folder='/home/juan/git/SGP/templates')
+app = Flask(__name__,template_folder='/home/divina/git/SGP/templates')
 app.debug = True
 app.secret_key = 'secreto'
 app.config.from_object(__name__)
@@ -241,6 +241,10 @@ def conPerm():
         listPermiso = CtrlAdmRol.getPermisoList()   
         return render_template('conPerm.html',listPermiso = listPermiso)
     if request.method == 'POST':
+        if request.form['opcion'] == "Buscar":
+            listPermiso = CtrlAdmRol.buscarPermiso(request.form['buscar'])
+            flash('Resultado de la busqueda')
+            return render_template('conPerm.html',listPermiso=listPermiso)        
         if request.form['opcion'] == "Home":
             return render_template('main.html')  
          
@@ -313,7 +317,6 @@ def modProy():
                               int(request.form['presupuesto']))
             flash('Proyecto modificado')
         return redirect(url_for('admProy'))
-
     
 @app.route('/defFases', methods=['GET','POST'])
 def defFases():
@@ -619,6 +622,14 @@ def abrirProyecto():
             global proyecto
             proyecto = int(request.form['select'])
             return redirect(url_for('proyectoX'))
+        if request.form['opcion'] == "Buscar":
+            listProy = CtrlAdmProy.busquedaProy(request.form['buscar'],
+                                         request.form['atributo'])
+            
+            flash('Resultado de la busqueda')
+            return render_template('abrirProyecto.html',listProy=listProy)        
+        if request.form['opcion'] == "Home":
+            return redirect(url_for('menu'))     
    
 
 @app.route('/proyectoX', methods=['GET','POST'])
@@ -722,7 +733,6 @@ def cargarAtributos():
                 listaAtributoItemPorTipo.append(nuevo)
         return redirect(url_for('crearItem'))
         
-
 """-----------------------Relacion entre Items---------------------------------------"""
 @app.route('/relacion', methods=['GET','POST'])
 def relacion():

@@ -24,7 +24,7 @@
 				<td><input name="select" type="radio" value={{ proyecto.idproyecto }} checked /></td>	
 				<td>{{ proyecto.nombre }}</td>
 				<td>{{ proyecto.fechacreacion}}</td>	
-				<td>{{ proyecto.usuariolider }}</td>
+				<td>{{ proyecto.usuario.username }}</td>
 				</tr>  	
 			{% endif %}	
 	  	{% endfor %}

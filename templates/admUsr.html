@@ -8,25 +8,25 @@
  <center><h1>ADMINISTRACION DE USUARIOS</h1></center>
  <br>
  <br>
-	<div style="height:150px;overflow:auto;">	
+	<div style="height:300px;overflow:auto;">	
 	
 	<table width="100%" border="1">
 	<tr>
+	<th scope="col"> </th>	
 	<th scope="col">Usuario</th>
 	<th scope="col">Nombre</th>
 	<th scope="col">Apellido</th>
 	<th scope="col">CI</th>
-	<th scope="col">OK</th>
 	</tr>
 
 	 {% for user in listUser %}
 		{% if user.username != owner and user.idusuario != 1 %}
 			<tr>
+				<td><input name="select" type="radio" value={{ user.idusuario }} checked/></td>			
 				<td>{{ user.username }}</td>
 				<td>{{ user.nombre }}</td>
 				<td>{{ user.apellido }}</td>
 				<td>{{ user.ci }}</td>
-				<td><input name="select" type="radio" value={{ user.idusuario }} checked/></td>
 			</tr>  	
   		{% endif %}
   	{% endfor %}

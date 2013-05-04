@@ -8,22 +8,24 @@
  <center><h1>ADMINISTRACION DE PROYECTOS</h1></center>
  <br>
  <br>
-	<div style="height:150px;width:700px;overflow:scroll;">	
+	<div style="height:150px;width:700px;overflow:auto;">	
 	
 	<table width="100%" border="1">
 	<tr>
+	<th scope="col"> </th>
 	<th scope="col">Nombre</th>
 	<th scope="col">Fecha Creacion</th>
 	<th scope="col">Lider</th>
-	<th scope="col">OK</th>
+	<th scope="col">Estado</th>	
 	</tr>
 
 		  {% for proyecto in listProy %}
 	<tr>
+	<td><input name="select" type="radio" value={{ proyecto.idproyecto }} checked /></td>	
 	<td>{{ proyecto.nombre }}</td>
 	<td>{{ proyecto.fechacreacion}}</td>	
 	<td>{{ proyecto.usuario.username }}</td>
-	<td><input name="select" type="radio" value={{ proyecto.idproyecto }} checked /></td>
+	<td>{{ proyecto.estado }}</td>
 	</tr>  	
 	  	{% endfor %}
 	  	

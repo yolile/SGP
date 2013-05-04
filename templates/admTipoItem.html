@@ -1,27 +1,27 @@
 {% extends "layout.html" %}
 {% block body %}
 
- <body class = formato2>
+ <body class = formato4>
 
 <form class='estilos' action=""{{ url_for('admTipoItem')}}"" method="post">
 
  <center><h1>ADMINISTRACION DE TIPOS DE ITEM</h1></center>
  <br>
  <br>
-	<div style="height:200px;width:700px;overflow:scroll;">	
+	<div style="height:200px;width:500px;overflow:auto;">	
 	
 	<table width="100%" border="1">
 	<tr>
+	<th scope="col"> </th>
 	<th scope="col">Nombre</th>
-	<th scope="col">Descripcion</th>
-	<th scope="col">OK</th>	
+	<th scope="col">Descripcion</th>	
 	</tr>
 
             	{% for tipoItem in listTipoItem %}
 						<tr>
-						<td>{{ tipoItem.nombre }}</td>
-						<td>{{ tipoItem.descripcion }}</td>
 						<td><input name="select" type="radio" value={{ tipoItem.idtipoitem }} checked/></td>						
+						<td>{{ tipoItem.nombre }}</td>
+						<td>{{ tipoItem.descripcion }}</td>						
 						</tr>  	
   				{% endfor %}
 	  	
