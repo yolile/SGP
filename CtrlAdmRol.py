@@ -60,6 +60,9 @@ def permiso(idPermiso):
     """Funcion que recibe el Id de un Permiso y retorna el objeto Permiso"""   
     result = session.query(Permiso).filter(Permiso.idpermiso==idPermiso).first()
     return result
+
+def buscarPermiso(texto):
+    return session.query(Permiso).filter(Permiso.nombre.like('%'+texto+'%')).all()
         
 def crearRol(nombre,descripcion,idPermisoList):
     """Funcion que recibe los atributos de un rol y lo persiste en la base de datos."""

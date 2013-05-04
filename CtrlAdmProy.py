@@ -110,14 +110,14 @@ def asigComiteCamb(idproyecto, idusuarioList):
     
 def busquedaProy(parametro,atributo):
     if atributo == 'nombre':
-        result = session.query(Proyecto).filter(Proyecto.nombre.like(parametro+'%')).all()
+        result = session.query(Proyecto).filter(Proyecto.nombre.like('%'+parametro+'%')).all()
     if atributo == 'fechaCreacion':
         try:
             result = session.query(Proyecto).filter(Proyecto.fechacreacion.like(parametro+'%')).all()
         except sqlalchemy.exc.ProgrammingError:
             result=[]
     if atributo == 'lider':
-        result = session.query(Proyecto).join((Usuario,Proyecto.usuario)).filter(Usuario.username.like(parametro+'%')).all()
+        result = session.query(Proyecto).join((Usuario,Proyecto.usuario)).filter(Usuario.username.like('%'+parametro+'%')).all()
     return result
 
 def elimProy(idproyecto):
