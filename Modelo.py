@@ -21,7 +21,7 @@ __file__ = 'Modelo.py'
 rutaBD='postgresql+psycopg2://admin:admin@localhost/sgptest'
 
 engine = create_engine(os.environ['DATABASE_URI'])
-#engine=create_engine(rutaBD)//asi era antes
+#engine=create_engine(rutaBD)
 Base= declarative_base()
 
 """------------------------TABLAS DE RELACION---------------------------------------"""
@@ -156,6 +156,8 @@ class Fase(Base):
     roles = relationship("Rol", secondary=RolFase)
     tipositems = relationship("TipoItem", secondary=TipoItemFase)
     
+    items = relationship("Item")
+    
     def __init__(self, idfase, idproyecto, posicionfase, nombre, descripcion, estado):
         self.idfase = idfase
         self.idproyecto = idproyecto
@@ -229,6 +231,8 @@ class Item(Base):
     estado = Column(String(45))
     idtipoitem = Column(Integer, ForeignKey('tipoitem.idtipoitem'))
     idfase = Column(Integer, ForeignKey('fase.idfase'))        
+    
+    atributos = relationship("AtributoItemPorTipo")
     #idlineabase = Column (Integer,ForeignKey ('lineabase.idlineabase'))
     
     def __init__(self, iditem, nombre, estado, idtipoitem,idfase):

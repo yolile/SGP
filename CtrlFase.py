@@ -1,5 +1,5 @@
 from Modelo import Item, VersionItem, Relacion, AtributoItemPorTipo, Fase, Proyecto, engine
-from sqlalchemy import create_engine, and_, or_
+from sqlalchemy import create_engine, and_, or_, func
 from sqlalchemy.orm import sessionmaker
 
 """Controlador de Fases en el modulo de desarrollo"""  
@@ -139,5 +139,16 @@ def getListAntecesorSucesor(idItem):
     for relacion in relacionList:
         idItemList.append(relacion.delitem)
     return idItemList
+
+def busquedaItem(parametro,atributo,idfase):
+    """Funcion que recibe un parametro de busqueda, el atributo y el id de la fase por el cual buscar y retorna coincidencias"""
+    if atributo == 'nombre':
+        result = session.query(Item).filter(and_(Item.nombre.like(parametro+'%'),
+                                                 Item.idfase==idfase)).all()
+    return result
     
-     
+def getVersionActual(iditem):
+    """Funcion para obtener la ultima version de VersionItem"""
+    version = session.query(VersionItem).filter(and_(VersionItem.iditem==iditem,
+                                                     VersionItem.version==session.query(func.max(VersionItem.version)))).first()
+    return version

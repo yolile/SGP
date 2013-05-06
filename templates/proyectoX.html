@@ -6,9 +6,21 @@
             <div><label>Seleccionar Fase</label>
 					<div><br>	
 							<select name="fase">
-								{% for fase in listFases %}
-										<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
-							 	{% endfor %}						
+								{% if faseSeleccionada %}
+									<option value={{faseSeleccionada.idfase }}>
+									{{ faseSeleccionada.posicionfase }}-{{ faseSeleccionada.nombre }}
+									</option>
+									{% for fase in listFases %}
+											{%	if fase.idfase != faseSeleccionada.idfase %}		
+												<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
+							 				{%	endif %}
+							 		{% endfor %}
+								{% else %}
+									{% for fase in listFases %}		
+												<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
+							 		{% endfor %}								
+								{% endif%}
+						
 							</select>
 				    </div>
             		<br>
@@ -33,12 +45,18 @@
 					</table>
 				    <br>        
             </div>
-            
-            <div><center><input type='submit' name="opcion" value='Crear Item'>
+            <div>
+            <center>
+            <input type='submit' name="opcion" value='Consultar Item'>
+            <input type='submit' name="opcion" value='Crear Item'>
             <input type='submit' name="opcion" value='Relacionar'>
-            </center></div>  
-            <label>Nombre:</label>
-			<input type="text" name="buscar"/> <input type="submit" name="opcion" value="Buscar" />          
+            </center>
+            </div>  
+            <input type="text" name="buscar"/>
+            <select name="atributo">
+			<option value="nombre">Nombre</option>
+			</select>
+			<input type="submit" name="opcion" value="Buscar" />          
             <div><center><input type='submit' name="opcion" value='Cerrar Proyecto'></center></div>
 
         </form>

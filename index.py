@@ -15,7 +15,7 @@ __credits__ = 'none'
 __text__ = 'indice principal que conmuta con las diferentes funcionalidades de SGP'
 __file__ = 'index.py' 
 
-app = Flask(__name__,template_folder='/home/divina/git/SGP/templates')
+app = Flask(__name__,template_folder='/home/juan/git/SGP/templates')
 app.debug = True
 app.secret_key = 'secreto'
 app.config.from_object(__name__)
@@ -676,16 +676,39 @@ def proyectoX():
             return redirect(url_for('relacion'))
         if (request.form['opcion']=="Mostrar Items"):
             listItem = CtrlFase.getItemsFase(int(request.form['fase']))
+            faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
             listaFases = CtrlAdmProy.getFasesListByProy(proyecto)
-            return render_template('proyectoX.html',listFases=listaFases,listItem=listItem)
+            return render_template('proyectoX.html',
+                                   listFases=listaFases,
+                                   listItem=listItem,
+                                   faseSeleccionada=faseSeleccionada)
         if request.form['opcion'] == "Buscar":
-            global iditem
-            iditem=int(request.form['iditem'])            
-            return render_template('proyectoX.html')
-        if request.form['opcion'] == "Consultar":
-            return render_template('conItem.html')        
+            faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+            listItem = CtrlFase.busquedaItem(request.form['buscar'],
+                                             request.form['atributo'],
+                                             faseSeleccionada.idfase)
+            return render_template('proyectoX.html',
+                                   listItem = listItem,
+                                   faseSeleccionada=faseSeleccionada)
+        if request.form['opcion'] == "Consultar Item":
+            if request.form['iditem']=="":
+                listaFases = CtrlAdmProy.getFasesListByProy(proyecto)
+                return render_template('proyectoX.html',
+                                       listFases=listaFases,
+                                       error='Debe escoger un item')
+            #print request.form['iditem']
+            iditem=int(request.form['iditem'])
+            item=CtrlFase.getItem(iditem)
+            versionitem=CtrlFase.getVersionActual(item.iditem)
+            listaValores=item.atributos
+            listaAtributos = CtrlAdmTipoItem.getAtributosTipo(item.idtipoitem)            
+            return render_template('conItem.html',
+                                   item=item,
+                                   versionitem=versionitem,
+                                   listaValores=listaValores,
+                                   listaAtributos=listaAtributos)        
         if request.form['opcion'] == "Cerrar Proyecto":
-            return render_template('main.html') 
+            return redirect(url_for('abrirProyecto')) 
 
 """-----------------------Crear Items---------------------------------------"""
 @app.route('/crearItem', methods=['GET','POST'])
