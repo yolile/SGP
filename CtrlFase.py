@@ -1,6 +1,6 @@
 from Modelo import Item, VersionItem, Relacion, AtributoItemPorTipo, Fase, Proyecto, engine
 from sqlalchemy import create_engine, and_, or_, func
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, join
 
 """Controlador de Fases en el modulo de desarrollo"""  
 __author__ = 'Grupo 5'

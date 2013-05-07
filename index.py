@@ -457,6 +457,7 @@ def asigRolesFase():
         idproyecto=CtrlAdmProy.getFase(idfase).idproyecto
         if request.form['opcion']=="Aceptar":
             idroles=request.form.getlist('roles')
+            idroles.append('100')#Para agregar el rol de administrador
             CtrlAdmProy.asignarRolesFase(idroles,idfase)
         listaFases = CtrlAdmProy.getFasesListByProy(idproyecto)
         return render_template('defFases.html',listFases=listaFases,proyecto=idproyecto)    
@@ -651,10 +652,10 @@ def proyectoX():
     """Funcion que muestra las fases de un proyecto Elegido donde se pueden acceder a las diferentes opciones del modulo de desarrollo como crear consultar items y relacionarlos"""
     if request.method == 'GET':
         global proyecto
-        listaFases = CtrlAdmProy.getFasesListByProy(proyecto)
+        global owner
+        listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
         return render_template('proyectoX.html',listFases=listaFases)
     if request.method == 'POST':
-        global owner
         if (request.form['opcion']=="Crear Item"):
             idfase = int(request.form['fase'])
             global item

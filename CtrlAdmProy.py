@@ -1,6 +1,6 @@
 from Modelo import Fase, Proyecto, Usuario, engine, TipoItemFase, TipoItem, Rol
 from sqlalchemy import create_engine, and_
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, join
 from datetime import *
 import sqlalchemy.exc
 import CtrlAdmTipoItem
@@ -54,8 +54,21 @@ def getFasesList():
     return result
 
 def getFasesListByProy(idproyecto):
-    """Funcion que recibe el Id de un Proyecto y retorna su lista de fases"""
     faseList = session.query(Fase).filter(Fase.idproyecto==idproyecto).all()
+    return faseList
+
+def getFasesListByProyAndUser(idproyecto,username):
+    """Funcion que recibe el Id de un Proyecto y el username de un Usuario y 
+    retorna su lista de fases segun el rol del Usuario"""
+    idroles = []
+    user = session.query(Usuario).filter(Usuario.username==username).first()
+    for r in user.roles:
+        idroles.append(r.idrol)    
+    faseRol = session.query(Fase).join(Rol,Fase.roles).filter(Rol.idrol.in_(idroles)).all()
+    faseList = []
+    for f in faseRol:
+        if f.idproyecto == idproyecto:
+            faseList.append(f)
     return faseList
 
 def getMaxSeqProy(idproyecto):
