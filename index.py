@@ -657,24 +657,32 @@ def proyectoX():
         return render_template('proyectoX.html',listFases=listaFases)
     if request.method == 'POST':
         if (request.form['opcion']=="Crear Item"):
-            idfase = int(request.form['fase'])
-            global item
-            global versionitem
-            item = CtrlFase.instanciarItem("","desarrollo",0,idfase)
-            versionitem = CtrlFase.instanciarVersionItem(item.iditem,
-                                                         CtrlAdmUsr.getIdByUsername(owner),
-                                                         "",
-                                                         0,
-                                                         0,
-                                                         0,
-                                                         1)
-            global listaAtributoItemPorTipo
-            listaAtributoItemPorTipo = []
-            return redirect(url_for('crearItem'))
+            if CtrlAdmUsr.havePermission(owner,207):
+                idfase = int(request.form['fase'])
+                global item
+                global versionitem
+                item = CtrlFase.instanciarItem("","desarrollo",0,idfase)
+                versionitem = CtrlFase.instanciarVersionItem(item.iditem,
+                                                             CtrlAdmUsr.getIdByUsername(owner),
+                                                             "", 
+                                                             0,
+                                                             0,
+                                                             0,
+                                                             1)
+                global listaAtributoItemPorTipo
+                listaAtributoItemPorTipo = []
+                return redirect(url_for('crearItem'))
+            else:
+                flash('No tiene permisos para realizar esta operacion ')
+                return redirect(url_for('proyectoX')) 
         if (request.form['opcion']=="Relacionar"):
-            global iditem
-            iditem = int(request.form['iditem'])
-            return redirect(url_for('relacion'))
+            if CtrlAdmUsr.havePermission(owner,208):
+                global iditem
+                iditem = int(request.form['iditem'])
+                return redirect(url_for('relacion'))
+            else:
+                flash('No tiene permisos para realizar esta operacion ')
+                return redirect(url_for('proyectoX')) 
         if (request.form['opcion']=="Mostrar Items"):
             listItem = CtrlFase.getItemsFase(int(request.form['fase']))
             faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
