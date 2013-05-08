@@ -15,7 +15,7 @@ __credits__ = 'none'
 __text__ = 'indice principal que conmuta con las diferentes funcionalidades de SGP'
 __file__ = 'index.py' 
 
-app = Flask(__name__,template_folder='/home/juan/git/SGP/templates')
+app = Flask(__name__,template_folder='/home/divina/git/SGP/templates')
 app.debug = True
 app.secret_key = 'secreto'
 app.config.from_object(__name__)
@@ -620,7 +620,7 @@ def modTipoItem():
                                listAtribTipoItem=listaAtributosTipo,
                                nombre=nombre,descripcion=descripcion)
 
-"""---------------------Abrir Proyecto--------------------------------"""
+"""---------------------Abrir Proyecto en modo de desarrollo--------------------------------"""
 @app.route('/abrirProyecto', methods=['GET','POST'])
 def abrirProyecto():
     """Funcion que presenta el menu para abrir proyectos en modo de desarrollo"""  
@@ -646,7 +646,7 @@ def abrirProyecto():
         if request.form['opcion'] == "Home":
             return redirect(url_for('menu'))     
    
-
+"""Funcion que abre un proyecto seleccionado en Modo de Desarrollo y muestra las fases y opciones acerca de items"""
 @app.route('/proyectoX', methods=['GET','POST'])
 def proyectoX():
     """Funcion que muestra las fases de un proyecto Elegido donde se pueden acceder a las diferentes opciones del modulo de desarrollo como crear consultar items y relacionarlos"""
@@ -657,32 +657,24 @@ def proyectoX():
         return render_template('proyectoX.html',listFases=listaFases)
     if request.method == 'POST':
         if (request.form['opcion']=="Crear Item"):
-            if CtrlAdmUsr.havePermission(owner,207):
-                idfase = int(request.form['fase'])
-                global item
-                global versionitem
-                item = CtrlFase.instanciarItem("","desarrollo",0,idfase)
-                versionitem = CtrlFase.instanciarVersionItem(item.iditem,
-                                                             CtrlAdmUsr.getIdByUsername(owner),
-                                                             "", 
-                                                             0,
-                                                             0,
-                                                             0,
-                                                             1)
-                global listaAtributoItemPorTipo
-                listaAtributoItemPorTipo = []
-                return redirect(url_for('crearItem'))
-            else:
-                flash('No tiene permisos para realizar esta operacion ')
-                return redirect(url_for('proyectoX')) 
+            idfase = int(request.form['fase'])
+            global item
+            global versionitem
+            item = CtrlFase.instanciarItem("","desarrollo",0,idfase)
+            versionitem = CtrlFase.instanciarVersionItem(item.iditem,
+                                                            CtrlAdmUsr.getIdByUsername(owner),
+                                                            "", 
+                                                            0,
+                                                            0,
+                                                            0,
+                                                            1)
+            global listaAtributoItemPorTipo
+            listaAtributoItemPorTipo = []
+            return redirect(url_for('crearItem'))
         if (request.form['opcion']=="Relacionar"):
-            if CtrlAdmUsr.havePermission(owner,208):
-                global iditem
-                iditem = int(request.form['iditem'])
-                return redirect(url_for('relacion'))
-            else:
-                flash('No tiene permisos para realizar esta operacion ')
-                return redirect(url_for('proyectoX')) 
+            global iditem
+            iditem = int(request.form['iditem'])
+            return redirect(url_for('relacion'))
         if (request.form['opcion']=="Mostrar Items"):
             listItem = CtrlFase.getItemsFase(int(request.form['fase']))
             faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
@@ -837,6 +829,56 @@ def relacion():
         if request.form['opcion'] == "Home":
             return render_template('main.html')
     return redirect(url_for('proyectoX'))
-                            
+
+"""-------------------------MODULO DE GESTION DE CAMBIOS--------------------------------------"""
+
+"""---------------------Abrir Proyecto en modo de desarrollo--------------------------------"""
+@app.route('/abrirProyectoEnGC', methods=['GET','POST'])
+def abrirProyectoEnGC():
+    """Funcion que presenta el menu para abrir proyectos en modo de desarrollo"""  
+    if request.method == 'GET':
+        global owner
+        if CtrlAdmUsr.havePermission(owner,206):
+            #agregar permiso para Linea Base!!!!!!!!!!!!!!!!!!!!!!
+            listaProy = CtrlAdmProy.getProyectoList()
+            return render_template('abrirProyectoEnGC.html',listProy=listaProy)
+        else:
+            flash('No tiene permisos para realizar esta operacion ')
+            return redirect(url_for('menu')) 
+    if request.method == 'POST':
+        if request.form['opcion'] == "Abrir":
+            global proyecto
+            proyecto = int(request.form['select'])
+            return redirect(url_for('proyectoXenGC'))
+        if request.form['opcion'] == "Buscar":
+            listProy = CtrlAdmProy.busquedaProy(request.form['buscar'],
+                                         request.form['atributo'])
+            
+            flash('Resultado de la busqueda')
+            return render_template('abrirProyectoEnGC.html',listProy=listProy)        
+        if request.form['opcion'] == "Home":
+            return redirect(url_for('menu'))   
+
+"""Funcion que abre un proyecto seleccionado en Modo de Gestion de Cambios y muestra las lineas bases de una fase seleccionada"""
+@app.route('/proyectoXenGC', methods=['GET','POST'])
+def proyectoXenGC():
+    """Funcion que muestra las fases de un proyecto Elegido donde se pueden acceder a las diferentes opciones del modulo de desarrollo como crear consultar items y relacionarlos"""
+    if request.method == 'GET':
+        global proyecto
+        global owner
+        listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+        return render_template('proyectoXenGC.html',listFases=listaFases)
+    if request.method == 'POST':
+        if request.form['opcion'] == "Buscar":
+            return render_template('proyectoXenGC.html')
+        if request.form['opcion'] == "Consultar":            
+            return render_template('conLB.html')
+        if request.form['opcion'] == "Nueva Liena base":            
+            return render_template('')
+        if request.form['opcion'] == "Add/Quitar Items":            
+            return render_template('asigItemsEnLB')        
+        if request.form['opcion'] == "Cerrar Proyecto":
+            return redirect(url_for('abrirProyectoEnGC'))
+                                     
 if __name__=='__main__':
     app.run()             
