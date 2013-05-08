@@ -1,0 +1,65 @@
+{% extends "layout.html" %}
+{% block body %}
+<body class=formato1>
+        <form class='estilos' action="{{ url_for('proyectoXenGC') }}" method=post>
+             <br>
+            <div><label>Seleccionar Fase</label>
+					<div><br>	
+							<select name="fase">
+								{% if faseSeleccionada %}
+									<option value={{faseSeleccionada.idfase }}>
+									{{ faseSeleccionada.posicionfase }}-{{ faseSeleccionada.nombre }}
+									</option>
+									{% for fase in listFases %}
+											{%	if fase.idfase != faseSeleccionada.idfase %}		
+												<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
+							 				{%	endif %}
+							 		{% endfor %}
+								{% else %}
+									{% for fase in listFases %}		
+												<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
+							 		{% endfor %}								
+								{% endif%}
+						
+							</select>
+				    </div>
+            		<br>
+					<input type='submit' name="opcion" value='Mostrar Lineas Bases'>
+	        </div>
+	            <div><label>Lineas Bases de fase seleccionada:</label>
+	            	<br>
+	            	<div style="height:150px;width:200px;overflow:auto;">	
+	            	<table width="50%" border="1">
+					<tr>
+					<th scope="col"> </th>
+					<th scope="col">Nro</th>
+					<th scope="col">ESTADO</th>					
+					</tr>
+						{% for item in listLB %}
+						<tr>
+						<td><input name="idlineabase" type="radio" value={{ lineabase.idlineabase }} checked /></td>	
+						<td>{{ lineabase.numero }}</td>	
+						<td>{{ lineabase.estado}}</td>
+						</tr>  	
+						  	{% endfor %}
+					</table>
+				    <br>        
+            </div>
+            <div>
+            <center>
+            <input type='submit' name="opcion" value='Nueva Linea Base'>
+            <input type='submit' name="opcion" value='Add/Quitar Items'>
+            <input type='submit' name="opcion" value='Cerrar Linea Base'>
+			<input type='submit' name="opcion" value='Consultar'>
+            </center>
+            </div>  
+            <input type="text" name="buscar"/>
+            <select name="atributo">
+			<option value="nombre">Nombre</option>
+			</select>
+			<input type="submit" name="opcion" value="Buscar" />          
+            <div><center><input type='submit' name="opcion" value='Cerrar Proyecto'></center></div>
+
+        </form>
+    </body>
+{% endblock %}
