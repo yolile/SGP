@@ -31,8 +31,8 @@ RolPermiso = Table('rolpermiso', Base.metadata,
 )
 
 RolUsuario = Table('rolusuario', Base.metadata,
-    Column('idusuario', Integer, ForeignKey('usuario.idusuario'),primary_key=True),
-    Column('idrol', Integer, ForeignKey('rol.idrol'),primary_key=True)
+    Column('idrol', Integer, ForeignKey('rol.idrol'),primary_key=True),                   
+    Column('idusuario', Integer, ForeignKey('usuario.idusuario'),primary_key=True)
 )
 
 RolFase = Table('rolfase', Base.metadata,
@@ -233,19 +233,19 @@ class Item(Base):
     idfase = Column(Integer, ForeignKey('fase.idfase'))        
     
     atributos = relationship("AtributoItemPorTipo")
-    #idlineabase = Column (Integer,ForeignKey ('lineabase.idlineabase'))
+    idlineabase = Column (Integer,ForeignKey ('lineabase.idlineabase'))
     
-    def __init__(self, iditem, nombre, estado, idtipoitem,idfase):
+    def __init__(self, iditem, nombre, estado, idtipoitem,idfase,idlineabase=None):
         self.iditem = iditem
         self.nombre = nombre 
         self.estado = estado
         self.idtipoitem = idtipoitem
         self.idfase = idfase
-        #self.idlineabase = idlineabase               
+        self.idlineabase = idlineabase     
  
  
     def __repr__(self):
-        return "<Item '%s' '%s' '%s' '%s' '%s' '%s' '%s'>" % self.idtipoitem, self.nombre,self.estado, self.idtipoitem, self.idfase, self.idlineabase
+        return "<Item '%s' '%s' '%s' '%s' '%s' '%s' '%s' '%s'>" % self.idtipoitem, self.nombre,self.estado, self.idtipoitem, self.idfase, self.idlineabase
         
 """------------------------VERSION DEL ITEM---------------------------------------"""
 class VersionItem(Base):
@@ -311,5 +311,6 @@ def init_db():
 def drop_db():
     _SessionClassMethods.close_all()
     Base.metadata.drop_all(engine)
-   
+    
+#drop_db()   
 init_db()

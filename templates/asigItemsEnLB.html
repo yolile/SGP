@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block body %}
+<body class=formato1>
+        <form class='estilos' action="{{ url_for('asigItemsEnLB') }}" method=post>
+             <br>
+            <div><label>Asignacion de Items en Linea Base</label>
+            		<br>
+					<input type='submit' name="opcion" value='Mostrar Items'>
+	        </div>
+	            <div><label>Items de fase seleccionada:</label>
+	            	<br>
+	            	<div style="height:150px;width:200px;overflow:auto;">	
+	            	<table width="50%" border="1">
+					<tr>
+					<th scope="col"> </th>
+					<th scope="col">NOMBRE</th>
+					<th scope="col">ESTADO</th>					
+					</tr>
+						{% for item in listItem %}
+						<tr>
+						<td><input name="iditem" type="radio" value={{ item.iditem }} checked /></td>	
+						<td>{{ item.nombre }}</td>	
+						<td>{{ item.estado}}</td>
+						</tr>  	
+						  	{% endfor %}
+					</table>
+				    <br>        
+            </div>
+            <div>
+            <center>
+            <input type='submit' name="opcion" value='Guardar'>
+            <input type='submit' name="opcion" value='Cancelar'>
+            </center>
+            </div>  
+            <input type="text" name="buscar"/>
+            <select name="atributo">
+        </form>
+    </body>
+{% endblock %}
