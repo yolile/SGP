@@ -6,6 +6,7 @@ import CtrlAdmRol
 import CtrlAdmProy
 import CtrlAdmTipoItem
 import CtrlFase
+import CtrlLineaBase
 
 """Modulo de ejecucion principal de SGP"""  
 __author__ = 'Grupo 5'
@@ -15,7 +16,7 @@ __credits__ = 'none'
 __text__ = 'indice principal que conmuta con las diferentes funcionalidades de SGP'
 __file__ = 'index.py' 
 
-app = Flask(__name__,template_folder='/home/thelma/git/SGP/templates')
+app = Flask(__name__,template_folder='/home/divina/git/SGP/templates')
 app.debug = True
 app.secret_key = 'secreto'
 app.config.from_object(__name__)
@@ -870,26 +871,62 @@ def abrirProyectoEnGC():
         if request.form['opcion'] == "Home":
             return redirect(url_for('menu'))   
 
-"""Funcion que abre un proyecto seleccionado en Modo de Gestion de Cambios y muestra las lineas bases de una fase seleccionada"""
 @app.route('/proyectoXenGC', methods=['GET','POST'])
 def proyectoXenGC():
-    """Funcion que muestra las fases de un proyecto Elegido donde se pueden acceder a las diferentes opciones del modulo de desarrollo como crear consultar items y relacionarlos"""
+    """Funcion que abre un proyecto seleccionado en Modo de Gestion de Cambios y muestra las lineas bases de una fase seleccionada"""    
     if request.method == 'GET':
         global proyecto
         global owner
         listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
         return render_template('proyectoXenGC.html',listFases=listaFases)
     if request.method == 'POST':
+        if request.form['opcion'] == "Mostrar Lineas Bases":
+            listLB = CtrlLineaBase.getLBFase(int(request.form['fase']))
+            faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+            listaFases = CtrlAdmProy.getFasesListByProy(proyecto)
+            return render_template('proyectoXenGC.html',
+                                   listFases=listaFases,
+                                   listLB=listLB,
+                                   faseSeleccionada=faseSeleccionada)     
+            return render_template('proyectoXenGC.html')         
+        if request.form['opcion'] == "Nueva Linea Base":
+            idfase = int(request.form['fase'])
+            CtrlLineaBase.crearLB(idfase)
+            faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+            listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)   
+            return render_template('proyectoXenGC.html',listFases=listaFases)         
+        if request.form['opcion'] == "Add/Quitar Items":
+            global idfase
+            idfase = int(request.form['fase'])
+            global idlineabase
+            idlineabase = int(request.form['idlineabase'])
+            return redirect(url_for('asigItemsEnLB'))
         if request.form['opcion'] == "Buscar":
             return render_template('proyectoXenGC.html')
         if request.form['opcion'] == "Consultar":            
-            return render_template('conLB.html')
-        if request.form['opcion'] == "Nueva Liena base":            
-            return render_template('')
-        if request.form['opcion'] == "Add/Quitar Items":            
-            return render_template('asigItemsEnLB')        
+            return render_template('conLB.html')       
         if request.form['opcion'] == "Cerrar Proyecto":
-            return redirect(url_for('abrirProyectoEnGC'))
-                                     
+            return redirect(url_for('abrirProyectoEnGC')) 
+
+@app.route('/asigItemsEnLB', methods=['GET','POST'])
+def asigItemsEnLB():                                    
+    """Funcion que asigna y desasigna items a una linea base abierta en una fase seleccionada"""
+    if request.method == 'GET':
+        listItem = CtrlFase.getItemsFase(idfase) #lista de todos los items de la fase
+        listItemEnLB = CtrlLineaBase.getListItemsEnLB(idlineabase) #lista de los items que estan en la linea base 
+        return render_template('asigItemsEnLB.html',
+                                bool = True,
+                                listItem =listItem,
+                                listItemEnLB = listItemEnLB,
+                                idlineabase=idlineabase)
+    if request.method == 'POST':
+        if request.form['opcion'] == "Guardar":
+            #idlineabase = int(request.form['idlineabase'])
+            listItemEnLB=request.form.getlist('iditem')
+            CtrlLineaBase.agregarItems(listItemEnLB,idlineabase)
+        return render_template('proyectoXenGC.html')         
+        if request.form['opcion'] == "Cancelar":
+            return redirect(url_for('proyectoXenGC.html'))       
+
 if __name__=='__main__':
     app.run()             
