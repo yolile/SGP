@@ -870,26 +870,53 @@ def abrirProyectoEnGC():
         if request.form['opcion'] == "Home":
             return redirect(url_for('menu'))   
 
-"""Funcion que abre un proyecto seleccionado en Modo de Gestion de Cambios y muestra las lineas bases de una fase seleccionada"""
 @app.route('/proyectoXenGC', methods=['GET','POST'])
 def proyectoXenGC():
-    """Funcion que muestra las fases de un proyecto Elegido donde se pueden acceder a las diferentes opciones del modulo de desarrollo como crear consultar items y relacionarlos"""
+    """Funcion que abre un proyecto seleccionado en Modo de Gestion de Cambios y muestra las lineas bases de una fase seleccionada"""    
     if request.method == 'GET':
         global proyecto
         global owner
         listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
         return render_template('proyectoXenGC.html',listFases=listaFases)
     if request.method == 'POST':
+        if request.form['opcion'] == "Mostrar Lineas Bases":
+            listLB = CtrlLineaBase.getLBFase(int(request.form['fase']))
+            faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+            listaFases = CtrlAdmProy.getFasesListByProy(proyecto)
+            return render_template('proyectoXenGC.html',
+                                   listFases=listaFases,
+                                   listLB=listLB,
+                                   faseSeleccionada=faseSeleccionada)     
+            return render_template('proyectoXenGC.html')         
+        if request.form['opcion'] == "Nueva Linea Base":
+            idfase = int(request.form['fase'])
+            CtrlLineaBase.crearLB(idfase)
+            return render_template('proyectoXenGC.html')         
+        if request.form['opcion'] == "Add/Quitar Items":            
+            return render_template('asigItemsEnLB.html')
         if request.form['opcion'] == "Buscar":
             return render_template('proyectoXenGC.html')
         if request.form['opcion'] == "Consultar":            
-            return render_template('conLB.html')
-        if request.form['opcion'] == "Nueva Liena base":            
-            return render_template('')
-        if request.form['opcion'] == "Add/Quitar Items":            
-            return render_template('asigItemsEnLB')        
+            return render_template('conLB.html')       
         if request.form['opcion'] == "Cerrar Proyecto":
-            return redirect(url_for('abrirProyectoEnGC'))
+            return redirect(url_for('abrirProyectoEnGC.html'))
+
+@app.route('/asigItemsEnLB', methods=['GET','POST'])
+def asigItemsEnLB():                                    
+    """Funcion que asigna y desasigna items a una linea base abierta en una fase seleccionada"""
+    if request.method == 'GET':
+        global idfase
+        global idlineabase
+        listItem = CtrlFase.getItemsFase(idfase)
+        return render_template('asigItemEnLB',
+                                listItem=listItem,
+                                idfase=idfase,
+                                idlineabase=idlineabase)
+    if request.method == 'POST':
+        if request.form['opcion'] == "Guardar":
+            return render_template('proyectoXenGC.html')
+        if request.form['opcion'] == "Cancelar":
+            return render_template('proyectoXenGC.html')          
 
 if __name__=='__main__':
-    app.run()
+    app.run()             
