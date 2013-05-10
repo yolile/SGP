@@ -107,12 +107,16 @@ def crearFase(nombre,descripcion,idproyecto):
     
 def setProyIniciado(idproyecto):
     """Funcion que establece el estado de un proyecto como
-    'iniciado' y el estado de su primera fase como 'desarrollo'"""
+    'iniciado' y el de todas sus fases como 'desarrollo'"""
     proyecto = proy(idproyecto)
     proyecto.estado = 'iniciado'
-    fase=getFase(getIdPrimeraFase(idproyecto))
-    fase.estado= 'desarrollo'
-    session.commit() 
+    setFasesIniciadas(getFasesListByProy(idproyecto))
+    session.commit()
+    
+def setFasesIniciadas(listafases):
+    for fase in listafases:
+        fase.estado= 'desarrollo'
+    session.commit()
                     
 def getProyEstado(idproyecto):
     """Funcion que recibe un id proyecto y retorna el estado en que se encuentra el mismo"""
@@ -224,3 +228,46 @@ def desasignarRolesFase(fase):
     rolesasignados=fase.roles
     for rol in rolesasignados:
         fase.roles.remove(rol)
+
+def elimFase(idfase):
+    """Funcion que recibe un idfase y elimina logicamente la fase correspondiente.
+    Luego arregla las secuencias de las fases siguientes"""
+    fase=getFase(idfase)
+    fase.estado='eliminada'
+    arreglarSecuencia(fase)
+    session.commit()
+    
+def arreglarSecuencia(fase):  
+    """Funcion que recibe una fase, extrae su posicion y actualiza las posiciones
+    de todas las fases siguientes, considerando que la fase recibida ha sido eliminada"""
+    listafases=getFasesListByProy(fase.idproyecto)
+    poseliminada=fase.posicionfase
+    for row in listafases:
+        if(row.posicionfase>poseliminada):
+            row.posicionfase=row.posicionfase-1
+            
+def modFase(idfase,nombre,descripcion):
+    """Funcion que recibe un idfase y valores para sus atributos y modifica la fase
+    con esos valores"""
+    fase=getFase(idfase)
+    fase.nombre=nombre
+    fase.descripcion=descripcion
+    session.commit()
+
+def faseTieneRol(idfase):
+    """Funcion que recibe una fase y retorna True si tiene al menos un rol asociado"""
+    fase=getFase(idfase)
+    if(len(fase.roles)>0):
+        return True
+    return False    
+
+def fasesTotalmenteDefinidas(listaFases):
+    """Funcion que recibe una lista de fases y retorna True
+    en el caso de que todas tengan tipos de item y roles asociados,
+    False en caso contrario"""
+    for fase in listaFases:
+        if not(faseTieneTipoItem(fase.idfase)):
+            return False
+        if not(faseTieneRol(fase.idfase)):
+            return False
+    return True

@@ -31,7 +31,7 @@ RolPermiso = Table('rolpermiso', Base.metadata,
 )
 
 RolUsuario = Table('rolusuario', Base.metadata,
-    Column('idrol', Integer, ForeignKey('rol.idrol'),primary_key=True),                   
+    Column('idrol', Integer, ForeignKey('rol.idrol'),primary_key=True),
     Column('idusuario', Integer, ForeignKey('usuario.idusuario'),primary_key=True)
 )
 

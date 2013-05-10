@@ -26,15 +26,15 @@
 	    </div>
 	    <center>
 	    <input type="submit" name="opcion" value="Definir"/>
+	    <input type="submit" name="opcion" value="Eliminar" onclick="return confirmar('¿Está seguro que desea eliminar?')"/>
+	    <input type="submit" name="opcion" value="Modificar"/>
+	    <br><br>
 	    <input type="submit" name="opcion" value='Asignar Roles'/>
-		<input type='submit' name="opcion" value='Asignar Tipo de Item'  />	    
-	<br><br>	
-		<input type="submit" name="opcion" value='ImportarFases'/>
-		<input type="submit" name="opcion" value="Listo"/>
-
-	
-		<br>
-
+		<input type='submit' name="opcion" value='Asignar Tipo de Item'/>  
+		<input type="submit" name="opcion" value='Importar Fase'/>
+		<br><br>	
+		<input type="submit" name="opcion" value="Iniciar Proyecto"onclick="return confirmar('¿Está seguro de que desea iniciar el proyecto? Las fases ya no seran modificables ni sera posible asignar tipos de item ni roles')"/>
+		<input type="submit" name="opcion" value="Atras"/>
 		</center>
 	</form>
 </body>
