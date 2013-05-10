@@ -1,4 +1,4 @@
-from Modelo import LineaBase,Fase,Proyecto,engine
+from Modelo import LineaBase,Fase,Proyecto,Item,engine
 from sqlalchemy import create_engine, and_, or_, func
 from sqlalchemy.orm import sessionmaker, join
 import sqlalchemy.exc
@@ -42,11 +42,29 @@ def crearLB(idfase):
     session.commit()
 
 def getMaxSeqLB(idfase):
-    """Funcion que recibe el ID de una fase y retorna en numero maximo de secuencia de id"""
-    listLB = getLBFase(idfase)
-    max = 0
-    for row in listLB:
-        if max < row.numero:
-            max = row.numero
-    return max
+    """Funcion que recibe el ID de una y devuelve el numero maximo
+    de secuencia de sus lineas bases"""
+    lista= getLBFase(idfase)
+    result=0
+    for row in lista:
+        if result < row.numero:
+            result = row.numero
+    return result
+
+def getListItemsEnLB(idlineabase):
+    """Funcion que recibe una id de linea base y retorna la lista de los items que se encuentran en la misma"""
+    result = session.query(Item).filter(Item.idlineabase==idlineabase).all()
+    return result
+
+def agregarItems(listItemEnLB,idlineabase):
+    """Funcion que recibe la lista de los id de los items elegidos a ser agregados a una linea Base seleccionada"""
+    """La funcion es agrega en Item el id de la linea base """
+#     listDesagregados = session.query(Item).filter(Item.idlineabase==idlineabase).all()
+#     for iditem in listDesagregados:
+#         session.delete(Item.idlineabase)
+#     session.commit()    
+    for id in listItemEnLB:
+        Item = session.query(Item).filter(Item.iditem==iditem).first()
+        Item.idlineabase=idlineabase
+    session.commit() 
             
