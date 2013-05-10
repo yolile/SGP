@@ -1,4 +1,4 @@
-from Modelo import TipoItem, AtributoTipo, engine
+from Modelo import TipoItem, AtributoTipo, engine, Item
 from sqlalchemy.orm import sessionmaker, join
 import time
 Session = sessionmaker(bind=engine)
@@ -119,8 +119,9 @@ def borrarAtributo(idatributo):
 def tipoDeItemNoInstanciado(idtipoitem):
     """Funcion que verifica si un tipo id item esta instanciado 
     es decir si ya esta en uso en un item para no modificar si ya esta"""
-    #Falta implementar. Funcion que retorna si un tipo de item
-    #no fue utilizado en un proyecto, o sea si se puede redefinir
+    items = session.query(Item).join(TipoItem).filter(Item.idtipoitem==idtipoitem).all()
+    if len(items)!= 0:
+        return False
     return True
 
 def busquedaTipo(texto):

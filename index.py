@@ -15,7 +15,7 @@ __credits__ = 'none'
 __text__ = 'indice principal que conmuta con las diferentes funcionalidades de SGP'
 __file__ = 'index.py' 
 
-app = Flask(__name__,template_folder='/home/divina/git/SGP/templates')
+app = Flask(__name__,template_folder='/home/thelma/git/SGP/templates')
 app.debug = True
 app.secret_key = 'secreto'
 app.config.from_object(__name__)
@@ -28,11 +28,6 @@ versionitem=None
 listaAtributoItemPorTipo=[]
 
 iditem=0
-
-"""fases creadas es una variable global que ayuda a saber si fueron creadas
-nuevas fases dentro de la llamada defFases"""
-fasesCreadas=0
-
 
 @app.route('/')
 def index():
@@ -267,8 +262,6 @@ def admProy():
         if request.form['opcion'] == "Crear":
             return render_template('crearProy.html')
         if request.form['opcion'] == "Administrar Fases":
-            global fasesCreadas
-            fasesCreadas=0
             global proyecto
             proyecto = int(request.form['select'])
             return redirect(url_for('defFases'))
@@ -339,20 +332,24 @@ def defFases():
             else:
                  flash('Proyecto Iniciado, imposible definir mas fases')
                  return redirect(url_for('defFases'))
-        if (request.form['opcion']=="Listo"):
-            global fasesCreadas
-            if(fasesCreadas != 0):#si se creo al menos una fase
-                idfase=CtrlAdmProy.getIdPrimeraFase(proy)
-                if(CtrlAdmProy.faseTieneTipoItem(idfase)==False):
-                    flash('Debe asignar al menos un tipo de item a la primera fase')
-                    return redirect(url_for('defFases'))
-                CtrlAdmProy.setProyIniciado(proy)
-                fasesCreadas = 0
-            return redirect(url_for('admProy'))
+        if (request.form['opcion']=="Iniciar Proyecto"):
+            listadefases=CtrlAdmProy.getFasesListByProy(proyecto)
+            if(len(listadefases)==0):
+                flash('Debe definirse al menos una fase para iniciar un proyecto')
+                return redirect(url_for('defFases'))
+            if not(CtrlAdmProy.fasesTotalmenteDefinidas(listadefases)):
+                flash('No se puede iniciar el proyecto. Algunas fases aun no poseen tipos de item o roles asociados')
+                return redirect(url_for('defFases'))
+            CtrlAdmProy.setProyIniciado(proy)
+            flash('Proyecto iniciado')
+            return redirect(url_for('defFases'))
         idfase=int(request.form['select'])
         if (request.form['opcion']=="Asignar Roles"):
             if(CtrlAdmUsr.tienePermisoEnFase(idfase,owner,205)==False):
                 flash('No tiene permisos para realizar esta operacion')
+                return redirect(url_for('defFases'))
+            if(CtrlAdmProy.getFase(idfase).estado !='no-iniciada'):
+                flash('No se permite asignar roles a una fase que ha iniciado')
                 return redirect(url_for('defFases'))
             listaRoles=CtrlAdmRol.getRolList()
             idRolesEnFase=[]
@@ -379,6 +376,22 @@ def defFases():
                                    listTipoItem=listaTipos,
                                    idtipos=idTiposEnFase,
                                    idfase=idfase)
+        if (request.form['opcion']=="Eliminar"):
+            fase=CtrlAdmProy.getFase(idfase)
+            if(fase.estado=='desarrollo'):
+                flash('Imposible eliminar. Fase en desarrollo')
+                return redirect(url_for('defFases'))
+            CtrlAdmProy.elimFase(idfase)
+            flash('Fase eliminada')
+            return redirect(url_for('defFases'))
+        if (request.form['opcion']=='Modificar'):
+            fase=CtrlAdmProy.getFase(idfase)
+            if(fase.estado=='desarrollo'):
+                flash('Imposible modificar. Fase en desarrollo')
+                return redirect(url_for('defFases'))
+            return render_template('modFase.html',fase=fase)
+        if (request.form['opcion']=='Atras'):
+            return redirect(url_for('admProy'))
         return redirect(url_for('defFases'))
            
 @app.route('/crearFase', methods=['GET','POST'])
@@ -391,8 +404,6 @@ def crearFase():
                                   request.form['descripcion'],
                                   project)
             flash('Fase creada')
-            global fasesCreadas
-            fasesCreadas=fasesCreadas+1
         listaFases = CtrlAdmProy.getFasesListByProy(project)
         return render_template('defFases.html',listFases=listaFases,proyecto=project) 
 
