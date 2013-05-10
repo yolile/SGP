@@ -15,7 +15,7 @@ __credits__ = 'none'
 __text__ = 'indice principal que conmuta con las diferentes funcionalidades de SGP'
 __file__ = 'index.py' 
 
-app = Flask(__name__,template_folder='/home/thelma/git/SGP/templates')
+app = Flask(__name__,template_folder='/home/divina/git/SGP/templates')
 app.debug = True
 app.secret_key = 'secreto'
 app.config.from_object(__name__)
@@ -890,6 +890,6 @@ def proyectoXenGC():
             return render_template('asigItemsEnLB')        
         if request.form['opcion'] == "Cerrar Proyecto":
             return redirect(url_for('abrirProyectoEnGC'))
-                                     
+
 if __name__=='__main__':
-    app.run()             
+    app.run()
