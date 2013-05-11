@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block body %}
+	<body class=formato1>
+        <form class='estilos' action="{{ url_for('conProy') }}" method=post>
+            <center><h1>Consulta de Proyecto</h1></center>
+          	<br>
+          	<br>
+            <div><label>Nombre:</label>{{ proyecto.nombre }}</div>
+            <div><label>Descripcion:</label>{{ proyecto.descripcion }}</div>
+            <div><label>Fecha de Creacion:</label>{{ proyecto.fechacreacion }}</div>
+            <div><label>Complejidad:</label>{{ proyecto.complejidad }}</div>
+            <div><label>Estado:</label>{{ proyecto.estado }}</div>
+            <div><label>Usuario Lider:</label>{{ proyecto.usuario.nombre }}</div>
+            <div><label>Presupuesto:</label>{{ proyecto.presupuesto }}</div>
+            <div><label>Fases<label></div>	
+            <center>
+			<div style="height:150px;width:300px;overflow:auto;">	
+			<table width="50%" border="1">
+			<tr>
+			<th scope="col">Secuencia</th>
+			<th scope="col">Nombre</th>
+			<th scope="col">OK</th>
+			</tr>
+            	{% for fase in proyecto.fases %}
+            		{% if fase.estado != 'eliminada' %}
+						<tr>
+						<td>{{ fase.posicionfase }}</td>
+						<td>{{ fase.nombre }}</td>
+						<td><input name="select" type="radio" value={{ fase.idfase }} checked /></td>
+						</tr> 
+					{% endif %} 	
+  				{% endfor %}
+			</table>
+			</div>
+			</center>
+		    <div><center><input name='opcion' type='submit' value='Aceptar'>
+		    <input type='submit' name='opcion' value='Consultar Tipos de Item'>
+		    <input type='submit' name='opcion' value='Consultar Roles'>
+            </center></div>
+        </form>
+    </body>
+{% endblock %}

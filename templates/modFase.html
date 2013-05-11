@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block body %}
+	<body class=formato1>
+        <form class='estilos' action="{{ url_for('modFase') }}" method=post>
+            <center><h1>Modificacion de Fase</h1></center>
+          	<br>
+          	<br>
+            <div><input type='hidden' name='idfase' value="{{ fase.idfase }}"></div>
+            <div><label>Nombre:</label><input type='text' name='nombre' value="{{ fase.nombre }}"></div>
+            <div><label>Descripcion:</label><input type='text' name='descripcion' value="{{ fase.descripcion }}"></div>
+            <div><center><input type='submit' name="opcion" value='Guardar'>
+            <input type='submit' name="opcion" value='Cancelar'></center></div>
+        </form>
+    </body>
+{% endblock %}

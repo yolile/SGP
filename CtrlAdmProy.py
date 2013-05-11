@@ -54,7 +54,7 @@ def getFasesList():
     return result
 
 def getFasesListByProy(idproyecto):
-    faseList = session.query(Fase).filter(Fase.idproyecto==idproyecto).all()
+    faseList = session.query(Fase).filter(and_(Fase.idproyecto==idproyecto,Fase.estado!='eliminada')).all()
     return faseList
 
 def getFasesListByProyAndUser(idproyecto,username):
@@ -67,7 +67,7 @@ def getFasesListByProyAndUser(idproyecto,username):
     faseRol = session.query(Fase).join(Rol,Fase.roles).filter(Rol.idrol.in_(idroles)).all()
     faseList = []
     for f in faseRol:
-        if f.idproyecto == idproyecto:
+        if f.idproyecto == idproyecto and f.estado!='eliminada':
             faseList.append(f)
     return faseList
 
@@ -242,6 +242,7 @@ def arreglarSecuencia(fase):
     de todas las fases siguientes, considerando que la fase recibida ha sido eliminada"""
     listafases=getFasesListByProy(fase.idproyecto)
     poseliminada=fase.posicionfase
+    fase.posicionfase=0
     for row in listafases:
         if(row.posicionfase>poseliminada):
             row.posicionfase=row.posicionfase-1
@@ -266,8 +267,9 @@ def fasesTotalmenteDefinidas(listaFases):
     en el caso de que todas tengan tipos de item y roles asociados,
     False en caso contrario"""
     for fase in listaFases:
-        if not(faseTieneTipoItem(fase.idfase)):
-            return False
-        if not(faseTieneRol(fase.idfase)):
-            return False
+        if fase.estado != 'eliminada':
+            if not(faseTieneTipoItem(fase.idfase)):
+                return False
+            if not(faseTieneRol(fase.idfase)):
+                return False
     return True
