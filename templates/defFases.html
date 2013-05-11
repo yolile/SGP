@@ -15,17 +15,19 @@
 					<th scope="col">OK</th>
 				</tr>
 				{% for fase in listFases %}
-					<tr>
-						<td>{{ fase.posicionfase }}</td>
-						<td>{{ fase.nombre}}</td>	
-						<td>{{ fase.descripcion }}</td>
-						<td><input name="select" type="radio" value={{ fase.idfase }} checked /></td>
-					</tr>  	
+					{% if fase.estado != 'eliminada' %}
+						<tr>
+							<td>{{ fase.posicionfase }}</td>
+							<td>{{ fase.nombre}}</td>	
+							<td>{{ fase.descripcion }}</td>
+							<td><input name="select" type="radio" value={{ fase.idfase }} checked /></td>
+						</tr>
+					{% endif %}  	
 				 {% endfor %}
 			 </TABLE>
 	    </div>
 	    <center>
-	    <input type="submit" name="opcion" value="Definir"/>
+	    <input type="submit" name="opcion" value="Nueva Fase"/>
 	    <input type="submit" name="opcion" value="Eliminar" onclick="return confirmar('¿Está seguro que desea eliminar?')"/>
 	    <input type="submit" name="opcion" value="Modificar"/>
 	    <br><br>

@@ -18,7 +18,7 @@ __file__ = 'Modelo.py'
 #Para usar la base de datos de prueba descomentar la linea 19 y comentar la linea 20
 
 #rutaBD='postgresql+psycopg2://admin:admin@localhost/BDDEPRUEBA'
-rutaBD='postgresql+psycopg2://admin:admin@localhost/sgptest'
+rutaBD='postgresql+psycopg2://admin:admin@localhost/newsgp'
 
 #engine = create_engine(os.environ['DATABASE_URI'])
 engine=create_engine(rutaBD)
@@ -123,7 +123,7 @@ class Proyecto(Base):
     usuariolider = Column(Integer, ForeignKey('usuario.idusuario'))
     usuario = relationship("Usuario")
     presupuesto = Column(Integer)
-    
+    fases = relationship("Fase")
     comitecambios = relationship("Usuario", secondary=ComiteCambios)
 
      

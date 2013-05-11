@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block body %}
+	<body class=formato1>
+        <form class='estilos' action="{{ url_for('conProy') }}" method=get>
+            <center><h1>Consulta de Roles en una Fase</h1></center>
+            <center>
+			<div style="height:150px;width:160px;overflow:auto;">	
+			<table width="50%" border="1">
+			<tr>
+			<th scope="col">Nombre</th>
+			</tr>
+            	{% for rol in fase.roles %}
+						<tr>
+						<td>{{ rol.nombre }}</td>
+						</tr>  	
+  				{% endfor %}
+			</table>
+			</div>
+			</center>
+		    <div><center><input type='submit' value='Aceptar'>
+            </center></div>
+        </form>
+    </body>
+{% endblock %}

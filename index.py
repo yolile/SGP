@@ -16,7 +16,7 @@ __credits__ = 'none'
 __text__ = 'indice principal que conmuta con las diferentes funcionalidades de SGP'
 __file__ = 'index.py' 
 
-app = Flask(__name__,template_folder='/home/divina/git/SGP/templates')
+app = Flask(__name__,template_folder='/home/thelma/git/SGP/templates')
 app.debug = True
 app.secret_key = 'secreto'
 app.config.from_object(__name__)
@@ -260,10 +260,13 @@ def admProy():
             flash('No tiene permisos para realizar esta operacion ')
             return redirect(url_for('menu')) 
     if request.method == 'POST':
+        global proyecto
         if request.form['opcion'] == "Crear":
             return render_template('crearProy.html')
-        if request.form['opcion'] == "Administrar Fases":
-            global proyecto
+        if request.form['opcion'] == "Definicion de Fases":
+            if CtrlAdmProy.proy(int(request.form['select'])).estado == 'iniciado':
+                flash("Proyecto iniciado, imposible definir mas fases")
+                return redirect(url_for('admProy'))
             proyecto = int(request.form['select'])
             return redirect(url_for('defFases'))
         if request.form['opcion'] == "Comite de Cambios":
@@ -275,8 +278,7 @@ def admProy():
 #                                    idproyecto=request.form['select'])
         if request.form['opcion'] == "Buscar":
             listProy = CtrlAdmProy.busquedaProy(request.form['buscar'],
-                                         request.form['atributo'])
-            
+                                         request.form['atributo'])            
             flash('Resultado de la busqueda')
             return render_template('admProy.html',listProy=listProy)
         if request.form['opcion'] == "Eliminar":
@@ -289,6 +291,9 @@ def admProy():
             return render_template('modProy.html', proyecto=proy) 
         if request.form['opcion'] == "Home":
             return render_template('main.html')
+        if request.form['opcion'] == "Consultar":
+            proyecto=int(request.form['select'])
+            return redirect(url_for('conProy'))
         return redirect(url_for('admProy'))                 
 
 @app.route('/crearProy', methods=['GET','POST'])
@@ -316,6 +321,21 @@ def modProy():
                               int(request.form['presupuesto']))
             flash('Proyecto modificado')
         return redirect(url_for('admProy'))
+
+@app.route('/conProy', methods=['GET','POST'])    
+def conProy():
+    """Funcion que presenta los datos de un proyecto."""
+    global proyecto
+    if request.method == 'GET':
+        return render_template('conProy.html',proyecto=CtrlAdmProy.proy(proyecto))
+    if request.method == 'POST':
+        fase=CtrlAdmProy.getFase(int(request.form['select']))
+        if(request.form['opcion'] == "Consultar Tipos de Item"):
+            return render_template("conTipoItemFase.html",fase=fase)
+        if(request.form['opcion'] == "Consultar Roles"):
+            return render_template("conRolFase.html",fase=fase)
+        return redirect(url_for('admProy'))
+
     
 @app.route('/defFases', methods=['GET','POST'])
 def defFases():
@@ -327,7 +347,7 @@ def defFases():
     if request.method == 'POST':
         global owner
         proy=request.form['proyecto']
-        if (request.form['opcion']=="Definir"):
+        if (request.form['opcion']=="Nueva Fase"):
             if(CtrlAdmProy.getProyEstado(proy)=='no-iniciado'):
                return render_template('crearFase.html',idproyecto=proy)
             else:
@@ -491,7 +511,17 @@ def asigTipoItem():
                                        idfase=idfase)
         listaFases = CtrlAdmProy.getFasesListByProy(idproyecto)
         return render_template('defFases.html',listFases=listaFases,proyecto=idproyecto)
-        
+
+@app.route('/modFase', methods=['GET','POST'])    
+def modFase():
+    """Funcion que presenta el menu para modificar una fase."""  
+    if request.method == 'POST':
+        if(request.form['opcion'] == "Guardar"):
+            CtrlAdmProy.modFase(int(request.form['idfase']), 
+                              request.form['nombre'], 
+                              request.form['descripcion'])
+            flash('Fase modificada')
+        return redirect(url_for('defFases'))
 """-------------------------MODULO DE DESARROLLO---------------------------------------"""        
                                                            
 """------------------------Tipos de Items---------------------------------------"""
