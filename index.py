@@ -16,7 +16,7 @@ __credits__ = 'none'
 __text__ = 'indice principal que conmuta con las diferentes funcionalidades de SGP'
 __file__ = 'index.py' 
 
-app = Flask(__name__,template_folder='/home/thelma/git/SGP/templates')
+app = Flask(__name__,template_folder='/home/divina/git/SGP/templates')
 app.debug = True
 app.secret_key = 'secreto'
 app.config.from_object(__name__)
@@ -951,12 +951,10 @@ def asigItemsEnLB():
                                 idlineabase=idlineabase)
     if request.method == 'POST':
         if request.form['opcion'] == "Guardar":
-            #idlineabase = int(request.form['idlineabase'])
-            listItemEnLB=request.form.getlist('iditem')
+            listItemEnLB = request.form.getlist('iditem')
             CtrlLineaBase.agregarItems(listItemEnLB,idlineabase)
-        return render_template('proyectoXenGC.html')         
-        if request.form['opcion'] == "Cancelar":
-            return redirect(url_for('proyectoXenGC.html'))       
-
+        return render_template('proyectoXenGC.html')        
+    return redirect(url_for('proyectoXenGC'))
+       
 if __name__=='__main__':
     app.run()             

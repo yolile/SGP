@@ -18,7 +18,7 @@ __file__ = 'Modelo.py'
 #Para usar la base de datos de prueba descomentar la linea 19 y comentar la linea 20
 
 #rutaBD='postgresql+psycopg2://admin:admin@localhost/BDDEPRUEBA'
-rutaBD='postgresql+psycopg2://admin:admin@localhost/newsgp'
+rutaBD='postgresql+psycopg2://admin:admin@localhost/sgptest'
 
 #engine = create_engine(os.environ['DATABASE_URI'])
 engine=create_engine(rutaBD)
@@ -294,11 +294,11 @@ class LineaBase(Base):
     estado = Column(String(45))
     numero = Column(Integer)
     
-    def __init__(self, idlineabase, idfase, estado,numero):
+    def __init__(self, idlineabase, idfase, estado, numero):
         self.idlineabase = idlineabase
         self.idfase = idfase
         self.estado = estado
-        selnumero = numero
+        self.numero = numero
 
 
     def __repr__(self):
