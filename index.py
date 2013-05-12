@@ -951,12 +951,10 @@ def asigItemsEnLB():
                                 idlineabase=idlineabase)
     if request.method == 'POST':
         if request.form['opcion'] == "Guardar":
-            #idlineabase = int(request.form['idlineabase'])
-            listItemEnLB=request.form.getlist('iditem')
+            listItemEnLB = request.form.getlist('iditem')
             CtrlLineaBase.agregarItems(listItemEnLB,idlineabase)
-        return render_template('proyectoXenGC.html')         
-        if request.form['opcion'] == "Cancelar":
-            return redirect(url_for('proyectoXenGC.html'))       
-
+        return render_template('proyectoXenGC.html')        
+    return redirect(url_for('proyectoXenGC'))
+       
 if __name__=='__main__':
     app.run()             

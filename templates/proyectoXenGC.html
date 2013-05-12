@@ -1,23 +1,27 @@
 {% extends "layout.html" %}
 {% block body %}
-<body class=formato1>
+<body class=formato4>
         <form class='estilos' action="{{ url_for('proyectoXenGC') }}" method=post>
              <br>
             <div><label>Seleccionar Fase</label>
 					<div><br>	
-							<select name="fase">
+							<select name="fase">						
 								{% if faseSeleccionada %}
 									<option value={{faseSeleccionada.idfase }}>
 									{{ faseSeleccionada.posicionfase }}-{{ faseSeleccionada.nombre }}
 									</option>
 									{% for fase in listFases %}
-											{%	if fase.idfase != faseSeleccionada.idfase %}		
-												<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
+											{%	if fase.idfase != faseSeleccionada.idfase %}
+												{% if fase.estado == 'iniciado' %}														
+													<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
+							 					{%	endif %}
 							 				{%	endif %}
 							 		{% endfor %}
 								{% else %}
-									{% for fase in listFases %}		
+									{% for fase in listFases %}
+										{% if fase.estado == 'iniciado' %}
 												<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
+							 			{%	endif %}
 							 		{% endfor %}								
 								{% endif%}
 						
@@ -49,6 +53,9 @@
             <center>
             <input type='submit' name="opcion" value='Nueva Linea Base'>
             <input type='submit' name="opcion" value='Add/Quitar Items'>
+            </center>
+            <br>
+            <center>
             <input type='submit' name="opcion" value='Cerrar Linea Base'>
 			<input type='submit' name="opcion" value='Consultar'>
             </center>

@@ -64,12 +64,11 @@ def getListItemsEnLB(idlineabase):
 def agregarItems(listItemEnLB,idlineabase):
     """Funcion que recibe la lista de los id de los items elegidos a ser agregados a una linea Base seleccionada"""
     """La funcion es agrega en Item el id de la linea base """
-#     listDesagregados = session.query(Item).filter(Item.idlineabase==idlineabase).all()
-#     for iditem in listDesagregados:
-#         session.delete(Item.idlineabase)
-#     session.commit()    
+    listDesagregados = session.query(Item).filter(Item.idlineabase==idlineabase).all()
+    for iditem in listDesagregados:
+        session.delete(Item.idlineabase)
+    session.commit()
     for id in listItemEnLB:
-        Item = session.query(Item).filter(Item.iditem==iditem).first()
-        Item.idlineabase=idlineabase
-    session.commit() 
-            
+        Item = session.query(Item).filter(Item.iditem==id).first()
+        Item.idlineabase = idlineabase
+    session.commit()
