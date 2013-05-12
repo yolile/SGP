@@ -18,6 +18,11 @@ def getLBList():
     result = session.query(LineaBase).all()
     return result
 
+def getLB(idlineabase):
+    """Funcion que recibe el id de una fase y retorna el objeto Fase"""
+    lineabase = session.query(LineaBase).filter(LineaBase.idlineabase==idlineabase).first()
+    return fase
+
 def getMaxIdLineaBase():
     """Funcion que retorna el maximo valor de lineas bases en la base de datos"""
     lista = getLBList()
