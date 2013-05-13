@@ -5,19 +5,21 @@
              <br>
             <div><label>Seleccionar Fase</label>
 					<div><br>	
-							<select name="fase">
+							<select name="fase">						
 								{% if faseSeleccionada %}
 									<option value={{faseSeleccionada.idfase }}>
 									{{ faseSeleccionada.posicionfase }}-{{ faseSeleccionada.nombre }}
 									</option>
 									{% for fase in listFases %}
-											{%	if fase.idfase != faseSeleccionada.idfase %}		
-												<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
+											{%	if fase.idfase != faseSeleccionada.idfase and  fase.estado == 'desarrollo'%}														
+													<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
 							 				{%	endif %}
 							 		{% endfor %}
 								{% else %}
-									{% for fase in listFases %}		
+									{% for fase in listFases %}
+										{% if fase.estado == 'desarrollo' %}
 												<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
+							 			{%	endif %}
 							 		{% endfor %}								
 								{% endif%}
 						

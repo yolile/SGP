@@ -11,15 +11,13 @@
 									{{ faseSeleccionada.posicionfase }}-{{ faseSeleccionada.nombre }}
 									</option>
 									{% for fase in listFases %}
-											{%	if fase.idfase != faseSeleccionada.idfase %}
-												{% if fase.estado == 'iniciado' %}														
+											{%	if fase.idfase != faseSeleccionada.idfase and  fase.estado == 'desarrollo'%}														
 													<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
-							 					{%	endif %}
 							 				{%	endif %}
 							 		{% endfor %}
 								{% else %}
 									{% for fase in listFases %}
-										{% if fase.estado == 'iniciado' %}
+										{% if fase.estado == 'desarrollo' %}
 												<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
 							 			{%	endif %}
 							 		{% endfor %}								
@@ -40,18 +38,21 @@
 					<th scope="col">ESTADO</th>					
 					</tr>
 						{% for lineabase in listLB %}
-						<tr>
-						<td><input name="idlineabase" type="radio" value={{ lineabase.idlineabase }} checked /></td>	
-						<td>{{ lineabase.numero }}</td>	
-						<td>{{ lineabase.estado}}</td>
-						</tr>  	
-						  	{% endfor %}
+							{% if lineabase.estado != 'eliminado' %}
+							<tr>
+							<td><input name="idlineabase" type="radio" value={{ lineabase.idlineabase }} checked /></td>	
+							<td>{{ lineabase.numero }}</td>	
+							<td>{{ lineabase.estado}}</td>
+							</tr>  	
+							{% endif %}
+						{% endfor %}
 					</table>
 				    <br>        
             </div>
             <div>
             <center>
             <input type='submit' name="opcion" value='Nueva Linea Base'>
+            <input type='submit' name="opcion" value='Eliminar Linea Base'>
             <input type='submit' name="opcion" value='Add/Quitar Items'>
             </center>
             <br>
