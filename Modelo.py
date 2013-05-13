@@ -42,17 +42,13 @@ RolFase = Table('rolfase', Base.metadata,
 
 ComiteCambios = Table('comitecambios', Base.metadata,
     Column('idusuario', Integer, ForeignKey('usuario.idusuario'),primary_key=True),
-    Column('idproyecto', Integer, ForeignKey('proyecto.idproyecto',
-                                             onupdate="CASCADE",
-                                            ondelete="CASCADE"),
-                                            primary_key=True)
+    Column('idproyecto', Integer, ForeignKey('proyecto.idproyecto'),primary_key=True)
 )
 
 TipoItemFase=Table('tipoitemfase', Base.metadata,
-                   Column('idtipoitem', Integer, ForeignKey('tipoitem.idtipoitem',
-                                                            ondelete='CASCADE'),primary_key=True),
-                   Column('idfase', Integer, ForeignKey('fase.idfase',
-                                                        ondelete='CASCADE'),primary_key=True))
+                   Column('idtipoitem', Integer, ForeignKey('tipoitem.idtipoitem'),primary_key=True),
+                   Column('idfase', Integer, ForeignKey('fase.idfase'),primary_key=True)
+)
   
 
 """------------------------USUARIO---------------------------------------""" 
@@ -145,9 +141,7 @@ class Fase(Base):
 
     __tablename__ = 'fase'
     idfase = Column(Integer,primary_key = True)
-    idproyecto = Column(Integer,ForeignKey('proyecto.idproyecto',
-                                            onupdate="CASCADE",
-                                            ondelete="CASCADE"))
+    idproyecto = Column(Integer,ForeignKey('proyecto.idproyecto'))
     proyecto = relationship("Proyecto")
     posicionfase = Column(Integer)
     nombre = Column(String(45))

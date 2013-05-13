@@ -16,7 +16,7 @@ __credits__ = 'none'
 __text__ = 'indice principal que conmuta con las diferentes funcionalidades de SGP'
 __file__ = 'index.py' 
 
-app = Flask(__name__,template_folder='/home/divina/git/SGP/templates')
+app = Flask(__name__,template_folder='/home/juan/git/SGP/templates')
 app.debug = True
 app.secret_key = 'secreto'
 app.config.from_object(__name__)
@@ -700,27 +700,44 @@ def proyectoX():
     if request.method == 'POST':
         if (request.form['opcion']=="Crear Item"):
             idfase = int(request.form['fase'])
-            global item
-            global versionitem
-            item = CtrlFase.instanciarItem("","desarrollo",0,idfase)
-            versionitem = CtrlFase.instanciarVersionItem(item.iditem,
+            if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
+                global item
+                global versionitem
+                item = CtrlFase.instanciarItem("","desarrollo",0,idfase)
+                versionitem = CtrlFase.instanciarVersionItem(item.iditem,
                                                             CtrlAdmUsr.getIdByUsername(owner),
                                                             "", 
                                                             0,
                                                             0,
                                                             0,
                                                             1)
-            global listaAtributoItemPorTipo
-            listaAtributoItemPorTipo = []
-            return redirect(url_for('crearItem'))
+                global listaAtributoItemPorTipo
+                listaAtributoItemPorTipo = []
+                return redirect(url_for('crearItem'))
+            else:
+                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                return render_template('proyectoX.html',
+                                       listFases=listaFases,
+                                       faseSeleccionada=faseSeleccionada,
+                                       error='Fase finalizada no se pueden agregar items')
         if (request.form['opcion']=="Relacionar"):
-            global iditem
-            iditem = int(request.form['iditem'])
-            return redirect(url_for('relacion'))
+            idfase = int(request.form['fase'])
+            if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
+                global iditem
+                iditem = int(request.form['iditem'])
+                return redirect(url_for('relacion'))
+            else:
+                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                return render_template('proyectoX.html',
+                                       listFases=listaFases,
+                                       faseSeleccionada=faseSeleccionada,
+                                       error='Fase finalizada no se pueden relacionar items')
         if (request.form['opcion']=="Mostrar Items"):
             listItem = CtrlFase.getItemsFase(int(request.form['fase']))
             faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
-            listaFases = CtrlAdmProy.getFasesListByProy(proyecto)
+            listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
             return render_template('proyectoX.html',
                                    listFases=listaFases,
                                    listItem=listItem,
@@ -730,14 +747,19 @@ def proyectoX():
             listItem = CtrlFase.busquedaItem(request.form['buscar'],
                                              request.form['atributo'],
                                              faseSeleccionada.idfase)
+            listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
             return render_template('proyectoX.html',
+                                   listFases=listaFases,
                                    listItem = listItem,
                                    faseSeleccionada=faseSeleccionada)
         if request.form['opcion'] == "Consultar Item":
             if request.form['iditem']=="":
-                listaFases = CtrlAdmProy.getFasesListByProy(proyecto)
+                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
                 return render_template('proyectoX.html',
+                                       listaFases,
                                        listFases=listaFases,
+                                       faseSeleccionada=faseSeleccionada,
                                        error='Debe escoger un item')
             #print request.form['iditem']
             iditem=int(request.form['iditem'])
@@ -749,7 +771,19 @@ def proyectoX():
                                    item=item,
                                    versionitem=versionitem,
                                    listaValores=listaValores,
-                                   listaAtributos=listaAtributos)        
+                                   listaAtributos=listaAtributos)
+        if request.form['opcion'] == "Finalizar Fase":
+            if(CtrlFase.finalizarFase(int(request.form['fase']))):
+                flash('Fase finalizada')
+                return redirect(url_for('proyectoX'))
+            else:
+                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                return render_template('proyectoX.html',
+                                       listaFases,
+                                       listFases=listaFases,
+                                       faseSeleccionada=faseSeleccionada,
+                                       error='Imposible finalizar la fase. Existe items que no estan en lineas bases cerradas')
         if request.form['opcion'] == "Cerrar Proyecto":
             return redirect(url_for('abrirProyecto')) 
 
@@ -880,7 +914,7 @@ def abrirProyectoEnGC():
     """Funcion que presenta el menu para abrir proyectos en modo de desarrollo"""  
     if request.method == 'GET':
         global owner
-        if CtrlAdmUsr.havePermission(owner,206):
+        if CtrlAdmUsr.havePermission(owner,207):
             #agregar permiso para Linea Base!!!!!!!!!!!!!!!!!!!!!!
             listaProy = CtrlAdmProy.getProyectoList()
             return render_template('abrirProyectoEnGC.html',listProy=listaProy)
@@ -920,21 +954,85 @@ def proyectoXenGC():
                                    faseSeleccionada=faseSeleccionada)     
             return render_template('proyectoXenGC.html')         
         if request.form['opcion'] == "Nueva Linea Base":
-            idfase = int(request.form['fase'])
-            CtrlLineaBase.crearLB(idfase)
-            faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
-            listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)   
-            return render_template('proyectoXenGC.html',listFases=listaFases)         
-        if request.form['opcion'] == "Add/Quitar Items":
             global idfase
+            idfase = int(request.form['fase'])
+            if(CtrlAdmProy.getFase(idfase).estado != 'finalizado'):
+                CtrlLineaBase.crearLB(idfase)
+                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                listLB = CtrlLineaBase.getLBFase(int(request.form['fase']))
+                flash('Linea Base Creada')
+                return render_template('proyectoXenGC.html',
+                                        listLB=listLB,
+                                        faseSeleccionada=faseSeleccionada,
+                                        listFases=listaFases)
+            else:
+                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                listLB = CtrlLineaBase.getLBFase(int(request.form['fase']))
+                return render_template('proyectoXenGC.html',
+                                        listLB=listLB,
+                                        faseSeleccionada=faseSeleccionada,
+                                        listFases=listaFases,
+                                        error='Fase finalizada imposible crear linea base')        
+        if request.form['opcion'] == "Eliminar Linea Base":
             idfase = int(request.form['fase'])
             global idlineabase
             idlineabase = int(request.form['idlineabase'])
-            return redirect(url_for('asigItemsEnLB'))
+            if((CtrlLineaBase.getLB(idlineabase)).estado=='cerrado'):
+                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                listLB = CtrlLineaBase.getLBFase(int(request.form['fase']))
+                return render_template('proyectoXenGC.html',
+                                       listLB=listLB,
+                                       faseSeleccionada=faseSeleccionada,
+                                       listFases=listaFases,
+                                       error='Linea Base cerrada imposible eliminar Linea Base')
+            else:
+                CtrlLineaBase.eliminarLB(idlineabase)
+                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                listLB = CtrlLineaBase.getLBFase(int(request.form['fase']))
+                flash('Linea Base Eliminada')
+                return render_template('proyectoXenGC.html',
+                                       listLB=listLB,
+                                       faseSeleccionada=faseSeleccionada,
+                                       listFases=listaFases)
+                                         
+        if request.form['opcion'] == "Add/Quitar Items":
+            idfase = int(request.form['fase'])
+            idlineabase = int(request.form['idlineabase'])
+            if((CtrlLineaBase.getLB(idlineabase)).estado=='cerrado'):
+                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                listLB = CtrlLineaBase.getLBFase(int(request.form['fase']))
+                return render_template('proyectoXenGC.html',
+                                       listLB=listLB,
+                                       faseSeleccionada=faseSeleccionada,
+                                       listFases=listaFases,
+                                       error='Linea Base cerrada imposible agregar items')
+            else:
+                return redirect(url_for('asigItemsEnLB'))
+        if request.form['opcion'] == "Consultar":
+            idlineabase = int(request.form['idlineabase'])
+            listItem = CtrlLineaBase.getListItemsEnLB(idlineabase) #lista de los items que estan en la linea base             
+            return render_template('conLB.html',listItem=listItem) 
+        if request.form['opcion'] == "Cerrar Linea Base":
+            idlineabase = int(request.form['idlineabase'])
+            if(CtrlLineaBase.cerrarLB(idlineabase)):
+                flash('Linea Base Cerrada')
+                return redirect(url_for('proyectoXenGC'))
+            else:                
+                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                listLB = CtrlLineaBase.getLBFase(int(request.form['fase']))
+                return render_template('proyectoXenGC.html',
+                                       listLB=listLB,
+                                       faseSeleccionada=faseSeleccionada,
+                                       listFases=listaFases,
+                                       error='Imposible cerrar Linea Base, hay Items sin relaciones')
         if request.form['opcion'] == "Buscar":
             return render_template('proyectoXenGC.html')
-        if request.form['opcion'] == "Consultar":            
-            return render_template('conLB.html')       
         if request.form['opcion'] == "Cerrar Proyecto":
             return redirect(url_for('abrirProyectoEnGC')) 
 
@@ -942,18 +1040,15 @@ def proyectoXenGC():
 def asigItemsEnLB():                                    
     """Funcion que asigna y desasigna items a una linea base abierta en una fase seleccionada"""
     if request.method == 'GET':
-        listItem = CtrlFase.getItemsFase(idfase) #lista de todos los items de la fase
+        listItem = CtrlLineaBase.getItemsFaseNotLB(idfase) #lista de todos los items de la fase
         listItemEnLB = CtrlLineaBase.getListItemsEnLB(idlineabase) #lista de los items que estan en la linea base 
         return render_template('asigItemsEnLB.html',
-                                bool = True,
                                 listItem =listItem,
-                                listItemEnLB = listItemEnLB,
-                                idlineabase=idlineabase)
+                                listItemEnLB = listItemEnLB)
     if request.method == 'POST':
         if request.form['opcion'] == "Guardar":
             listItemEnLB = request.form.getlist('iditem')
-            CtrlLineaBase.agregarItems(listItemEnLB,idlineabase)
-        return render_template('proyectoXenGC.html')        
+            CtrlLineaBase.agregarItems(listItemEnLB,idlineabase)        
     return redirect(url_for('proyectoXenGC'))
        
 if __name__=='__main__':

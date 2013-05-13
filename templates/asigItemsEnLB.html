@@ -5,9 +5,7 @@
              <br>
         	<center><h1>ASIGNACION DE ITEMS A UNA LINEA BASE</h1></center>
         	<br>
-        	  <div><input type='hidden' name='idlineabase' value="{{ idlineabase}}"></div>
-        	  
-	            <div><label>Items de fase seleccionada:</label>
+        	    <div><label>Items de fase seleccionada:</label>
 	            	<br>
 	            	<div style="height:150px;width:220px;overflow:auto;">	
 	            	<table width="50%" border="1">
@@ -16,19 +14,20 @@
 					<th scope="col">NOMBRE</th>
 					<th scope="col">ESTADO</th>					
 					</tr>
+						{%for item in listItemEnLB%}
+							<tr>
+							<td><INPUT TYPE="checkbox" checked="checked" NAME="iditem" VALUE="{{ item.iditem }}"></td> 	
+							<td>{{ item.nombre }}</td>	
+							<td>{{ item.estado }}</td>
+							</tr>
+						{% endfor %}
 						{% for item in listItem %}
 							<tr>
-							
-							{% if item.iditem in listItemEnLB %}
-	        					<td><INPUT TYPE="checkbox" checked="checked" NAME="iditem" VALUE="{{ item.iditem }}"></td>  
-	      					{% else %}
-	        					<td><INPUT TYPE="checkbox" NAME="iditem" VALUE="{{ item.iditem }}"></td>  
-	      					{% endif %}
-	      							
+							<td><INPUT TYPE="checkbox" NAME="iditem" VALUE="{{ item.iditem }}"></td> 		
 							<td>{{ item.nombre }}</td>	
 							<td>{{ item.estado }}</td>
 							</tr>  	
-						  	{% endfor %}						  	
+						 {% endfor %}						  	
 						  	
 					</table>
 				    <br>        

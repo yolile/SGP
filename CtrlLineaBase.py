@@ -1,4 +1,4 @@
-from Modelo import LineaBase,Fase,Proyecto,Item,engine
+from Modelo import LineaBase, Fase, Proyecto, Item, Relacion, engine
 from sqlalchemy import create_engine, and_, or_, func
 from sqlalchemy.orm import sessionmaker, join
 import sqlalchemy.exc
@@ -57,18 +57,58 @@ def getMaxSeqLB(idfase):
     return result
 
 def getListItemsEnLB(idlineabase):
-    """Funcion que recibe una id de linea base y retorna la lista de los items que se encuentran en la misma"""
+    """Funcion que recibe una id de linea base y retorna la lista de los id 
+    de los items que se encuentran en la misma"""
     result = session.query(Item).filter(Item.idlineabase==idlineabase).all()
+    return result
+
+def getLB(idlineabase):
+    """Retorna el objeto LineaBase con el mismo idlieabase recibido como parametro"""
+    result = session.query(LineaBase).filter(LineaBase.idlineabase==idlineabase).first()
+    return result
+    
+def getItemsFaseNotLB(idfase):
+    """Retorna los items de la fase con el id pasado como parametro y los items que no esten en 
+    ninguna linea base"""
+    result = session.query(Item).filter(and_(Item.idfase==idfase,Item.idlineabase==None)).all()
     return result
 
 def agregarItems(listItemEnLB,idlineabase):
     """Funcion que recibe la lista de los id de los items elegidos a ser agregados a una linea Base seleccionada"""
     """La funcion es agrega en Item el id de la linea base """
     listDesagregados = session.query(Item).filter(Item.idlineabase==idlineabase).all()
-    for iditem in listDesagregados:
-        session.delete(Item.idlineabase)
+    for item in listDesagregados:
+        item.idlineabase=None
     session.commit()
-    for id in listItemEnLB:
-        Item = session.query(Item).filter(Item.iditem==id).first()
-        Item.idlineabase = idlineabase
+    listItem = session.query(Item).filter(Item.iditem.in_(listItemEnLB)).all()
+    for item in listItem:
+        item.idlineabase = idlineabase
     session.commit()
+
+def eliminarLB(idlineabase):
+    """Elimina logicamente una linea base dado el id de una linea base y quita 
+    los items de tal linea base"""
+    listItems = session.query(Item).filter(Item.idlineabase==idlineabase).all()
+    for item in listItems:
+        item.idlineabase=None
+    LB = getLB(idlineabase)
+    LB.numero=0
+    LB.estado='eliminado'
+    session.commit()
+    
+def cerrarLB(idlineabase):
+    """Funcion de cerrar linea base, primero determina a que fase pertenece la linea base a cerrar.
+    Si es que pertenece a la primera solo la cierra en caso contrario ve si todos sus items tienen
+    algun otro item apuntandolo en alguna relacion"""
+    lineabase = session.query(LineaBase).filter(LineaBase.idlineabase==idlineabase).first()
+    fase = session.query(Fase).filter(Fase.idfase==lineabase.idfase).first()
+    if fase.posicionfase > 1:
+        listItem = getListItemsEnLB(idlineabase)
+        for i in listItem:
+            result = session.query(Relacion).filter(Relacion.alitem==i.iditem).first()
+            if result==None:
+                return False
+    lineabase.estado='cerrado'
+    session.commit()
+    return True
+

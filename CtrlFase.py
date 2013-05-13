@@ -1,4 +1,4 @@
-from Modelo import Item, VersionItem, Relacion, AtributoItemPorTipo, Fase, Proyecto, engine
+from Modelo import Item, VersionItem, Relacion, AtributoItemPorTipo, Fase, Proyecto, LineaBase, engine
 from sqlalchemy import create_engine, and_, or_, func
 from sqlalchemy.orm import sessionmaker, join
 
@@ -152,3 +152,19 @@ def getVersionActual(iditem):
     version = session.query(VersionItem).filter(and_(VersionItem.iditem==iditem,
                                                      VersionItem.version==session.query(func.max(VersionItem.version)))).first()
     return version
+
+def finalizarFase(idfase):
+    """Funcion utilizada para finalizar la fase. 
+    Comprueba si los items pertenecen a alguna linea base y si es asi 
+    comprueba que la linea base este cerrada"""
+    listItem = getItemsFase(idfase)
+    for i in listItem:
+        if i.idlineabase == None:
+            return False
+        lb = session.query(LineaBase).filter(LineaBase.idlineabase==i.idlineabase).first()
+        if lb.estado != 'cerrado':
+            return False
+    fase = session.query(Fase).filter(Fase.idfase==idfase).first()
+    fase.estado='finalizado'
+    session.commit()
+    return True
