@@ -11,13 +11,13 @@
 									{{ faseSeleccionada.posicionfase }}-{{ faseSeleccionada.nombre }}
 									</option>
 									{% for fase in listFases %}
-											{%	if fase.idfase != faseSeleccionada.idfase and  fase.estado == 'desarrollo'%}														
+											{%	if fase.idfase != faseSeleccionada.idfase and  fase.estado != 'eliminada'%}														
 													<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
 							 				{%	endif %}
 							 		{% endfor %}
 								{% else %}
 									{% for fase in listFases %}
-										{% if fase.estado == 'desarrollo' %}
+										{% if fase.estado != 'eliminada' %}
 												<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
 							 			{%	endif %}
 							 		{% endfor %}								
@@ -49,6 +49,8 @@
             </div>
             <div>
             <center>
+            <input type='submit' name="opcion" value='Finalizar Fase' 
+            onclick="return confirmar('¿Está seguro que desea finalizar la fase? No podra agregar ni quitar items despues de finalizar la fase')">
             <input type='submit' name="opcion" value='Consultar Item'>
             <input type='submit' name="opcion" value='Crear Item'>
             <input type='submit' name="opcion" value='Relacionar'>

@@ -97,6 +97,9 @@ def eliminarLB(idlineabase):
     session.commit()
     
 def cerrarLB(idlineabase):
+    """Funcion de cerrar linea base, primero determina a que fase pertenece la linea base a cerrar.
+    Si es que pertenece a la primera solo la cierra en caso contrario ve si todos sus items tienen
+    algun otro item apuntandolo en alguna relacion"""
     lineabase = session.query(LineaBase).filter(LineaBase.idlineabase==idlineabase).first()
     fase = session.query(Fase).filter(Fase.idfase==lineabase.idfase).first()
     if fase.posicionfase > 1:

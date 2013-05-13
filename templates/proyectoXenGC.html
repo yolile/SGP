@@ -11,13 +11,13 @@
 									{{ faseSeleccionada.posicionfase }}-{{ faseSeleccionada.nombre }}
 									</option>
 									{% for fase in listFases %}
-											{%	if fase.idfase != faseSeleccionada.idfase and  fase.estado == 'desarrollo'%}														
+											{%	if fase.idfase != faseSeleccionada.idfase and  fase.estado != 'eliminada'%}														
 													<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
 							 				{%	endif %}
 							 		{% endfor %}
 								{% else %}
 									{% for fase in listFases %}
-										{% if fase.estado == 'desarrollo' %}
+										{% if fase.estado != 'eliminada' %}
 												<option value={{fase.idfase }}>{{ fase.posicionfase }}-{{ fase.nombre }}</option>
 							 			{%	endif %}
 							 		{% endfor %}								
@@ -52,12 +52,13 @@
             <div>
             <center>
             <input type='submit' name="opcion" value='Nueva Linea Base'>
-            <input type='submit' name="opcion" value='Eliminar Linea Base'>
+            <input type='submit' name="opcion" value='Eliminar Linea Base' onclick="return confirmar('¿Está seguro que desea eliminar?')">
             <input type='submit' name="opcion" value='Add/Quitar Items'>
             </center>
             <br>
             <center>
-            <input type='submit' name="opcion" value='Cerrar Linea Base'>
+            <input type='submit' name="opcion" value='Cerrar Linea Base' 
+            onclick="return confirmar('¿Está seguro que desea cerrar la Linea Base? No podrá agregar ni quitar items después de haber cerrado')">
 			<input type='submit' name="opcion" value='Consultar'>
             </center>
             </div>  
