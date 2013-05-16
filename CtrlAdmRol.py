@@ -73,6 +73,7 @@ def crearRol(nombre,descripcion,idPermisoList):
     nuevo_rol.permisos = listapermisos
     session.add(nuevo_rol)
     session.commit()
+    return nuevo_rol.idrol
     
 def idPermisoList(idRol):
     """Funcion que recibe el Id de un Rol y retorna la lista de rolpermisos del rol"""

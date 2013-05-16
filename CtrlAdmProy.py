@@ -42,6 +42,7 @@ def crearProy (nombre,descripcion,presupuesto,liderusername):
     proy_nuevo.comitecambios.append(lider)
     session.add(proy_nuevo)
     session.commit()
+    return proy_nuevo.idproyecto
     
 def proy(idproyecto):
     """Funcion que recibe el Id de un Proyecto y retorna el objeto proyecto"""
@@ -104,6 +105,7 @@ def crearFase(nombre,descripcion,idproyecto):
     nueva_fase = Fase(maxidfase+1,idproyecto,maxsecuencia+1,nombre,descripcion,estado)
     session.add(nueva_fase)
     session.commit()
+    return nueva_fase.idfase
     
 def setProyIniciado(idproyecto):
     """Funcion que establece el estado de un proyecto como

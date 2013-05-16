@@ -45,6 +45,7 @@ def crearLB(idfase):
     nueva_lineabase = LineaBase(maxidlineabase+1,idfase,estado,maxsecuencia+1)
     session.add(nueva_lineabase)
     session.commit()
+    return nueva_lineabase.idlineabase
 
 def getMaxSeqLB(idfase):
     """Funcion que recibe el ID de una y devuelve el numero maximo
