@@ -790,7 +790,7 @@ def proyectoX():
 """-----------------------Crear Items---------------------------------------"""
 @app.route('/crearItem', methods=['GET','POST'])
 def crearItem():
-    """Funcion para crear los items para una fase dada, dentro de un proyecto elejido""" 
+    """Funcion para crear los items para una fase dada, dentro de un proyecto elegido""" 
     if request.method == 'GET':
         global item
         global versionitem

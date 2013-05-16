@@ -3,9 +3,11 @@ os.environ['DATABASE_URI']='postgresql+psycopg2://admin:admin@localhost/sgptest'
 import index
 import unittest
 import tempfile
+import CtrlAdmProy
 import CtrlAdmRol
 import CtrlAdmUsr
 import CtrlAdmTipoItem
+import CtrlLineaBase
 from Modelo import init_db, drop_db, engine
  
 class SGPTestCase(unittest.TestCase):
@@ -121,6 +123,21 @@ class SGPTestCase(unittest.TestCase):
                                        costo=costo,
                                        prioridad=prioridad,
                                        complejidad=complejidad),
+                             follow_redirects=True)
+        
+    def crearLineaBase(self, opcion, fase):
+        return self.app.post('/proyectoXenGC',
+                             data=dict(
+                                       opcion=opcion,
+                                       fase=fase),
+                             follow_redirects=True)
+        
+    def eliminarLineaBase(self,opcion,fase,idlineabase):
+        return self.app.post('/proyectoXenGC',
+                             data=dict(
+                                       opcion=opcion,
+                                       fase=fase,
+                                       idlineabase=idlineabase),
                              follow_redirects=True)
 
     """---------Test---------"""
@@ -246,23 +263,104 @@ class SGPTestCase(unittest.TestCase):
                               idtipoitem)
         assert 'Tipo de Item Creado' in rv.data
         
-    def crearItem(self):
+    def test_crearItem(self):
         #crear escenario
-        idusuario=CtrlAdmUsr.insertarUsr('test10-username',
-                                 'test10-password',
-                                 'test10-nombre',
-                                 'test10-apellido',
-                                 'test10-telefono',
+        idusuario=CtrlAdmUsr.insertarUsr('username',
+                                 'password',
+                                 'nombre',
+                                 'apellido',
+                                 '10101010',
                                  '1000')
-        idtipoitem=CtrlAdmTipoItem.crearTipoItem('test10-nombre',
-                                                 'test10-descripcion')
+        idtipoitem=CtrlAdmTipoItem.crearTipoItem('nombre','descripcion')
+        CtrlAdmTipoItem.agregarAtributo(idtipoitem,'nombre','VARCHAR','pordefecto')
+        CtrlAdmRol.insertarPermiso('200','nombre','descripcion')
+        idrol=CtrlAdmRol.insertarRol('nombre','descripcion',[200])
+        idproyecto=CtrlAdmProy.crearProy('nombre','descripcion',10000,'username')
+        idfase=CtrlAdmProy.crearFase('nombre','descripcion',idproyecto)
+        CtrlAdmProy.asignarRolesFase([idrol],idfase)
+        CtrlAdmProy.asignarTiposAFase(idfase,[idtipoitem])
+        CtrlAdmProy.setProyIniciado(idproyecto)
+        rv=self.login('username', 'password')
+        rv=self.app.post('/abrirProyecto',data=dict(opcion='Abrir',select=idproyecto))
+        rv=self.app.post('/proyectoX',data=dict(opcion='Crear Item',fase=idfase))
+        rv=self.app.post('/crearItem',data=dict(opcion='Cargar Atributos',
+                                                nombre='nombre',
+                                                tipoItem=idtipoitem))
+        rv=self.app.post('/cargarAtributos',data=dict(opcion='Aceptar',
+                                                      nombre='bydefault',
+                                                      descripcion='1',
+                                                      costo='10',
+                                                      prioridad='1',
+                                                      complejidad='1'))
         #prueba
         rv=self.crearItem('Crear', 'nombre', idtipoitem, 'descripcion', '1', '1', '1')
-        assert 'Debe Cargar Valores a los Atributos de Tipo de Item' in rv.data
-    
+        assert 'Item Creado' in rv.data
         
+    def test_crearLineaBase(self):
+        #crear escenario
+        idusuario=CtrlAdmUsr.insertarUsr('username',
+                                 'password',
+                                 'nombre',
+                                 'apellido',
+                                 '10101010',
+                                 '1000')
+        idtipoitem=CtrlAdmTipoItem.crearTipoItem('nombre','descripcion')
+        CtrlAdmTipoItem.agregarAtributo(idtipoitem,'nombre','VARCHAR','pordefecto')
+        CtrlAdmRol.insertarPermiso('200','nombre','descripcion')
+        idrol=CtrlAdmRol.insertarRol('nombre','descripcion',[200])
+        idproyecto=CtrlAdmProy.crearProy('nombre','descripcion',10000,'username')
+        idfase=CtrlAdmProy.crearFase('nombre','descripcion',idproyecto)
+        CtrlAdmProy.asignarRolesFase([idrol],idfase)
+        CtrlAdmProy.asignarTiposAFase(idfase,[idtipoitem])
+        CtrlAdmProy.setProyIniciado(idproyecto)
+        rv=self.login('username', 'password')
+        rv=self.app.post('/abrirProyecto',data=dict(opcion='Abrir',select=idproyecto))
+        rv=self.app.post('/proyectoX',data=dict(opcion='Crear Item',fase=idfase))
+        rv=self.app.post('/crearItem',data=dict(opcion='Cargar Atributos',
+                                                nombre='nombre',
+                                                tipoItem=idtipoitem))
+        rv=self.app.post('/cargarAtributos',data=dict(opcion='Aceptar',
+                                                      nombre='bydefault',
+                                                      descripcion='1',
+                                                      costo='10',
+                                                      prioridad='1',
+                                                      complejidad='1'))
+        #prueba
+        rv=self.crearLineaBase(opcion='Nueva Linea Base',
+                               fase=idfase)
+        assert 'Linea Base Creada' in rv.data
         
-        
+    def test_eliminarLineaBase(self):
+        #crear escenario
+        idusuario=CtrlAdmUsr.insertarUsr('username',
+                                 'password',
+                                 'nombre',
+                                 'apellido',
+                                 '10101010',
+                                 '1000')
+        idtipoitem=CtrlAdmTipoItem.crearTipoItem('nombre','descripcion')
+        CtrlAdmTipoItem.agregarAtributo(idtipoitem,'nombre','VARCHAR','pordefecto')
+        CtrlAdmRol.insertarPermiso('200','nombre','descripcion')
+        idrol=CtrlAdmRol.insertarRol('nombre','descripcion',[200])
+        idproyecto=CtrlAdmProy.crearProy('nombre','descripcion',10000,'username')
+        idfase=CtrlAdmProy.crearFase('nombre','descripcion',idproyecto)
+        CtrlAdmProy.asignarRolesFase([idrol],idfase)
+        CtrlAdmProy.asignarTiposAFase(idfase,[idtipoitem])
+        CtrlAdmProy.setProyIniciado(idproyecto)
+        idlb=CtrlLineaBase.crearLB(idfase)
+        idusuario=CtrlAdmUsr.insertarUsr('USERNAME',
+                         'PASSWORD',
+                         'NOMBRE',
+                         'APELLIDO',
+                         '10101010',
+                         '1000')
+        rv=self.login('USERNAME', 'PASSWORD')
+        #prueba
+        rv=self.eliminarLineaBase(opcion='Eliminar Linea Base',
+                                  fase= idfase,
+                                  idlineabase= idlb)
+        assert 'Linea Base Eliminada' in rv.data
+            
 if __name__ == '__main__':
     unittest.main()
 
