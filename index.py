@@ -726,7 +726,19 @@ def proyectoX():
             if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
                 global iditem
                 iditem = int(request.form['iditem'])
-                return redirect(url_for('relacion'))
+                i = CtrlFase.getItem(iditem)
+                if i.idlineabase != None:
+                    if(CtrlLineaBase.getLB(i.idlineabase).estado=='cerrado'):
+                        faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                        listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                        return render_template('proyectoX.html',
+                                           listFases=listaFases,
+                                           faseSeleccionada=faseSeleccionada,
+                                           error='El item que escogio se encuentra en una linea base cerrada no se pueden relacionar items')                    
+                    elif(CtrlLineaBase.getLB(i.idlineabase).estado=='abierto'):
+                        return redirect(url_for('relacion'))
+                else:
+                    return redirect(url_for('relacion'))
             else:
                 faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
                 listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
@@ -1032,7 +1044,15 @@ def proyectoXenGC():
                                        listFases=listaFases,
                                        error='Imposible cerrar Linea Base, hay Items sin relaciones')
         if request.form['opcion'] == "Buscar":
-            return render_template('proyectoXenGC.html')
+            faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+            listLB = CtrlLineaBase.busquedaLineaBase(request.form['buscar'],
+                                             request.form['atributo'],
+                                             faseSeleccionada.idfase)
+            listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+            return render_template('proyectoXenGC.html',
+                                   listFases=listaFases,
+                                   listLB = listLB,
+                                   faseSeleccionada=faseSeleccionada)
         if request.form['opcion'] == "Cerrar Proyecto":
             return redirect(url_for('abrirProyectoEnGC')) 
 
