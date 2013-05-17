@@ -113,3 +113,9 @@ def cerrarLB(idlineabase):
     session.commit()
     return True
 
+def busquedaLineaBase(parametro,atributo,idfase):
+    """Funcion que recibe un parametro de busqueda, el atributo y el id de la fase por el cual buscar y retorna coincidencias"""
+    if atributo == 'estado':
+        result = session.query(LineaBase).filter(and_(LineaBase.estado.like(parametro+'%'),
+                                                 LineaBase.idfase==idfase)).all()
+    return result
