@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block body %}
+
+ <body class = formato2>
+
+<form class='estilos' action=""{{ url_for('gestionarArchivos')}}"" method="post" enctype=multipart/form-data>
+
+ <center><h1>GESTIONAR ARCHIVO</h1></center>
+ <br>
+ <br>
+	<div style="height:300px;overflow:auto;">	
+	
+	<table width="100%" border="1">
+	<tr>
+	<th scope="col">Nombre</th>
+	<th scope="col"> </th>	
+	<th scope="col"> </th>	
+	</tr>
+	 {% for archivo in listArchivo %}
+			<tr>
+				<td>{{ archivo.nombre }}</td>
+				{% if archivo.idarchivo in idarchivos %}
+                	<td><INPUT TYPE="checkbox" checked="checked" NAME="idarchivos" VALUE="{{ archivo.idarchivo}}"></td>  
+              	{% else %}
+                	<td><INPUT TYPE="checkbox" NAME="idarchivos" VALUE="{{ archivo.idarchivo}}"></td>  
+              	{% endif %}			
+				<td><button name="opcion" value={{ archivo.idarchivo }} type="submit">Descargar</button></td>
+			</tr>  	
+  	{% endfor %}
+	</table>
+	</div>	
+	
+	<br>
+	<input type="submit" name="opcion" value="Subir" />
+	<input type=file name=file>
+	<input type="submit" name="opcion" value="Adjuntar" />
+	<input type="submit" name="opcion" value="Cancelar" />
+	<br>
+	<br>
+	<input type="text" name="buscar"/>
+	<select name="atributo">
+		<option value="nombre">Nombre</option>
+	</select>
+	<input type="submit" name="opcion" value="Buscar" />
+	<br>
+	<br>
+	</form>
+	</body>
+{% endblock %}
