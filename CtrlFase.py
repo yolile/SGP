@@ -1,4 +1,4 @@
-from Modelo import Item, VersionItem, Relacion, AtributoItemPorTipo, Fase, Proyecto, LineaBase, engine
+from Modelo import Item, VersionItem, Relacion, AtributoItemPorTipo, Fase, Proyecto, LineaBase, engine, Archivo
 from sqlalchemy import create_engine, and_, or_, func
 from sqlalchemy.orm import sessionmaker, join
 
@@ -168,3 +168,53 @@ def finalizarFase(idfase):
     fase.estado='finalizado'
     session.commit()
     return True
+
+def getArchivoList():
+    """Funcion que retorna la lista de todos los archivos"""
+    result = session.query(Archivo).all()
+    return result
+
+def getIdArchivosByItem(iditem):
+    """Funcion que recibe un id de un item y retorna la lista de los 
+    id de todos los archivos adjuntos al item"""
+    item = session.query(Item).filter(Item.iditem==iditem).first()
+    idarchivos = []
+    for a in item.archivos:
+        idarchivos.append(a.idarchivo)
+    return idarchivos
+
+def getMaxIdArchivo():
+    """Funcion que retorna el maximo valor de la idVersion de un item"""
+    lista = getArchivoList()
+    idarchivomax = 0
+    for archivo in lista:
+        if idarchivomax < archivo.idarchivo:
+            idarchivomax = archivo.idarchivo
+    return idarchivomax
+
+def subir(archivo):
+    """Funcion que recibe un archivo y lo persiste en la base de datos"""
+    nuevo = Archivo(getMaxIdArchivo()+1,archivo.read(),archivo.filename)
+    session.add(nuevo)
+    session.commit()
+            
+def descargar(idarchivo):
+    """Funcion que recibe el id de un archivo y retorna el objeto archivo dado el id recibido"""
+    archivo = session.query(Archivo).filter(Archivo.idarchivo==idarchivo).first()
+    arc = open("archivo", 'w')
+    arc.write(archivo.archivo)
+    arc.close()
+    return archivo
+
+def adjuntar(iditem,idarchivos):
+    """Funcion que recibe el item y la lista de los archivos, para asignarle archivos a un item """
+    item = session.query(Item).filter(Item.iditem==iditem).first()
+    listaArchivos = session.query(Archivo).filter(Archivo.idarchivo.in_(idarchivos)).all()
+    item.archivos = listaArchivos
+    session.commit()
+    
+def busquedaArchivo(parametro,atributo):
+    """Funcion que recibe un parametro de busqueda, el atributo y retorna coincidencias"""
+    if atributo == 'nombre':
+        result = session.query(Archivo).filter(Archivo.nombre.like(parametro+'%')).all()
+    return result

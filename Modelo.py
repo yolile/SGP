@@ -1,5 +1,5 @@
 import os
-from sqlalchemy import Table, Integer, ForeignKey, String, Column, Date
+from sqlalchemy import Table, Integer, ForeignKey, String, Column, Date, LargeBinary
 from sqlalchemy import Sequence
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.session import _SessionClassMethods
@@ -50,6 +50,10 @@ TipoItemFase=Table('tipoitemfase', Base.metadata,
                    Column('idfase', Integer, ForeignKey('fase.idfase'),primary_key=True)
 )
   
+ArchivoItem = Table('archivoitem', Base.metadata,
+    Column('iditem', Integer, ForeignKey('item.iditem'),primary_key=True),
+    Column('idarchivo', Integer, ForeignKey('archivo.idarchivo'),primary_key=True)
+)
 
 """------------------------USUARIO---------------------------------------""" 
 class Usuario(Base):
@@ -229,6 +233,9 @@ class Item(Base):
     atributos = relationship("AtributoItemPorTipo")
     idlineabase = Column (Integer,ForeignKey ('lineabase.idlineabase'))
     
+    archivos = relationship("Archivo", secondary=ArchivoItem)
+    
+    
     def __init__(self, iditem, nombre, estado, idtipoitem,idfase,idlineabase=None):
         self.iditem = iditem
         self.nombre = nombre 
@@ -297,7 +304,24 @@ class LineaBase(Base):
 
     def __repr__(self):
         return "<LineaBase'%s' '%s' '%s' '%s'>" % self.idlineabase, self.idfase, self.estado, self.numero
-    
+
+"""------------------------ARCHIVO---------------------------------------"""
+class Archivo(Base):
+    __tablename__ = 'archivo'
+    idarchivo = Column(Integer,primary_key = True)
+    archivo = Column(LargeBinary)
+    nombre = Column(String(45))
+    items = relationship("Item", secondary=ArchivoItem)
+     
+    def __init__(self, idarchivo, archivo, nombre):
+        self.idarchivo = idarchivo
+        self.archivo =  archivo
+        self.nombre = nombre
+
+ 
+    def __repr__(self):
+        return "<Archivo '%s' '%s' '%s' '%s' >" % self.idarchivo, self.archivo, self.nombre
+        
 """-----------Metodos para crear y eliminar todas las tablas definidas---------------------------------------"""
 def init_db():
     Base.metadata.create_all(engine)

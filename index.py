@@ -1,6 +1,7 @@
 from __future__ import with_statement
 from flask import Flask, request, session, g, redirect, url_for, abort, \
-render_template, flash, _app_ctx_stack
+render_template, flash, _app_ctx_stack, send_file
+import os
 import CtrlAdmUsr
 import CtrlAdmRol
 import CtrlAdmProy
@@ -727,16 +728,13 @@ def proyectoX():
                 global iditem
                 iditem = int(request.form['iditem'])
                 i = CtrlFase.getItem(iditem)
-                if i.idlineabase != None:
-                    if(CtrlLineaBase.getLB(i.idlineabase).estado=='cerrado'):
-                        faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
-                        listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
-                        return render_template('proyectoX.html',
+                if i.estado == 'bloqueado':
+                    faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                    listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                    return render_template('proyectoX.html',
                                            listFases=listaFases,
                                            faseSeleccionada=faseSeleccionada,
-                                           error='El item que escogio se encuentra en una linea base cerrada no se pueden relacionar items')                    
-                    elif(CtrlLineaBase.getLB(i.idlineabase).estado=='abierto'):
-                        return redirect(url_for('relacion'))
+                                           error='El item que escogio se encuentra bloqueado y no se pueden relacionar con otros items')                    
                 else:
                     return redirect(url_for('relacion'))
             else:
@@ -796,6 +794,27 @@ def proyectoX():
                                        listFases=listaFases,
                                        faseSeleccionada=faseSeleccionada,
                                        error='Imposible finalizar la fase. Existe items que no estan en lineas bases cerradas')
+        if (request.form['opcion']=="Adjuntar Archivo"):
+            idfase = int(request.form['fase'])
+            if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
+                iditem = int(request.form['iditem'])
+                i = CtrlFase.getItem(iditem)
+                if i.estado == 'bloqueado':
+                    faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                    listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                    return render_template('proyectoX.html',
+                                           listFases=listaFases,
+                                           faseSeleccionada=faseSeleccionada,
+                                           error='El item que escogio se encuentra bloqueado y no se le puede adjuntar archivos')                    
+                else:
+                    return redirect(url_for('gestionarArchivos'))
+            else:
+                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                return render_template('proyectoX.html',
+                                       listFases=listaFases,
+                                       faseSeleccionada=faseSeleccionada,
+                                       error='Fase finalizada no se pueden relacionar items')
         if request.form['opcion'] == "Cerrar Proyecto":
             return redirect(url_for('abrirProyecto')) 
 
@@ -917,6 +936,45 @@ def relacion():
         if request.form['opcion'] == "Home":
             return render_template('main.html')
     return redirect(url_for('proyectoX'))
+
+"""-----------------------Gestionar Archivos---------------------------------------"""
+@app.route('/gestionarArchivos', methods=['GET','POST'])
+def gestionarArchivos():
+    """Funcion para gestionar archivos"""  
+    if request.method == 'GET':
+        listArchivo = CtrlFase.getArchivoList()
+        global iditem
+        idarchivos = CtrlFase.getIdArchivosByItem(iditem)
+        return render_template('gestionarArchivos.html',
+                               listArchivo=listArchivo,
+                               idarchivos=idarchivos)
+    if request.method == 'POST':
+        if (request.form['opcion']=="Subir"):
+            archivo = request.files['file']
+            CtrlFase.subir(archivo)
+            flash("Archivo Subido")
+            return redirect(url_for('gestionarArchivos'))
+        if (request.form['opcion']=="Adjuntar"):
+            idarchivos = request.form.getlist('idarchivos')
+            CtrlFase.adjuntar(iditem,idarchivos)
+            flash("Archivos adjuntados")
+            return redirect(url_for('proyectoX'))
+        if (request.form['opcion']=="Cancelar"):
+            return redirect(url_for('proyectoX'))
+        if (request.form['opcion']=="Buscar"):
+            listArchivo = CtrlFase.busquedaArchivo(request.form['buscar'],
+                                                request.form['atributo'])
+            idarchivos = CtrlFase.getIdArchivosByItem(iditem)
+            flash('Resultado de la busqueda')
+            return render_template('gestionarArchivos.html',
+                                   listArchivo=listArchivo,
+                                   idarchivos=idarchivos)
+        return send_file("archivo",
+                     attachment_filename=CtrlFase.descargar(int(request.form['opcion'])).nombre,
+                     as_attachment=True)
+        os.remove('archivo')
+        return redirect(url_for('gestionarArchivos'))
+        
 
 """-------------------------MODULO DE GESTION DE CAMBIOS--------------------------------------"""
 

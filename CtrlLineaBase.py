@@ -109,6 +109,9 @@ def cerrarLB(idlineabase):
             result = session.query(Relacion).filter(Relacion.alitem==i.iditem).first()
             if result==None:
                 return False
+    listItem = getListItemsEnLB(idlineabase)
+    for i in listItem:
+        i.estado='bloqueado'
     lineabase.estado='cerrado'
     session.commit()
     return True
