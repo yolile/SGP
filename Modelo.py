@@ -1,7 +1,7 @@
 import os
 from sqlalchemy import Table, Integer, ForeignKey, String, Column, Date, LargeBinary
 from sqlalchemy import Sequence
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy.orm.session import _SessionClassMethods
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -321,7 +321,49 @@ class Archivo(Base):
  
     def __repr__(self):
         return "<Archivo '%s' '%s' '%s' '%s' >" % self.idarchivo, self.archivo, self.nombre
-        
+    
+"""------------------------SOLICITUD DE CAMBIO---------------------------------------"""
+class SolicitudDeCambio(Base):
+    __tablename__ = 'solicituddecambio'
+    idsolicituddecambio = Column(Integer,primary_key = True)
+    idusuariosolicitante = Column(Integer,ForeignKey('usuario.idusuario'))
+    descripcion = Column(String(200))
+    estado = Column(String(45))
+    tipo = Column(String(45))
+    
+    iditem = Column(Integer, ForeignKey('item.iditem'))
+    item = relationship("Item", backref=backref("solicituddecambio", uselist=False))
+    
+    idversionitem = Column(Integer, ForeignKey('versionitem.idversionitem'))
+    versionitem = relationship("VersionItem", backref=backref("solicituddecambio", uselist=False))
+     
+    def __init__(self, idsolicituddecambio, idusuariosolicitante, descripcion,tipo,iditem,idversionitem):
+        self.idsolicituddecambio = idsolicituddecambio
+        self.idusuariosolicitante =  idusuariosolicitante
+        self.descripcion = descripcion
+        self.tipo = tipo
+        self.iditem = iditem
+        self.idversionitem = idversionitem
+ 
+    def __repr__(self):
+        return "<SolicitudDeCambio '%s' '%s' '%s' '%s' '%s' '%s' '%s' >" % self.idsolicituddecambio, self.idusuariosolicitante, self.descripcion, self.estado, self.tipo, self.iditem, self.idversionitem
+
+"""------------------------Solicitud por Usuario de Comite de Cambios---------------------------------------"""
+class SolicitudPorUsuarioCC(Base):
+    __tablename__ = 'solicitudporusuariocc'
+    idsolicituddecambio = Column(Integer,ForeignKey('solicituddecambio.idsolicituddecambio'), primary_key=True)   
+    idusuariocc = Column(Integer,ForeignKey('usuario.idusuario'), primary_key=True)
+    idproyectocc = Column(Integer,ForeignKey('proyecto.idproyecto'), primary_key=True)
+    voto = Column(String(45))
+
+    def __init__(self, idsolicituddecambio, idusuariocc, idproyectocc):
+        self.idsolicituddecambio = idsolicituddecambio
+        self.idusuariocc = idusuariocc
+        self.idproyectocc = idproyectocc
+
+    def __repr__(self):
+        return "<SolicitudPorUsuarioCC '%s' '%s' '%s'>" % self.idsolicituddecambio, self.idusuariocc, self.idproyectocc
+
 """-----------Metodos para crear y eliminar todas las tablas definidas---------------------------------------"""
 def init_db():
     Base.metadata.create_all(engine)

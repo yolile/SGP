@@ -30,6 +30,7 @@ versionitem=None
 listaAtributoItemPorTipo=[]
 
 iditem=0
+tipo=''
 
 @app.route('/')
 def index():
@@ -763,15 +764,6 @@ def proyectoX():
                                    listItem = listItem,
                                    faseSeleccionada=faseSeleccionada)
         if request.form['opcion'] == "Consultar Item":
-            if request.form['iditem']=="":
-                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
-                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
-                return render_template('proyectoX.html',
-                                       listaFases,
-                                       listFases=listaFases,
-                                       faseSeleccionada=faseSeleccionada,
-                                       error='Debe escoger un item')
-            #print request.form['iditem']
             iditem=int(request.form['iditem'])
             item=CtrlFase.getItem(iditem)
             versionitem=CtrlFase.getVersionActual(item.iditem)
@@ -814,7 +806,35 @@ def proyectoX():
                 return render_template('proyectoX.html',
                                        listFases=listaFases,
                                        faseSeleccionada=faseSeleccionada,
-                                       error='Fase finalizada no se pueden relacionar items')
+                                       error='Fase finalizada no se le puede adjuntar archivos al item')
+        if (request.form['opcion']=="Eliminar"):
+            idfase = int(request.form['fase'])
+            if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
+                iditem = int(request.form['iditem'])
+                i = CtrlFase.getItem(iditem)
+                if i.estado == 'bloqueado':
+                    versionitem = None
+                    global tipo
+                    tipo = 'eliminar'
+                    return redirect(url_for('enviarSolicitud')) 
+                elif i.estado == 'desarrollo':
+                    iditem = int(request.form['iditem'])
+                    CtrlFase.eliminarItem(iditem)
+                    
+                    faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                    listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                    flash('Item eliminado')
+                    return render_template('proyectoX.html',
+                                       listFases=listaFases,
+                                       faseSeleccionada=faseSeleccionada)
+            else:
+                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                return render_template('proyectoX.html',
+                                       listFases=listaFases,
+                                       faseSeleccionada=faseSeleccionada,
+                                       error='Fase finalizada no se pueden eliminar items')
+            
         if request.form['opcion'] == "Cerrar Proyecto":
             return redirect(url_for('abrirProyecto')) 
 
@@ -975,6 +995,34 @@ def gestionarArchivos():
         os.remove('archivo')
         return redirect(url_for('gestionarArchivos'))
         
+"""-----------------------Enviar Solicitud de Cambio---------------------------------------"""
+@app.route('/enviarSolicitud', methods=['GET','POST'])
+def enviarSolicitud():
+    """Funcion para enviar solicitud de cambio"""  
+    if request.method == 'GET':
+        global iditem
+        item=CtrlFase.getItem(iditem)
+        global tipo
+        if tipo=='eliminar':
+            versionitem=CtrlFase.getVersionActual(item.iditem)
+        listaValores=item.atributos
+        listaAtributos = CtrlAdmTipoItem.getAtributosTipo(item.idtipoitem)            
+        return render_template('enviarSolicitud.html',
+                                   item=item,
+                                   versionitem=versionitem,
+                                   listaValores=listaValores,
+                                   listaAtributos=listaAtributos)
+    if request.method == 'POST':
+        if (request.form['opcion']=="Enviar"):
+            CtrlFase.enviarSolicitud(CtrlAdmUsr.getIdByUsername(owner),
+                                     tipo,
+                                     iditem,
+                                     None)
+            flash('Solicitud enviada')
+            return redirect(url_for('proyectoX'))
+        if (request.form['opcion']=="Cancelar"):
+            return redirect(url_for('proyectoX'))
+
 
 """-------------------------MODULO DE GESTION DE CAMBIOS--------------------------------------"""
 

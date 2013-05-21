@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block body %}
+<body class=formato4>
+        <form class='estilos' action="{{ url_for('enviarSolicitud') }}" method=post>
+             <center><h1>ENVIAR SOLICITUD DE CAMBIO</h1></center>
+          	<br>
+          	<br>
+          	
+          	<div><label>Nombre:</label><input type='text' name=nombre value='{{ item.nombre }}' disabled></div>        
+            <div><label>Descripcion:</label><textarea rows='2' name=descripcion readonly>{{ versionitem.descripcion }}</textarea></div>
+            <div><label>Complejidad:</label><input type='text' name=complejidad value='{{ versionitem.complejidad }}' disabled></div>
+            <div><label>Prioridad:</label><input type='text' name=prioridad value='{{ versionitem.prioridad }}' disabled></div>
+            <div><label>Costo:</label><input type='text' name=costo value='{{ versionitem.costo }}' disabled></div>
+
+			<br>
+	            	<div style="height:150px;width:430px;overflow:auto;">	
+	            	<table width="50%" border="1">
+					<tr>
+					<th scope="col">NOMBRE</th>
+					<th scope="col">VALOR</th>
+					</tr>
+					{% for atributo in listaAtributos %}
+						{% for valor in listaValores %}
+							{% if valor.idatributo == atributo.idatributo%}
+							<tr>
+								<td>{{ atributo.nombre }}</td>
+								<td><input type='text' name={{ atributo.nombre }} value="{{ valor.valor }}"/></td>
+							</tr>
+							{% endif %}
+						{% endfor %}	
+					{% endfor %}
+					</table>
+				    <br>        
+            </div>
+			
+
+			<center><h2>El item que desea {{ tipo }} se encuentra en una linea base. ¿Desea enviar una solicitud 
+			al comite de cambio para realizar la accion?</h2></center>
+            <div><center><input type='submit' name="opcion" value='Enviar'></center></div>
+			<div><center><input type='submit' name="opcion" value='Cancelar'></center></div>
+        </form>
+    </body>
+{% endblock %}
