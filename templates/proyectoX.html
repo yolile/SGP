@@ -38,12 +38,14 @@
 					<th scope="col">ESTADO</th>					
 					</tr>
 						{% for item in listItem %}
+						{% if item.estado != 'eliminado' %}
 						<tr>
 						<td><input name="iditem" type="radio" value={{ item.iditem }} checked /></td>	
 						<td>{{ item.nombre }}</td>	
 						<td>{{ item.estado}}</td>
 						</tr>  	
-						  	{% endfor %}
+						{% endif %}  	
+						{% endfor %}
 					</table>
 				    <br>        
             </div>
@@ -55,6 +57,7 @@
             <input type='submit' name="opcion" value='Crear Item'>
             <input type='submit' name="opcion" value='Relacionar'>
             <input type='submit' name="opcion" value='Adjuntar Archivo'>
+            <input type='submit' name="opcion" value='Eliminar'>
             </center>
             </div>  
             <input type="text" name="buscar"/>

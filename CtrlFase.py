@@ -1,6 +1,7 @@
-from Modelo import Item, VersionItem, Relacion, AtributoItemPorTipo, Fase, Proyecto, LineaBase, engine, Archivo
+from Modelo import *
 from sqlalchemy import create_engine, and_, or_, func
 from sqlalchemy.orm import sessionmaker, join
+from datetime import *
 
 """Controlador de Fases en el modulo de desarrollo"""  
 __author__ = 'Grupo 5'
@@ -218,3 +219,55 @@ def busquedaArchivo(parametro,atributo):
     if atributo == 'nombre':
         result = session.query(Archivo).filter(Archivo.nombre.like(parametro+'%')).all()
     return result
+
+def eliminarItem(iditem):
+    item = session.query(Item).filter(Item.iditem==iditem).first()
+    item.estado='eliminado'
+    item.idlineabase=None
+    relaciones = session.query(Relacion).filter(or_(Relacion.alitem==iditem,Relacion.delitem==iditem)).all()
+    for r in relaciones:
+        session.delete(r)
+    session.commit()
+
+def getSolicitudCambioList():
+    result = session.query(SolicitudDeCambio).all()
+    return result
+
+def getMaxIdSolicitudCambio():
+    """Funcion que retorna el maximo valor de la idVersion de un item"""
+    lista = getSolicitudCambioList()
+    idsolicitudmax = 0
+    for solicitud in lista:
+        if idsolicitudmax < solicitud.idsolicituddecambio:
+            idsolicitudmax = solicitud.idsolicituddecambio
+    return idsolicitudmax
+    
+def enviarSolicitud(idusuariosolicitante,tipo,iditem,idversionitem):
+    usuario = session.query(Usuario).filter(Usuario.idusuario==idusuariosolicitante).first()
+    item = session.query(Item).filter(Item.iditem==iditem).first()
+    fase = session.query(Fase).filter(Fase.idfase==item.idfase).first()
+    lineabase = session.query(LineaBase).filter(LineaBase.idlineabase==item.idlineabase).first()
+    proyecto = session.query(Proyecto).filter(Proyecto.idproyecto==fase.idproyecto).first()
+    
+    des_usuario = '-Usuario: '+usuario.username+'\n'
+    des_fecha='-Fecha: '+date.today().strftime('%d/%m/%Y')+'\n'
+    des_proyecto='-Proyecto: '+proyecto.nombre+'\n'
+    des_fase='-Fase: '+fase.nombre+'\n'
+    des_lineabase='-Linea Base: '+str(lineabase.numero)+'\n'
+    des_item='-Item: '+item.nombre
+    descripcion = des_usuario+des_fecha+des_proyecto+des_fase+des_lineabase+des_item
+    
+    nuevo = SolicitudDeCambio(getMaxIdSolicitudCambio()+1, 
+                              idusuariosolicitante, 
+                              descripcion,
+                              tipo,
+                              iditem,
+                              idversionitem)
+    solicitudCC = []
+    for u in proyecto.comitecambios:
+        solicitudCC.append(SolicitudPorUsuarioCC(nuevo.idsolicituddecambio,u.idusuario,proyecto.idproyecto))
+    
+    session.add(nuevo)
+    session.commit()
+    session.add_all(solicitudCC)
+    session.commit()

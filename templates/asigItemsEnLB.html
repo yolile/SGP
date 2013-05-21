@@ -22,11 +22,13 @@
 							</tr>
 						{% endfor %}
 						{% for item in listItem %}
+							{% if item.estado != 'eliminado' %}
 							<tr>
 							<td><INPUT TYPE="checkbox" NAME="iditem" VALUE="{{ item.iditem }}"></td> 		
 							<td>{{ item.nombre }}</td>	
 							<td>{{ item.estado }}</td>
-							</tr>  	
+							</tr>
+							{% endif %}  	
 						 {% endfor %}						  	
 						  	
 					</table>
