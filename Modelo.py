@@ -229,7 +229,7 @@ class Item(Base):
     estado = Column(String(45))
     idtipoitem = Column(Integer, ForeignKey('tipoitem.idtipoitem'))
     idfase = Column(Integer, ForeignKey('fase.idfase'))        
-    
+    fase = relationship("Fase")
     atributos = relationship("AtributoItemPorTipo")
     idlineabase = Column (Integer,ForeignKey ('lineabase.idlineabase'))
     

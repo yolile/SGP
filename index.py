@@ -9,6 +9,7 @@ import CtrlAdmTipoItem
 import CtrlFase
 import CtrlLineaBase
 import CtrlSolicitudCambio
+from flask.exceptions import BadRequest
 
 """Modulo de ejecucion principal de SGP"""  
 __author__ = 'Grupo 5'
@@ -23,6 +24,7 @@ app.debug = True
 app.secret_key = 'secreto'
 app.config.from_object(__name__)
 app.config.from_envvar('SGP_SETTINGS', silent=True)
+app.config['TRAP_BAD_REQUEST_ERRORS'] = True
 
 owner=""
 proyecto=0
@@ -33,6 +35,7 @@ listaAtributoItemPorTipo=[]
 idfase=0
 iditem=0
 tipo=''
+importar=0
 
 @app.route('/')
 def index():
@@ -268,10 +271,11 @@ def admProy():
         if request.form['opcion'] == "Crear":
             return render_template('crearProy.html')
         if request.form['opcion'] == "Definicion de Fases":
-            if CtrlAdmProy.proy(int(request.form['select'])).estado == 'iniciado':
+            proyecto=int(request.form['select'])
+            proy = CtrlAdmProy.proy(proyecto)  
+            if proy.estado == 'iniciado':
                 flash("Proyecto iniciado, imposible definir mas fases")
                 return redirect(url_for('admProy'))
-            proyecto = int(request.form['select'])
             return redirect(url_for('defFases'))
         if request.form['opcion'] == "Comite de Cambios":
             proyecto = int(request.form['select'])
@@ -291,13 +295,18 @@ def admProy():
             flash('Proyecto eliminado')
             return render_template('admProy.html',listProy=listaProy)
         if request.form['opcion'] == "Modificar":
-            proy = CtrlAdmProy.proy(int(request.form['select']))        
+            proyecto=int(request.form['select'])
+            proy = CtrlAdmProy.proy(proyecto)  
             return render_template('modProy.html', proyecto=proy) 
         if request.form['opcion'] == "Home":
             return render_template('main.html')
         if request.form['opcion'] == "Consultar":
             proyecto=int(request.form['select'])
             return redirect(url_for('conProy'))
+        if request.form['opcion'] == "Importar":
+            proyecto=int(request.form['select'])
+            proy = CtrlAdmProy.proy(proyecto) 
+            return render_template('importarProy.html',proyecto=proy)
         return redirect(url_for('admProy'))                 
 
 @app.route('/crearProy', methods=['GET','POST'])
@@ -333,13 +342,37 @@ def conProy():
     if request.method == 'GET':
         return render_template('conProy.html',proyecto=CtrlAdmProy.proy(proyecto))
     if request.method == 'POST':
-        fase=CtrlAdmProy.getFase(int(request.form['select']))
+        if (request.form['opcion']=='Atras'):
+            return redirect(url_for('admProy'))
         if(request.form['opcion'] == "Consultar Tipos de Item"):
-            return render_template("conTipoItemFase.html",fase=fase)
+            try:
+                fase=CtrlAdmProy.getFase(int(request.form['select']))
+                return render_template("conTipoItemFase.html",fase=fase)
+            except BadRequest:
+                flash('Ninguna fase seleccionada')
+                return redirect(url_for('conProy'))
         if(request.form['opcion'] == "Consultar Roles"):
-            return render_template("conRolFase.html",fase=fase)
+            try:
+                fase=CtrlAdmProy.getFase(int(request.form['select']))
+                return render_template("conRolFase.html",fase=fase)
+            except BadRequest:
+                flash('Ninguna fase seleccionada')
+                return redirect(url_for('conProy'))
+            
+@app.route('/importarProy', methods=['GET','POST'])    
+def importarProy():
+    """Funcion que presenta el menu permitiendo importar un proyecto."""  
+    if request.method == 'POST':
+        if(request.form['opcion'] == "Aceptar"):
+            global owner
+            idproyecto=CtrlAdmProy.importarProy(request.form['idproyecto'],
+                                                owner)
+            CtrlAdmProy.modProy(idproyecto,
+                                request.form['nombre'],
+                                request.form['descripcion'],
+                                int(request.form['presupuesto']))
+            flash('Proyecto importado')
         return redirect(url_for('admProy'))
-
     
 @app.route('/defFases', methods=['GET','POST'])
 def defFases():
@@ -367,7 +400,9 @@ def defFases():
                 return redirect(url_for('defFases'))
             CtrlAdmProy.setProyIniciado(proy)
             flash('Proyecto iniciado')
-            return redirect(url_for('defFases'))
+            return redirect(url_for('admProy'))
+        if (request.form['opcion']=="Atras"):
+            return redirect(url_for('admProy'))
         idfase=int(request.form['select'])
         if (request.form['opcion']=="Asignar Roles"):
             if(CtrlAdmUsr.tienePermisoEnFase(idfase,owner,205)==False):
@@ -415,8 +450,6 @@ def defFases():
                 flash('Imposible modificar. Fase en desarrollo')
                 return redirect(url_for('defFases'))
             return render_template('modFase.html',fase=fase)
-        if (request.form['opcion']=='Atras'):
-            return redirect(url_for('admProy'))
         return redirect(url_for('defFases'))
            
 @app.route('/crearFase', methods=['GET','POST'])
@@ -1004,17 +1037,34 @@ def crearItem():
             versionitem.prioridad = int(request.form['prioridad'])
             versionitem.complejidad = int(request.form['complejidad'])
             listaAtributos = CtrlAdmTipoItem.getAtributosTipo(item.idtipoitem)
-            return render_template('cargarAtributos.html',listaAtributos=listaAtributos)
+            global listaAtributoItemPorTipo
+            global importar
+            if importar == 1:
+                return render_template('cargarAtributos.html',listaAtributos=listaAtributos,
+                                   listAtribItem=listaAtributoItemPorTipo)
+            else:
+                return render_template('cargarAtributos.html',listaAtributos=listaAtributos,)
         if request.form['opcion'] == "Crear":
             item.nombre = request.form['nombre']
             versionitem.descripcion = request.form['descripcion']
             versionitem.costo = int(request.form['costo'])
             versionitem.prioridad = int(request.form['prioridad'])
             versionitem.complejidad = int(request.form['complejidad'])
+            global importar
             global listaAtributoItemPorTipo
-            if listaAtributoItemPorTipo:
-                CtrlFase.crearItem(item,versionitem,listaAtributoItemPorTipo)
-                flash("Item Creado")
+            if ((listaAtributoItemPorTipo!=[])or(importar==1)):
+                if(versionitem.costo <= CtrlAdmProy.proy(proyecto).presupuesto):
+                    CtrlFase.crearItem(item,versionitem,listaAtributoItemPorTipo)
+                    flash("Item Creado")
+                    importar=0
+                else:
+                    tiposEnFase=CtrlAdmProy.getFase(item.idfase).tipositems
+                    return render_template('crearItem.html',
+                                           listTipoItem=tiposEnFase,
+                                           item=item,
+                                           versionitem=versionitem,
+                                           error="El costo del item sobrepasa el presupuesto de "+
+                                           str(CtrlAdmProy.proy(proyecto).presupuesto))
             else:
                 tiposEnFase=CtrlAdmProy.getFase(item.idfase).tipositems
                 return render_template('crearItem.html',
@@ -1022,8 +1072,51 @@ def crearItem():
                                item=item,
                                versionitem=versionitem,
                                error="Debe Cargar Valores a los Atributos de Tipo de Item")
+        if request.form['opcion']=="Importar":
+            importar=1
+            return redirect(url_for('importarItem'))
         return redirect(url_for('proyectoX'))
-        
+
+"""----------------------Importar Item-------------------"""        
+@app.route('/importarItem', methods=['GET','POST'])
+def importarItem():
+    """Funcion que permite al usuario elegir un item de otro proyecto para importarlo"""
+    global item
+    global versionitem
+    if request.method == 'GET':
+        global proyecto
+        proyactual = CtrlAdmProy.proy(proyecto)
+        idproyactual=proyactual.idproyecto
+        proyectos=CtrlAdmProy.getProyectoList()
+        return render_template('importarItem.html',
+                               idproyactual=idproyactual,
+                               listProyectos=proyectos)
+    if request.method == 'POST':
+        if request.form['opcion']=='Mostrar Items':
+            proyectosel=CtrlAdmProy.proy(int(request.form['proyecto']))
+            lista=[]
+            for fase in proyectosel.fases:
+                for curitem in fase.items:
+                    lista.append(curitem)
+            proyactual = CtrlAdmProy.proy(proyecto)
+            idproyactual=proyactual.idproyecto
+            proyectos=CtrlAdmProy.getProyectoList()
+            return render_template('importarItem.html',
+                                   idproyactual=idproyactual,
+                                   listProyectos=proyectos,
+                                   listItem=lista)
+        if request.form['opcion']=='Aceptar':
+            itemsel=CtrlFase.getItem(int(request.form['iditem']))
+            item = CtrlFase.copiarDatosItem(itemsel,item,versionitem)
+            versionorigen = CtrlFase.getVersionActual(itemsel.iditem)
+            versionitem = CtrlFase.copiarDatosVersion(versionorigen,versionitem)
+            versionitem.iditem=item.iditem
+            global listaAtributoItemPorTipo
+            listaAtributoItemPorTipo=item.atributos
+        if request.form['opcion']=='Cancelar':
+            importar=0
+        return redirect(url_for('crearItem'))
+    
 """----------------------Agregar Atributos de Tipo de Item por Item-------------------"""        
 @app.route('/cargarAtributos', methods=['GET','POST'])
 def cargarAtributos():
@@ -1032,13 +1125,16 @@ def cargarAtributos():
         if request.form['opcion'] == "Aceptar": 
             global item
             global listaAtributoItemPorTipo
-            listaAtributoItemPorTipo = []
+            global importar
             listaAtributos = CtrlAdmTipoItem.getAtributosTipo(item.idtipoitem)
             for atributo in listaAtributos:
-                nuevo = CtrlFase.instanciarAtributoItemPorTipo(item.iditem,
-                                                               atributo.idatributo,
-                                                               request.form[atributo.nombre])
-                listaAtributoItemPorTipo.append(nuevo)
+                if importar==0:
+                    nuevo = CtrlFase.instanciarAtributoItemPorTipo(item.iditem,
+                                                                   atributo.idatributo,
+                                                                   request.form[atributo.nombre])
+                    listaAtributoItemPorTipo.append(nuevo)
+                else:
+                    atributo.valor=request.form[atributo.nombre]
         return redirect(url_for('crearItem'))
         
 """-----------------------Relacion entre Items---------------------------------------"""

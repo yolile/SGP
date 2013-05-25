@@ -275,3 +275,40 @@ def fasesTotalmenteDefinidas(listaFases):
             if not(faseTieneRol(fase.idfase)):
                 return False
     return True
+
+def importarProy(idproyectoimp,username):
+    """Funcion que recibe un idproyecto y el username del usuario actual
+    y realiza una copia de los datos del proyecto correspondiente.
+    Los mismos incluyen los atributos de definicion y las fases,
+    junto con los atributos de las mismas"""
+    importedproy=proy(idproyectoimp)
+    idnewproyecto=getMayorIdProyecto()+1
+    usuariolider=CtrlAdmUsr.getIdByUsername(username)
+    newproy = Proyecto(idnewproyecto,
+                       importedproy.nombre,
+                       importedproy.descripcion,
+                       date.today(),
+                       importedproy.complejidad,
+                       'no-iniciado',
+                       importedproy.usuariolider,
+                       importedproy.presupuesto)
+    session.add(newproy)
+    session.commit()
+    sourcefases=getFasesListByProy(idproyectoimp)
+    for fase in sourcefases:
+        importarFase(fase,idnewproyecto)
+    return idnewproyecto
+        
+def importarFase(fase,idproyecto):
+    """Funcion que recibe una fase y un id de proyecto destino
+    y crea una fase en el proyecto destino que es copia de la fase
+    recibida"""
+    idnewfase=crearFase(fase.nombre,
+                     fase.descripcion,
+                     idproyecto)
+    newfase=getFase(idnewfase)
+    newfase.posicionfase=fase.posicionfase
+    newfase.estado='no-iniciada'
+    newfase.roles=fase.roles
+    newfase.tipositems=fase.tipositems
+    session.commit()
