@@ -13,11 +13,17 @@
 					<th scope="col">NOMBRE</th>
 					<th scope="col">VALOR</th>
 					</tr>
+					{% set count = 0 %}
 					{% for atributo in listaAtributos %}
 							<tr>
 								<td>{{ atributo.nombre }}</td>
-								<td><input type='text' name={{ atributo.nombre }} value="{{ atributo.valordefecto }}"/></td>
+								{% if listAtribItem is defined %}
+									<td><input type='text' name={{ atributo.nombre }} value="{{ listAtribItem[count].valor }}"/></td>
+								{% else %}
+									<td><input type='text' name={{ atributo.nombre }} value="{{ atributo.valordefecto }}"/></td>
+								{% endif %}
 							</tr>
+  							{% set count = count + 1 %}
 					{% endfor %}
 					</table>
 				    <br>        
