@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block body %}
+<body class=formato1>
+        <form class='estilos' action="{{ url_for('importarProy') }}" method=post>
+          <center><h1>Importar Proyecto</h1></center>
+          <br>
+          <br>  
+            <div><input type='hidden' name=idproyecto value="{{ proyecto.idproyecto }}"></div>
+            <div><label>Nombres:</label><input type='text' name=nombre value="{{ proyecto.nombre~'-copia' }}"></div>
+            <div><label>Descripcion:</label><textarea rows='4'name=descripcion>{{ proyecto.descripcion }}</textarea></div>
+            <div><label>Presupuesto:</label><input type='text' name=presupuesto value="{{ proyecto.presupuesto }}"></div>
+            <div><center><input type='submit' name="opcion" value='Aceptar'>
+            <input type='submit' name="opcion" value='Cancelar'></center></div>
+                
+        </form>
+    </body>
+{% endblock %}
