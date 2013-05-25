@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block body %}
+
+ <body class = formato2>
+
+<form class='estilos' action=""{{ url_for('admHistorial')}}"" method="post">
+
+ <center><h1>ADMINISTRACION DE HISTORIAL</h1></center>
+ <br>
+ <br>
+	<div style="height:300px;overflow:auto;">	
+	
+	<table width="100%" border="1">
+	<tr>
+	<th scope="col"> </th>	
+	<th scope="col">DESCRIPCION</th>
+	<th scope="col">COMPLEJIDAD</th>
+	<th scope="col">PRIORIDAD</th>
+	<th scope="col">COSTO</th>
+	<th scope="col">VERSION</th>
+	</tr>
+
+	 {% for version in listVersion %}
+			<tr>
+				{% if version.estado == 'actual'%}
+					<td><input name="idversionitem" type="radio" value={{ version.idversionitem }} checked /></td>			
+				{% else %}
+					<td><input name="idversionitem" type="radio" value={{ version.idversionitem }} /></td>
+				{% endif%}
+				<td><textarea rows='2' readonly>{{ version.descripcion }}</textarea></td>
+				{#<td>{{ version.descripcion }}</td>#}
+				<td>{{ version.complejidad }}</td>
+				<td>{{ version.prioridad }}</td>
+				<td>{{ version.costo }}</td>
+				<td>{{ version.version }}</td>
+			</tr>  	
+  	{% endfor %}
+	  	
+
+	</table>
+	</div>	
+	
+	<br>
+	<input type="submit" name="opcion" value="Reversionar" />
+	<input type="submit" name="opcion" value="Cancelar" />
+	</form>
+	</body>
+{% endblock %}

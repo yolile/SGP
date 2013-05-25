@@ -259,8 +259,9 @@ class VersionItem(Base):
     prioridad = Column(Integer)
     costo = Column(Integer)                   
     version = Column(Integer)
+    estado = Column(String(45))
 
-    def __init__(self, idversionitem, iditem, idusuario,descripcion,complejidad,prioridad,costo,version):
+    def __init__(self, idversionitem, iditem, idusuario,descripcion,complejidad,prioridad,costo,version,estado):
         self.idversionitem = idversionitem
         self.iditem = iditem
         self.idusuario = idusuario
@@ -269,8 +270,9 @@ class VersionItem(Base):
         self.prioridad = prioridad
         self.costo = costo        
         self.version = version
+        self.estado = estado
     def __repr__(self):
-        return "<Item '%s' '%s' '%s' '%s' '%s' '%s' '%s' '%s'>" % self.idversionitem, self.iditem, self.idusuario, self.descripcion, self.complejidad, self.prioridad, self.costo, self.version
+        return "<VersionItem '%s' '%s' '%s' '%s' '%s' '%s' '%s' '%s'>" % self.idversionitem, self.iditem, self.idusuario, self.descripcion, self.complejidad, self.prioridad, self.costo, self.version, self.estado
     
 """------------------------RELACION ENTRE ITEMS---------------------------------------"""
 class Relacion(Base):
@@ -337,14 +339,14 @@ class SolicitudDeCambio(Base):
     idversionitem = Column(Integer, ForeignKey('versionitem.idversionitem'))
     versionitem = relationship("VersionItem", backref=backref("solicituddecambio", uselist=False))
      
-    def __init__(self, idsolicituddecambio, idusuariosolicitante, descripcion,tipo,iditem,idversionitem):
+    def __init__(self, idsolicituddecambio, idusuariosolicitante, descripcion,tipo,iditem,idversionitem,estado):
         self.idsolicituddecambio = idsolicituddecambio
         self.idusuariosolicitante =  idusuariosolicitante
         self.descripcion = descripcion
         self.tipo = tipo
         self.iditem = iditem
         self.idversionitem = idversionitem
- 
+        self.estado=estado
     def __repr__(self):
         return "<SolicitudDeCambio '%s' '%s' '%s' '%s' '%s' '%s' '%s' >" % self.idsolicituddecambio, self.idusuariosolicitante, self.descripcion, self.estado, self.tipo, self.iditem, self.idversionitem
 

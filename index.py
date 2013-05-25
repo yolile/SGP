@@ -712,7 +712,8 @@ def proyectoX():
                                                             0,
                                                             0,
                                                             0,
-                                                            1)
+                                                            1,
+                                                            'actual')
                 global listaAtributoItemPorTipo
                 listaAtributoItemPorTipo = []
                 return redirect(url_for('crearItem'))
@@ -813,10 +814,18 @@ def proyectoX():
                 iditem = int(request.form['iditem'])
                 i = CtrlFase.getItem(iditem)
                 if i.estado == 'bloqueado':
-                    versionitem = None
-                    global tipo
-                    tipo = 'eliminar'
-                    return redirect(url_for('enviarSolicitud')) 
+                    if not CtrlFase.existeSolicitudPendiente(iditem):
+                        versionitem = None
+                        global tipo
+                        tipo = 'eliminar'
+                        return redirect(url_for('enviarSolicitud'))
+                    else:
+                        faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                        listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                        return render_template('proyectoX.html',
+                                       listFases=listaFases,
+                                       faseSeleccionada=faseSeleccionada,
+                                       error='Existe una solicitud pendiente sobre este item')
                 elif i.estado == 'desarrollo':
                     iditem = int(request.form['iditem'])
                     CtrlFase.eliminarItem(iditem)
@@ -834,9 +843,109 @@ def proyectoX():
                                        listFases=listaFases,
                                        faseSeleccionada=faseSeleccionada,
                                        error='Fase finalizada no se pueden eliminar items')
+        if request.form['opcion'] == "Modificar Item":
+            idfase = int(request.form['fase'])
+            if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
+                iditem = int(request.form['iditem'])
+                if not CtrlFase.existeSolicitudPendiente(iditem):
+                    return redirect(url_for('modItem')) 
+                else:
+                    faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                    listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                    return render_template('proyectoX.html',
+                                           listFases=listaFases,
+                                           faseSeleccionada=faseSeleccionada,
+                                           error='Existe una solicitud pendiente sobre este item')
+            else:
+                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                return render_template('proyectoX.html',
+                                       listFases=listaFases,
+                                       faseSeleccionada=faseSeleccionada,
+                                       error='Fase finalizada no se pueden modificar items')
+        if request.form['opcion'] == "Administrar Historial":
+            idfase = int(request.form['fase'])
+            if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
+                iditem = int(request.form['iditem'])
+                if not CtrlFase.existeSolicitudPendiente(iditem):
+                    return redirect(url_for('admHistorial')) 
+                else:
+                    faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                    listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                    return render_template('proyectoX.html',
+                                           listFases=listaFases,
+                                           faseSeleccionada=faseSeleccionada,
+                                           error='Existe una solicitud pendiente sobre este item')
+            else:
+                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                return render_template('proyectoX.html',
+                                       listFases=listaFases,
+                                       faseSeleccionada=faseSeleccionada,
+                                       error='Fase finalizada no se pueden modificar items')
+            
             
         if request.form['opcion'] == "Cerrar Proyecto":
             return redirect(url_for('abrirProyecto')) 
+
+"""-----------------------Administrar Historial Items---------------------------------------"""
+@app.route('/admHistorial', methods=['GET','POST'])
+def admHistorial():
+    """Funcion para crear los items para una fase dada, dentro de un proyecto elegido""" 
+    if request.method == 'GET':
+        global iditem
+        listVersion = CtrlFase.getListVersionbyIdItem(iditem)
+        return render_template('admHistorial.html',
+                                listVersion=listVersion)     
+    if request.method == 'POST':
+        if request.form['opcion'] == "Reversionar":
+            global versionitem
+            versionitem = CtrlFase.getVersion(int(request.form['idversionitem']))
+            
+            i = CtrlFase.getItem(iditem)
+            if i.estado == 'bloqueado':
+                    global tipo
+                    tipo = 'modificar'
+                    return redirect(url_for('enviarSolicitud')) 
+            elif i.estado == 'desarrollo':
+                    CtrlFase.reversionar(iditem,int(request.form['idversionitem']))
+                    flash('Item reversionado')
+        return redirect(url_for('proyectoX'))
+
+"""-----------------------Modificar Items---------------------------------------"""
+@app.route('/modItem', methods=['GET','POST'])
+def modItem():
+    """Funcion para crear los items para una fase dada, dentro de un proyecto elegido""" 
+    if request.method == 'GET':
+        global iditem
+        global versionitem
+        item = CtrlFase.getItem(iditem)
+        versionitem=CtrlFase.getVersionActual(item.iditem)
+        listaValores=item.atributos
+        listaAtributos = CtrlAdmTipoItem.getAtributosTipo(item.idtipoitem)    
+        return render_template('modItem.html',
+                                item=item,
+                                versionitem=versionitem,
+                                listaValores=listaValores,
+                                listaAtributos=listaAtributos)     
+
+    if request.method == 'POST':
+        if request.form['opcion'] == "Modificar":
+            versionitem.descripcion = request.form['descripcion']
+            versionitem.costo = int(request.form['costo'])
+            versionitem.prioridad = int(request.form['prioridad'])
+            versionitem.complejidad = int(request.form['complejidad'])
+            
+            i = CtrlFase.getItem(iditem)
+            if i.estado == 'bloqueado':
+                    global tipo
+                    tipo = 'reversionar'
+                    return redirect(url_for('enviarSolicitud')) 
+            elif i.estado == 'desarrollo':
+                    CtrlFase.modificarItem(iditem,versionitem,CtrlAdmUsr.getIdByUsername(owner))
+                    flash('Item modificado')
+        return redirect(url_for('proyectoX'))
+
 
 """-----------------------Crear Items---------------------------------------"""
 @app.route('/crearItem', methods=['GET','POST'])
@@ -868,17 +977,8 @@ def crearItem():
             versionitem.complejidad = int(request.form['complejidad'])
             global listaAtributoItemPorTipo
             if listaAtributoItemPorTipo:
-                if(versionitem.costo <= CtrlAdmProy.proy(proyecto).presupuesto):
-                    CtrlFase.crearItem(item,versionitem,listaAtributoItemPorTipo)
-                    flash("Item Creado")
-                else:
-                    tiposEnFase=CtrlAdmProy.getFase(item.idfase).tipositems
-                    return render_template('crearItem.html',
-                                           listTipoItem=tiposEnFase,
-                                           item=item,
-                                           versionitem=versionitem,
-                                           error="El costo del item sobrepasa el presupuesto de "+
-                                           str(CtrlAdmProy.proy(proyecto).presupuesto))
+                CtrlFase.crearItem(item,versionitem,listaAtributoItemPorTipo)
+                flash("Item Creado")
             else:
                 tiposEnFase=CtrlAdmProy.getFase(item.idfase).tipositems
                 return render_template('crearItem.html',
@@ -1002,12 +1102,14 @@ def enviarSolicitud():
     if request.method == 'GET':
         global iditem
         item=CtrlFase.getItem(iditem)
+        global versionitem
         global tipo
         if tipo=='eliminar':
             versionitem=CtrlFase.getVersionActual(item.iditem)
         listaValores=item.atributos
         listaAtributos = CtrlAdmTipoItem.getAtributosTipo(item.idtipoitem)            
         return render_template('enviarSolicitud.html',
+                                   tipo=tipo,
                                    item=item,
                                    versionitem=versionitem,
                                    listaValores=listaValores,
@@ -1017,7 +1119,7 @@ def enviarSolicitud():
             CtrlFase.enviarSolicitud(CtrlAdmUsr.getIdByUsername(owner),
                                      tipo,
                                      iditem,
-                                     None)
+                                     versionitem)
             flash('Solicitud enviada')
             return redirect(url_for('proyectoX'))
         if (request.form['opcion']=="Cancelar"):
