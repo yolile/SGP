@@ -8,6 +8,7 @@ import CtrlAdmProy
 import CtrlAdmTipoItem
 import CtrlFase
 import CtrlLineaBase
+import CtrlSolicitudCambio
 
 """Modulo de ejecucion principal de SGP"""  
 __author__ = 'Grupo 5'
@@ -1278,6 +1279,23 @@ def asigItemsEnLB():
             listItemEnLB = request.form.getlist('iditem')
             CtrlLineaBase.agregarItems(listItemEnLB,idlineabase)        
     return redirect(url_for('proyectoXenGC'))
-       
+
+@app.route('/bandejaEntrada', methods=['GET','POST'])
+def bandejaEntrada():                                    
+    """Funcion que muestra todas las solicitudes de cambio del usuario"""
+    if request.method == 'GET':
+        idusuario = CtrlAdmUsr.getIdByUsername(owner)
+        listsolicitudes = CtrlSolicitudCambio.getSolicitudesbyCC(idusuario)
+        return render_template('bandejaDeEntrada.html',
+                                listsolicitudes =listsolicitudes)
+    if request.method == 'POST':
+        if request.form['opcion'] == "Ver":
+            idsolicituddecambio = int(request.form['idsolicituddecambio'])
+            solicituddecambio = CtrlSolicitudCambio.getSolicitudDeCambio(idsolicituddecambio)
+            return render_template('solicitudCambio.html',
+                                solicituddecambio =solicituddecambio)            
+        if request.form['opcion'] == "Home":
+            return redirect(url_for('menu'))   
+        
 if __name__=='__main__':
     app.run()             
