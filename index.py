@@ -30,6 +30,7 @@ item=None
 versionitem=None
 listaAtributoItemPorTipo=[]
 
+idfase=0
 iditem=0
 tipo=''
 
@@ -883,16 +884,50 @@ def proyectoX():
                 return render_template('proyectoX.html',
                                        listFases=listaFases,
                                        faseSeleccionada=faseSeleccionada,
-                                       error='Fase finalizada no se pueden modificar items')
+                                       error='Fase finalizada no se puede reversionar items')
+
+        if request.form['opcion'] == "Revivir":
+            global idfase
+            idfase = int(request.form['fase'])
+            if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
+                    return redirect(url_for('revivirItem')) 
+            else:
+                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                return render_template('proyectoX.html',
+                                       listFases=listaFases,
+                                       faseSeleccionada=faseSeleccionada,
+                                       error='Fase finalizada no se pueden revivir items')
+            
             
             
         if request.form['opcion'] == "Cerrar Proyecto":
             return redirect(url_for('abrirProyecto')) 
 
+
+"""-----------------------Revivir Items---------------------------------------"""
+@app.route('/revivirItem', methods=['GET','POST'])
+def revivirItem():
+    """Funcion para revivir los items para una fase dada, dentro de un proyecto elegido""" 
+    if request.method == 'GET': 
+        global idfase
+        listItem = CtrlFase.getItemsFase(idfase)
+        for i in listItem:
+            flash(i.estado)
+        return render_template('revivirItem.html',
+                                listItem=listItem)
+    if request.method == 'POST':
+        if request.form['opcion'] == "Revivir":
+            iditem = int(request.form['iditem'])
+            CtrlFase.revivirItem(iditem)
+            flash('El item fue revivido satisfactoriamente')
+        return redirect(url_for('proyectoX'))
+
+
 """-----------------------Administrar Historial Items---------------------------------------"""
 @app.route('/admHistorial', methods=['GET','POST'])
 def admHistorial():
-    """Funcion para crear los items para una fase dada, dentro de un proyecto elegido""" 
+    """Funcion para volver a un a version antigua de un item""" 
     if request.method == 'GET':
         global iditem
         listVersion = CtrlFase.getListVersionbyIdItem(iditem)
@@ -916,7 +951,7 @@ def admHistorial():
 """-----------------------Modificar Items---------------------------------------"""
 @app.route('/modItem', methods=['GET','POST'])
 def modItem():
-    """Funcion para crear los items para una fase dada, dentro de un proyecto elegido""" 
+    """Funcion para modificar los items para una fase dada, dentro de un proyecto elegido""" 
     if request.method == 'GET':
         global iditem
         global versionitem
