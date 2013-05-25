@@ -1,0 +1,60 @@
+{% extends "layout.html" %}
+{% block body %}
+<body class=formato1>
+        <form class='estilos' action="{{ url_for('importarItem') }}" method=post>
+             <br>
+            <div><label>Importar Item</label>
+					<div><br>	
+							<select name="proyecto">						
+								{% if proyectoSeleccionado %}
+									<option value={{proyectoSeleccionado.idproyecto }}>
+									{{ proyectoSeleccionado.nombre }}
+									</option>
+									{% for proyecto in listProyectos %}
+											{%	if proyecto.idproyecto != proyectoSeleccionado.idproyecto and  proyecto.estado != 'eliminado' and proyecto.idproyecto != idproyactual %}														
+													<option value={{proyecto.idproyecto }}>{{ proyecto.nombre }}</option>
+							 				{%	endif %}
+							 		{% endfor %}
+								{% else %}
+									{% for proyecto in listProyectos %}
+										{% if proyecto.estado != 'eliminado' and proyecto.idproyecto != idproyactual %}
+												<option value={{proyecto.idproyecto }}>{{ proyecto.nombre }}</option>
+							 			{%	endif %}
+							 		{% endfor %}								
+								{% endif%}
+						
+							</select>
+				    </div>
+            		<br>
+					<input type='submit' name="opcion" value='Mostrar Items'>
+	        </div>
+	            <div><label>Items de proyecto seleccionado:</label>
+	            	<br>
+	            	<div style="height:150px;width:400px;overflow:auto;">	
+	            	<table width="50%" border="1">
+					<tr>
+					<th scope="col">Fase</th>
+					<th scope="col">Nombre</th>	
+					<th scope="col">OK</th>	
+					</tr>
+						{% for item in listItem %}
+							{% if item.estado != 'eliminado' %}
+								<tr>	
+								<td>{{ item.fase.posicionfase }}</td>
+								<td>{{ item.nombre }}</td>	
+								<td><input name="iditem" type="radio" value={{ item.iditem }} checked /></td>
+								</tr>  	
+							{% endif %}  	
+						{% endfor %}
+					</table>
+				    <br>        
+            </div>
+            <div>
+            <center>
+            <input type='submit' name="opcion" value='Aceptar'>
+            <input type='submit' name="opcion" value='Cancelar'>
+            </center>
+            </div>           
+        </form>
+    </body>
+{% endblock %}
