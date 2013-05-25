@@ -358,6 +358,9 @@ class SolicitudPorUsuarioCC(Base):
     idproyectocc = Column(Integer,ForeignKey('proyecto.idproyecto'), primary_key=True)
     voto = Column(String(45))
 
+    solicituddecambio = relationship("SolicitudDeCambio")
+    
+
     def __init__(self, idsolicituddecambio, idusuariocc, idproyectocc):
         self.idsolicituddecambio = idsolicituddecambio
         self.idusuariocc = idusuariocc

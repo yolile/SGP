@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block body %}
+<body class=formato4>
+        <form class='estilos' action="{{ url_for('bandejaEntrada') }}" method=get>
+             <center><h1>Solicitud de Cambio</h1></center>
+          	<br>
+          	<br>
+        
+            <div><label>Tipo de Solicitud:</label><input type='text' name=tipo value='{{ solicituddecambio.tipo }}' disabled></div>        
+            <div><label>Descripcion:</label><textarea rows='6' name=descripcion readonly>{{ solicituddecambio.descripcion }}</textarea></div>
+            <div><label>Estado:</label><input type='text' name=estado value='{{ solicituddecambio.estado }}' disabled></div> 
+            
+	<br>
+	<center>
+	<input type="submit" name="opcion" value="Atras" />
+	</center>
+
+        </form>
+    </body>
+{% endblock %}

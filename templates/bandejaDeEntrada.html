@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block body %}
+
+ <body class = formato2>
+
+<form class='estilos' action=""{{ url_for('bandejaEntrada')}}"" method="post">
+
+ <center><h1>Bandeja de Entrada</h1></center>
+  <center><h1>Solicitudes de Cambio</h1></center>
+ <br>
+ <br>
+	<div style="height:300px;overflow:auto;">	
+	
+	<table width="100%" border="1">
+	<tr>
+	<th scope="col"> </th>	
+	<th scope="col">Estado</th>
+	<th scope="col">Tipo</th>
+	</tr>
+
+	 {% for solicituddecambio in listsolicitudes %}
+			<tr>
+				<td><input name="idsolicituddecambio" type="radio" value={{ solicituddecambio.idsolicituddecambio }} checked/></td>			
+				<td>{{ solicituddecambio.estado }}</td>
+				<td>{{ solicituddecambio.tipo }}</td>
+			</tr>  	
+  	{% endfor %}
+	  	
+
+	</table>
+	</div>	
+	
+	<br>
+	<input type="submit" name="opcion" value="Ver" />
+	<br>
+	<center>
+	<input type="submit" name="opcion" value="Home" />
+	</center>
+	</form>
+	</body>
+{% endblock %}
