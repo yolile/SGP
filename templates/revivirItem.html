@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block body %}
+
+ <body class = formato2>
+
+<form class='estilos' action=""{{ url_for('revivirItem')}}"" method="post">
+
+ <center><h1>REVIVIR ITEM</h1></center>
+ <br>
+ <br>
+
+<br>
+		<div style="height:150px;width:200px;overflow:auto;">	
+	    	<table width="50%" border="1">
+				<tr>
+				<th scope="col"> </th>
+				<th scope="col">NOMBRE</th>
+				<th scope="col">ESTADO</th>					
+				</tr>
+						{% for item in listItem %}
+						{% if item.estado == 'eliminado' %}
+						<tr>
+						<td><input name="iditem" type="radio" value={{ item.iditem }} checked /></td>	
+						<td>{{ item.nombre }}</td>	
+						<td>{{ item.estado}}</td>
+						</tr>  	
+						{% endif %}  	
+						{% endfor %}
+				</table>
+				<br>        
+         </div>
+	
+	<br>
+
+	<center>
+	<input type="submit" name="opcion" value="Revivir" />
+	<input type="submit" name="opcion" value="Cancelar" />
+	</center>
+	</form>
+	</body>
+{% endblock %}

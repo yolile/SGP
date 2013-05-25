@@ -354,3 +354,7 @@ def reversionar(iditem,idversionitem):
     nuevo.estado = 'actual'
     session.commit()
     
+def revivirItem(iditem):
+    item = session.query(Item).filter(Item.iditem==iditem).first()
+    item.estado = 'desarrollo'
+    session.commit()    
