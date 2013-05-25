@@ -9,11 +9,13 @@
 			<tr>
 			<th scope="col">Nombre</th>
 			</tr>
-            	{% for rol in fase.roles %}
+			{% if fase is defined %}
+	           	{% for rol in fase.roles %}
 						<tr>
 						<td>{{ rol.nombre }}</td>
 						</tr>  	
-  				{% endfor %}
+	 			{% endfor %}
+ 			{% endif %}
 			</table>
 			</div>
 			</center>
