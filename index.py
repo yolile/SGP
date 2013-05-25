@@ -1206,10 +1206,10 @@ def gestionarArchivos():
             CtrlFase.subir(archivo)
             flash("Archivo Subido")
             return redirect(url_for('gestionarArchivos'))
-        if (request.form['opcion']=="Adjuntar"):
+        if (request.form['opcion']=="Adjuntar/Desadjuntar"):
             idarchivos = request.form.getlist('idarchivos')
             CtrlFase.adjuntar(iditem,idarchivos)
-            flash("Archivos adjuntados")
+            flash("Archivos adjuntados y desadjuntados correctamente")
             return redirect(url_for('proyectoX'))
         if (request.form['opcion']=="Cancelar"):
             return redirect(url_for('proyectoX'))
