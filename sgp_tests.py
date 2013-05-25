@@ -8,19 +8,18 @@ import CtrlAdmRol
 import CtrlAdmUsr
 import CtrlAdmTipoItem
 import CtrlLineaBase
-from Modelo import init_db, drop_db, engine
- 
+import CtrlFase
+from Modelo import init_db,drop_db
+
 class SGPTestCase(unittest.TestCase):
 
     """----------Funciones para las pruebas---------"""
     def setUp(self):
-        self.engine = engine
         drop_db()
         init_db()
         index.app.config['TESTING'] = True
-        self.app = index.app.test_client()       
+        self.app = index.app.test_client()      
        
-        
     def login(self, username, password):
         return self.app.post('/login', 
                              data=dict(
@@ -138,6 +137,24 @@ class SGPTestCase(unittest.TestCase):
                                        opcion=opcion,
                                        fase=fase,
                                        idlineabase=idlineabase),
+                             follow_redirects=True)
+
+    def importarProyecto(self,opcion,idproyecto,nombre,descripcion,presupuesto):
+        return self.app.post('/importarProy',
+                             data=dict(
+                                       opcion=opcion,
+                                       idproyecto=idproyecto,
+                                       nombre=nombre,
+                                       descripcion=descripcion,
+                                       presupuesto=presupuesto),
+                             follow_redirects=True)
+        
+    def eliminarItem(self,opcion,fase,iditem):
+        return self.app.post('/proyectoX',
+                             data=dict(
+                                       opcion=opcion,
+                                       fase=fase,
+                                       iditem=iditem),
                              follow_redirects=True)
 
     """---------Test---------"""
@@ -285,7 +302,11 @@ class SGPTestCase(unittest.TestCase):
         rv=self.app.post('/proyectoX',data=dict(opcion='Crear Item',fase=idfase))
         rv=self.app.post('/crearItem',data=dict(opcion='Cargar Atributos',
                                                 nombre='nombre',
-                                                tipoItem=idtipoitem))
+                                                descripcion='descripcion',
+                                                tipoItem=idtipoitem,
+                                                costo='0',
+                                                prioridad='10',
+                                                complejidad='100'))
         rv=self.app.post('/cargarAtributos',data=dict(opcion='Aceptar',
                                                       nombre='bydefault',
                                                       descripcion='1',
@@ -318,7 +339,11 @@ class SGPTestCase(unittest.TestCase):
         rv=self.app.post('/proyectoX',data=dict(opcion='Crear Item',fase=idfase))
         rv=self.app.post('/crearItem',data=dict(opcion='Cargar Atributos',
                                                 nombre='nombre',
-                                                tipoItem=idtipoitem))
+                                                descripcion='descripcion',
+                                                tipoItem=idtipoitem,
+                                                costo='0',
+                                                prioridad='10',
+                                                complejidad='100'))
         rv=self.app.post('/cargarAtributos',data=dict(opcion='Aceptar',
                                                       nombre='bydefault',
                                                       descripcion='1',
@@ -360,9 +385,61 @@ class SGPTestCase(unittest.TestCase):
                                   fase= idfase,
                                   idlineabase= idlb)
         assert 'Linea Base Eliminada' in rv.data
-            
+
+    def test_importarProyecto(self):
+        #crear escenario
+        idusuario=CtrlAdmUsr.insertarUsr('username',
+                             'password',
+                             'nombre',
+                             'apellido',
+                             '10101010',
+                             '1000')
+        idproyecto=CtrlAdmProy.crearProy('nombre','descripcion',10000,'username')
+        rv=self.login('username', 'password')
+        #prueba
+        rv=self.app.post('/admProy',data=dict(opcion='Importar',select=idproyecto))
+        rv=self.importarProyecto(opcion='Aceptar',
+                                 idproyecto=idproyecto,
+                                 nombre='NOMBRE',
+                                 descripcion='DESCRIP',
+                                 presupuesto='1000')
+        assert 'Proyecto importado' in rv.data
+        
+    def test_eliminarItem(self):
+        #crear escenario
+        idusuario=CtrlAdmUsr.insertarUsr('username',
+                                 'password',
+                                 'nombre',
+                                 'apellido',
+                                 '10101010',
+                                 '1000')
+        idtipoitem=CtrlAdmTipoItem.crearTipoItem('nombre','descripcion')
+        CtrlAdmTipoItem.agregarAtributo(idtipoitem,'nombre','VARCHAR','pordefecto')
+        CtrlAdmRol.insertarPermiso('200','nombre','descripcion')
+        idrol=CtrlAdmRol.insertarRol('nombre','descripcion',[200])
+        idproyecto=CtrlAdmProy.crearProy('nombre','descripcion',10000,'username')
+        idfase=CtrlAdmProy.crearFase('nombre','descripcion',idproyecto)
+        CtrlAdmProy.asignarRolesFase([idrol],idfase)
+        CtrlAdmProy.asignarTiposAFase(idfase,[idtipoitem])
+        CtrlAdmProy.setProyIniciado(idproyecto)
+        item = CtrlFase.instanciarItem("","desarrollo",idtipoitem,idfase)
+        versionitem = CtrlFase.instanciarVersionItem(item.iditem,
+                                                    CtrlAdmUsr.getIdByUsername('username'),
+                                                    "", 
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    1,
+                                                    'actual')
+        CtrlFase.crearItem(item,versionitem,[])
+        #prueba
+        rv=self.login('username', 'password')
+        rv=self.eliminarItem(opcion='Eliminar',
+                             fase=idfase,
+                             iditem=item.iditem)
+        assert 'Item eliminado' in rv.data
+                             
+        
 if __name__ == '__main__':
     unittest.main()
 
-    
-    
