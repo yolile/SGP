@@ -46,6 +46,10 @@ def getMaxIdVersionItem():
 def crearItem(item,versionitem,listaAtributoItemPorTipo):
      """Funcion que crea un item, la version 1 y la 
      lista de sus atributos segun el tipo de item"""
+     global session
+     session1 = Session.object_session(item)
+     if(session1!=None):
+         session=session1
      #proyecto = session.query(Proyecto).join((Fase.proyecto,Proyecto)).filter(Fase.idfase==item.idfase).first()
      #proyecto.presupuesto = proyecto.presupuesto - versionitem.costo
      session.add(item)
@@ -353,7 +357,29 @@ def reversionar(iditem,idversionitem):
     nuevo = getVersion(idversionitem)
     nuevo.estado = 'actual'
     session.commit()
-    
+
+def copiarDatosItem(itemorigen,item,versionitem):
+    """Funcion que copia todos los datos de un item origen con su ultima version
+    a un item destino tambien en la ultima version. No se copian las claves primarias"""
+    item.nombre=itemorigen.nombre+'-copia'
+    item.estado=itemorigen.estado
+    item.idtipoitem=itemorigen.idtipoitem
+    for atributo in itemorigen.atributos:
+        newatributo=AtributoItemPorTipo(item.iditem,
+                                        atributo.idatributo,
+                                        atributo.valor)
+        item.atributos.append(newatributo)
+    return item
+
+def copiarDatosVersion(versionorigen,versionitem):
+    versionitem.descripcion=versionorigen.descripcion
+    versionitem.complejidad=versionorigen.complejidad
+    versionitem.prioridad=versionorigen.prioridad
+    versionitem.costo=versionorigen.costo
+    versionitem.version=1
+    versionitem.estado='actual'
+    return versionitem
+
 def revivirItem(iditem):
     item = session.query(Item).filter(Item.iditem==iditem).first()
     item.estado = 'desarrollo'
