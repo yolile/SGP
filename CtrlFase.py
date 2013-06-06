@@ -154,9 +154,14 @@ def busquedaItem(parametro,atributo,idfase):
     
 def getVersionActual(iditem):
     """Funcion para obtener la version actual de VersionItem"""
-    version = session.query(VersionItem).filter(and_(VersionItem.iditem==iditem,
-                                                     VersionItem.estado=='actual')).first()
-    return version
+    versiones = session.query(VersionItem).filter(and_(VersionItem.iditem==iditem,
+                                                     VersionItem.estado!='pendiente')).all()
+    idversionmax = 0
+    for version in versiones:
+        if(version.idversionitem > idversionmax):
+            idversionmax = version.idversionitem
+            versionmax = version
+    return versionmax
 
 def finalizarFase(idfase):
     """Funcion utilizada para finalizar la fase. 
@@ -225,7 +230,6 @@ def busquedaArchivo(parametro,atributo):
     return result
 
 def eliminarItem(iditem):
-    """Funcion que elimina un item"""
     item = session.query(Item).filter(Item.iditem==iditem).first()
     item.estado='eliminado'
     item.idlineabase=None
@@ -235,7 +239,6 @@ def eliminarItem(iditem):
     session.commit()
 
 def getSolicitudCambioList():
-    """Funcion que obtiene la lista de solicitud de cambio"""
     result = session.query(SolicitudDeCambio).all()
     return result
 
@@ -249,7 +252,6 @@ def getMaxIdSolicitudCambio():
     return idsolicitudmax
     
 def enviarSolicitud(idusuariosolicitante,tipo,iditem,versionitem):
-    """Funcion que envia la solicitud de cambio """
     usuario = session.query(Usuario).filter(Usuario.idusuario==idusuariosolicitante).first()
     item = session.query(Item).filter(Item.iditem==iditem).first()
     fase = session.query(Fase).filter(Fase.idfase==item.idfase).first()
@@ -317,7 +319,6 @@ def enviarSolicitud(idusuariosolicitante,tipo,iditem,versionitem):
     session.commit()
     
 def modificarItem(iditem,versionitem,idusuario):
-    """Funcion que modifica un item"""
     actual = getVersionActual(iditem)
     actual.estado='no-actual'
     session.commit()
@@ -341,7 +342,6 @@ def modificarItem(iditem,versionitem,idusuario):
     session.commit()
     
 def existeSolicitudPendiente(iditem):
-    """Funcion que verifica el estado pendiente de una solicitud existente segun el item"""
     listaSC = session.query(SolicitudDeCambio).filter(SolicitudDeCambio.iditem==iditem).all()
     for sc in listaSC:
         if sc.estado == 'en-proceso':
@@ -349,21 +349,28 @@ def existeSolicitudPendiente(iditem):
     return False
 
 def getListVersionbyIdItem(iditem):
-    """Funcion que trae la lista de Versiones de un Item"""
     lista = session.query(VersionItem).filter(VersionItem.iditem==iditem).all()
     return lista
 
 def getVersion(idversionitem):
-    """Funcion que trae la version de un item"""
     version = session.query(VersionItem).filter(VersionItem.idversionitem==idversionitem).first()
     return version
 
-def reversionar(iditem,idversionitem):
-    """Funcion que permite reversionar un item"""
-    actual = getVersionActual(iditem)
-    actual.estado = 'no-actual'
-    nuevo = getVersion(idversionitem)
-    nuevo.estado = 'actual'
+def reversionar(idversionitem,iduser):
+    oldversion = getVersion(idversionitem)
+    oldversion.estado = 'no-actual'
+    idnuevaversion = getMaxIdVersionItem()+1
+    nuevonroversion = getVersionActual(oldversion.iditem).version+1
+    newversion = VersionItem(idnuevaversion, 
+                             oldversion.iditem,
+                             iduser,
+                             oldversion.descripcion,
+                             oldversion.complejidad,
+                             oldversion.prioridad,
+                             oldversion.costo,
+                             nuevonroversion,
+                             'actual')
+    session.add(newversion)
     session.commit()
 
 def copiarDatosItem(itemorigen,item,versionitem):
@@ -380,7 +387,6 @@ def copiarDatosItem(itemorigen,item,versionitem):
     return item
 
 def copiarDatosVersion(versionorigen,versionitem):
-    """Funcion que realiza una copia de la version de un item"""
     versionitem.descripcion=versionorigen.descripcion
     versionitem.complejidad=versionorigen.complejidad
     versionitem.prioridad=versionorigen.prioridad
@@ -390,7 +396,6 @@ def copiarDatosVersion(versionorigen,versionitem):
     return versionitem
 
 def revivirItem(iditem):
-    """Funcion que permite revivir un item"""
     item = session.query(Item).filter(Item.iditem==iditem).first()
     item.estado = 'desarrollo'
     session.commit()    

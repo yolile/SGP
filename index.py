@@ -961,13 +961,17 @@ def revivirItem():
 @app.route('/admHistorial', methods=['GET','POST'])
 def admHistorial():
     """Funcion para volver a un a version antigua de un item""" 
+    global iditem
     if request.method == 'GET':
-        global iditem
+        
         listVersion = CtrlFase.getListVersionbyIdItem(iditem)
         return render_template('admHistorial.html',
                                 listVersion=listVersion)     
     if request.method == 'POST':
         if request.form['opcion'] == "Reversionar":
+            if int(request.form['idversionitem'])==CtrlFase.getVersionActual(iditem).idversionitem:
+                flash('No se puede reversionar a la version actual')
+                return redirect(url_for('admHistorial'))
             global versionitem
             versionitem = CtrlFase.getVersion(int(request.form['idversionitem']))
             
@@ -977,8 +981,11 @@ def admHistorial():
                     tipo = 'modificar'
                     return redirect(url_for('enviarSolicitud')) 
             elif i.estado == 'desarrollo':
-                    CtrlFase.reversionar(iditem,int(request.form['idversionitem']))
+                    global owner
+                    iduser = CtrlAdmUsr.getIdByUsername(owner)
+                    CtrlFase.reversionar(int(request.form['idversionitem']),iduser)
                     flash('Item reversionado')
+                    return redirect(url_for('admHistorial'))
         return redirect(url_for('proyectoX'))
 
 """-----------------------Modificar Items---------------------------------------"""
@@ -997,14 +1004,17 @@ def modItem():
                                 versionitem=versionitem,
                                 listaValores=listaValores,
                                 listaAtributos=listaAtributos)     
-
     if request.method == 'POST':
         if request.form['opcion'] == "Modificar":
-            versionitem.descripcion = request.form['descripcion']
-            versionitem.costo = int(request.form['costo'])
-            versionitem.prioridad = int(request.form['prioridad'])
-            versionitem.complejidad = int(request.form['complejidad'])
-            
+            versionitem.estado = 'no-actual'
+            versionitem = CtrlFase.instanciarVersionItem(versionitem.iditem,
+                                    versionitem.idusuario,
+                                    request.form['descripcion'],
+                                    int(request.form['complejidad']),
+                                    int(request.form['prioridad']),
+                                    int(request.form['costo']),
+                                    versionitem.version+1,
+                                    versionitem.estado)
             i = CtrlFase.getItem(iditem)
             if i.estado == 'bloqueado':
                     global tipo
@@ -1206,10 +1216,10 @@ def gestionarArchivos():
             CtrlFase.subir(archivo)
             flash("Archivo Subido")
             return redirect(url_for('gestionarArchivos'))
-        if (request.form['opcion']=="Adjuntar/Desadjuntar"):
+        if (request.form['opcion']=="Adjuntar"):
             idarchivos = request.form.getlist('idarchivos')
             CtrlFase.adjuntar(iditem,idarchivos)
-            flash("Archivos adjuntados y desadjuntados correctamente")
+            flash("Archivos adjuntados")
             return redirect(url_for('proyectoX'))
         if (request.form['opcion']=="Cancelar"):
             return redirect(url_for('proyectoX'))
