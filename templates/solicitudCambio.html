@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block body %}
 <body class=formato4>
-        <form class='estilos' action="{{ url_for('bandejaEntrada') }}" method=get>
+        <form class='estilos' action="{{ url_for('votarSolicitud') }}" method=post>
              <center><h1>Solicitud de Cambio</h1></center>
           	<br>
           	<br>
@@ -9,10 +9,20 @@
             <div><label>Tipo de Solicitud:</label><input type='text' name=tipo value='{{ solicituddecambio.tipo }}' disabled></div>        
             <div><label>Descripcion:</label><textarea rows='6' name=descripcion readonly>{{ solicituddecambio.descripcion }}</textarea></div>
             <div><label>Estado:</label><input type='text' name=estado value='{{ solicituddecambio.estado }}' disabled></div> 
+            <div><label>Calculo de impacto</label><input type='text' name=tipo value=" " disabled></div>        
+            <div><label>Calculo de costo</label><input type='text' name=tipo value=" " disabled></div>        
             
 	<br>
 	<center>
+	{% if voto == 'Pendiente' %}
+		<input type="submit" name="opcion" value="Aceptar Solicitud" onclick="return confirmar('¿Está seguro que desea aceptar la solicitud de cambio?')" />
+		<input type="submit" name="opcion" value="Rechazar Solicitud" onclick="return confirmar('¿Está seguro que desea rechazar la solicitud de cambio?')" />
+	{% else %}
+		<input type="submit" name="opcion" value="Aceptar Solicitud" disabled="disabled"/>
+		<input type="submit" name="opcion" value="Rechazar Solicitud" disabled="disabled"/>
+	{% endif %}
 	<input type="submit" name="opcion" value="Atras" />
+
 	</center>
 
         </form>

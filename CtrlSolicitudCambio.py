@@ -22,3 +22,36 @@ def getSolicitudDeCambio(idsolicituddecambio):
     """Funcion que obtiene una solicitud de cambio"""
     solicitud = session.query(SolicitudDeCambio).filter(SolicitudDeCambio.idsolicituddecambio==idsolicituddecambio).first()
     return solicitud
+
+def votarSolicitud(idsolicituddecambio,idintegrante,voto):
+    solicitud=session.query(SolicitudPorUsuarioCC).filter(and_(SolicitudPorUsuarioCC.idsolicituddecambio==idsolicituddecambio,
+                                                               SolicitudPorUsuarioCC.idusuariocc==idintegrante)).first()
+    solicitud.voto = voto
+    session.commit()
+    
+def getVotobyCC(idusuario):
+    solicitud=session.query(SolicitudPorUsuarioCC).filter(SolicitudPorUsuarioCC.idusuariocc==idusuario).all()
+    return solicitud
+
+def getestadoVoto(idsolicituddecambio,idintegrante):
+    solicitud=session.query(SolicitudPorUsuarioCC).filter(and_(SolicitudPorUsuarioCC.idsolicituddecambio==idsolicituddecambio,
+                                                               SolicitudPorUsuarioCC.idusuariocc==idintegrante)).first()
+    return solicitud.voto
+    
+def contarVotos(idsolicituddecambio):
+    votos=session.query(SolicitudPorUsuarioCC).filter(SolicitudPorUsuarioCC.idsolicituddecambio==idsolicituddecambio).all()
+    total = len(votos)
+    aceptados=0
+    rechazados=0
+    for v in votos:
+        if v.voto == 'Aceptado':
+            aceptados = aceptados + 1
+        if v.voto == 'Rechazado':
+            rechazados = rechazados + 1
+    if total == (aceptados + rechazados):
+        solicitud = getSolicitudDeCambio(idsolicituddecambio)
+        if aceptados > rechazados:
+            solicitud.estado = 'Aceptado'
+        if aceptados < rechazados:
+            solicitud.estado = 'Rechazado'
+        session.commit()  

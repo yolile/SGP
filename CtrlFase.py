@@ -311,7 +311,7 @@ def enviarSolicitud(idusuariosolicitante,tipo,iditem,versionitem):
                                   'en-proceso')
     solicitudCC = []
     for u in proyecto.comitecambios:
-        solicitudCC.append(SolicitudPorUsuarioCC(nuevo.idsolicituddecambio,u.idusuario,proyecto.idproyecto))
+        solicitudCC.append(SolicitudPorUsuarioCC(nuevo.idsolicituddecambio,u.idusuario,proyecto.idproyecto,'Pendiente'))
     
     session.add(nuevo)
     session.commit()

@@ -361,10 +361,12 @@ class SolicitudPorUsuarioCC(Base):
     solicituddecambio = relationship("SolicitudDeCambio")
     
 
-    def __init__(self, idsolicituddecambio, idusuariocc, idproyectocc):
+    def __init__(self, idsolicituddecambio, idusuariocc, idproyectocc,voto):
         self.idsolicituddecambio = idsolicituddecambio
         self.idusuariocc = idusuariocc
         self.idproyectocc = idproyectocc
+        self.voto = voto
+
 
     def __repr__(self):
         return "<SolicitudPorUsuarioCC '%s' '%s' '%s'>" % self.idsolicituddecambio, self.idusuariocc, self.idproyectocc
