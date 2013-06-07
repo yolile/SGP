@@ -157,6 +157,7 @@ def getVersionActual(iditem):
     versiones = session.query(VersionItem).filter(and_(VersionItem.iditem==iditem,
                                                      VersionItem.estado!='pendiente')).all()
     idversionmax = 0
+    versionmax = None
     for version in versiones:
         if(version.idversionitem > idversionmax):
             idversionmax = version.idversionitem
@@ -376,8 +377,9 @@ def reversionar(idversionitem,iduser):
     session.commit()
 
 def copiarDatosItem(itemorigen,item,versionitem):
-    """Funcion que copia todos los datos de un item origen con su ultima version
-    a un item destino tambien en la ultima version. No se copian las claves primarias"""
+    """Funcion utilizada para importar item, que copia todos los datos de un item origen 
+    con su ultima version a un item destino tambien en la ultima version. No se copian 
+    las claves primarias"""
     item.nombre=itemorigen.nombre+'-copia'
     item.estado=itemorigen.estado
     item.idtipoitem=itemorigen.idtipoitem
@@ -389,6 +391,8 @@ def copiarDatosItem(itemorigen,item,versionitem):
     return item
 
 def copiarDatosVersion(versionorigen,versionitem):
+    """Funcion utilizada para importar item. Copia los datos de una version especifica
+    a la primera version de un nuevo item"""
     versionitem.descripcion=versionorigen.descripcion
     versionitem.complejidad=versionorigen.complejidad
     versionitem.prioridad=versionorigen.prioridad

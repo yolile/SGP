@@ -82,42 +82,6 @@ def asigRoles(iduser,idRolList):
     if(usr != None):
         usr.roles = listaroles
     session.commit()
-# 
-# def getId(iduser):
-#     s = select([usuario_table],usuario_table.c.idusuario==iduser)
-#     result = conn.execute(s)
-#     row = result.fetchone()
-#     return row['idusuario']
-# def getUsername(iduser):
-#     s = select([usuario_table],usuario_table.c.idusuario==iduser)
-#     result = conn.execute(s)
-#     row = result.fetchone()
-#     return row['username']
-# def getPasswrd(iduser):
-#     s = select([usuario_table],usuario_table.c.idusuario==iduser)
-#     result = conn.execute(s)
-#     row = result.fetchone()
-#     return row['passwrd']
-# def getNombre(iduser):
-#     s = select([usuario_table],usuario_table.c.idusuario==iduser)
-#     result = conn.execute(s)
-#     row = result.fetchone()
-#     return row['nombre']
-# def getApellido(iduser):
-#     s = select([usuario_table],usuario_table.c.idusuario==iduser)
-#     result = conn.execute(s)
-#     row = result.fetchone()
-#     return row['apellido']
-# def getTelefono(iduser):
-#     s = select([usuario_table],usuario_table.c.idusuario==iduser)
-#     result = conn.execute(s)
-#     row = result.fetchone()
-#     return row['telefono']
-# def getCi(iduser):
-#     s = select([usuario_table],usuario_table.c.idusuario==iduser)
-#     result = conn.execute(s)
-#     row = result.fetchone()
-#     return row['ci']
 
 def busquedaUsr(parametro,atributo):
     """Funcion que recibe un parametro de busqueda y el atributo por el cual buscar y retorna coincidencias"""

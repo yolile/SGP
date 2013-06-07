@@ -157,6 +157,20 @@ class SGPTestCase(unittest.TestCase):
                                        iditem=iditem),
                              follow_redirects=True)
 
+    def reversionarItem(self,opcion,idversionitem):
+        return self.app.post('/admHistorial',
+                             data=dict(
+                                       opcion=opcion,
+                                       idversionitem=idversionitem),
+                             follow_redirects=True) 
+    
+    def importarItem(self,opcion,iditem):
+        return self.app.post('/importarItem',
+                             data=dict(
+                                       opcion=opcion,
+                                       iditem=iditem),
+                             follow_redirects=True)   
+    
     """---------Test---------"""
     def test_insertarUsr(self):
         rv = self.insertarUsr('Crear',
@@ -204,12 +218,12 @@ class SGPTestCase(unittest.TestCase):
         assert 'Usuario modificado' in rv.data
         
     def test_crearRol(self):
-        #creando escenario, se crean los permisos 200,201,202 y 203
+        #escenario
         CtrlAdmRol.insertarPermiso(200,'','')
         CtrlAdmRol.insertarPermiso(201,'','')
         CtrlAdmRol.insertarPermiso(202,'','')
         CtrlAdmRol.insertarPermiso(203,'','')
-        #pruebara no tenemos tiempo para eso :( ... creo que yo le toque en bus
+        #prueb
         rv = self.crearRol('Crear', 
                          "test5-nombre",
                          "test5-descripcion",
@@ -439,7 +453,81 @@ class SGPTestCase(unittest.TestCase):
                              iditem=item.iditem)
         assert 'Item eliminado' in rv.data
                              
+    def test_reversionarItem(self):
+        #escenario
+        idusuario=CtrlAdmUsr.insertarUsr('username',
+                                 'password',
+                                 'nombre',
+                                 'apellido',
+                                 '10101010',
+                                 '1000')
+        idtipoitem=CtrlAdmTipoItem.crearTipoItem('nombre','descripcion')
+        CtrlAdmTipoItem.agregarAtributo(idtipoitem,'nombre','VARCHAR','pordefecto')
+        CtrlAdmRol.insertarPermiso('200','nombre','descripcion')
+        idrol=CtrlAdmRol.insertarRol('nombre','descripcion',[200])
+        idproyecto=CtrlAdmProy.crearProy('nombre','descripcion',10000,'username')
+        idfase=CtrlAdmProy.crearFase('nombre','descripcion',idproyecto)
+        CtrlAdmProy.asignarRolesFase([idrol],idfase)
+        CtrlAdmProy.asignarTiposAFase(idfase,[idtipoitem])
+        CtrlAdmProy.setProyIniciado(idproyecto)
+        item = CtrlFase.instanciarItem("","desarrollo",idtipoitem,idfase)
+        versionitem = CtrlFase.instanciarVersionItem(item.iditem,
+                                                    CtrlAdmUsr.getIdByUsername('username'),
+                                                    "", 
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    1,
+                                                    'actual')
+        CtrlFase.crearItem(item,versionitem,[])
+        versionitem.descripcion=versionitem.descripcion+'-mod'
+        idusuario=CtrlAdmUsr.getIdByUsername('username')
+        CtrlFase.modificarItem(item.iditem,versionitem,idusuario)
+        #prueba
+        rv=self.login('username', 'password')
+        rv=self.reversionarItem('Reversionar', 1)
+        assert 'Item reversionado' in rv.data
         
+    def test_importarItem(self):
+        #escenario
+        idusuario=CtrlAdmUsr.insertarUsr('username',
+                                 'password',
+                                 'nombre',
+                                 'apellido',
+                                 '10101010',
+                                 '1000')
+        idtipoitem=CtrlAdmTipoItem.crearTipoItem('nombre','descripcion')
+        CtrlAdmTipoItem.agregarAtributo(idtipoitem,'nombre','VARCHAR','pordefecto')
+        CtrlAdmRol.insertarPermiso('200','nombre','descripcion')
+        idrol=CtrlAdmRol.insertarRol('nombre','descripcion',[200])
+        idproyecto=CtrlAdmProy.crearProy('nombre','descripcion',10000,'username')
+        idfase=CtrlAdmProy.crearFase('nombre','descripcion',idproyecto)
+        CtrlAdmProy.asignarRolesFase([idrol],idfase)
+        CtrlAdmProy.asignarTiposAFase(idfase,[idtipoitem])
+        CtrlAdmProy.setProyIniciado(idproyecto)
+        item = CtrlFase.instanciarItem("","desarrollo",idtipoitem,idfase)
+        versionitem = CtrlFase.instanciarVersionItem(item.iditem,
+                                                    CtrlAdmUsr.getIdByUsername('username'),
+                                                    "", 
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    1,
+                                                    'actual')
+        CtrlFase.crearItem(item,versionitem,[])
+        idproyecto2 = CtrlAdmProy.crearProy('proyecto2','descripcion',100000,'username')  
+        idfase2=CtrlAdmProy.crearFase('nombre2','descripcion2',idproyecto2)
+        CtrlAdmProy.asignarRolesFase([idrol],idfase2)
+        CtrlAdmProy.asignarTiposAFase(idfase2,[idtipoitem])
+        CtrlAdmProy.setProyIniciado(idproyecto2)
+        #prueba
+        rv=self.login('username', 'password')
+        rv=self.app.post('/abrirProyecto',data=dict(opcion='Abrir',select=idproyecto2))
+        rv=self.app.post('/proyectoX',data=dict(opcion='Crear Item',fase=idfase2))
+        rv=self.app.post('/crearItem',data=dict(opcion='Importar'))
+        rv=self.importarItem('Aceptar', item.iditem)
+        assert 'Item importado para crearse' in rv.data
+                
 if __name__ == '__main__':
     unittest.main()
 
