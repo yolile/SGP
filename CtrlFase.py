@@ -281,14 +281,16 @@ def enviarSolicitud(idusuariosolicitante,tipo,iditem,versionitem):
             if version < v.version and v.iditem==iditem:
                 version = v.version
     
-        nuevoVersion = instanciarVersionItem(iditem,
-                                  usuario.idusuario,
-                                  versionitem.descripcion,
-                                  versionitem.complejidad,
-                                  versionitem.prioridad,
-                                  versionitem.costo,
-                                  version+1,
-                                  'no-actual')    
+        nuevoVersion = VersionItem(getMaxIdVersionItem()+1, 
+                                   iditem, 
+                                   usuario.idusuario,
+                                   versionitem.descripcion,
+                                   versionitem.complejidad,
+                                   versionitem.prioridad,
+                                   versionitem.costo,
+                                   version+1,
+                                   'no-actual')
+
         session.add(nuevoVersion)
         session.commit()
         
