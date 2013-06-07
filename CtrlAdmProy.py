@@ -312,3 +312,27 @@ def importarFase(fase,idproyecto):
     newfase.roles=fase.roles
     newfase.tipositems=fase.tipositems
     session.commit()
+    
+def finalizarProyecto(idproyecto):
+    """Funcion que recibe un id de proyecto y comprueba para ver si se 
+    puede finalizar"""
+    if (fasesTotalmenteFinalizadas(getFasesListByProy(idproyecto))):
+        setProyFinalizado(idproyecto)
+        return True
+    else:
+        return False
+
+def fasesTotalmenteFinalizadas(listaFases):
+    """Funcion que recibe una lista de fases y retorna True
+    en el caso de que todas sus fases esten finalizadas"""
+    for fase in listaFases:
+        if fase.estado != 'finalizado':
+                return False
+    return True
+    
+def setProyFinalizado(idproyecto):
+    """Funcion que establece el estado de un proyecto como
+    'finalizado' """
+    proyecto = proy(idproyecto)
+    proyecto.estado = 'finalizado'
+    session.commit()     

@@ -19,7 +19,7 @@ __credits__ = 'none'
 __text__ = 'indice principal que conmuta con las diferentes funcionalidades de SGP'
 __file__ = 'index.py' 
 
-app = Flask(__name__,template_folder='/home/thelma/git/SGP/templates')
+app = Flask(__name__,template_folder='/home/divina/git/SGP/templates')
 app.debug = True
 app.secret_key = 'secreto'
 app.config.from_object(__name__)
@@ -309,6 +309,12 @@ def admProy():
             proyecto=int(request.form['select'])
             proy = CtrlAdmProy.proy(proyecto) 
             return render_template('importarProy.html',proyecto=proy)
+        if request.form['opcion'] == "Finalizar":
+            proyecto=int(request.form['select'])
+            if (CtrlAdmProy.finalizarProyecto(proyecto)):
+                flash('El proyecto ha sido finalizado exitosamente')
+            else:
+                flash('El proyecto no se puede finalizar, existen fases en desarrollo')              
         return redirect(url_for('admProy'))                 
 
 @app.route('/crearProy', methods=['GET','POST'])
