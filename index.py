@@ -1008,7 +1008,6 @@ def modItem():
                                 listaAtributos=listaAtributos)     
     if request.method == 'POST':
         if request.form['opcion'] == "Modificar":
-            versionitem.estado = 'no-actual'
             versionitem = CtrlFase.instanciarVersionItem(versionitem.iditem,
                                     versionitem.idusuario,
                                     request.form['descripcion'],
@@ -1016,11 +1015,11 @@ def modItem():
                                     int(request.form['prioridad']),
                                     int(request.form['costo']),
                                     versionitem.version+1,
-                                    versionitem.estado)
+                                    'no-actual')
             i = CtrlFase.getItem(iditem)
             if i.estado == 'bloqueado':
                     global tipo
-                    tipo = 'reversionar'
+                    tipo = 'modificar'
                     return redirect(url_for('enviarSolicitud')) 
             elif i.estado == 'desarrollo':
                     CtrlFase.modificarItem(iditem,versionitem,CtrlAdmUsr.getIdByUsername(owner))
