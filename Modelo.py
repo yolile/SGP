@@ -20,8 +20,8 @@ __file__ = 'Modelo.py'
 #rutaBD='postgresql+psycopg2://admin:admin@localhost/BDDEPRUEBA'
 rutaBD='postgresql+psycopg2://admin:admin@localhost/sgptest'
 
-engine = create_engine(os.environ['DATABASE_URI'])
-#engine=create_engine(rutaBD)
+#engine = create_engine(os.environ['DATABASE_URI'])
+engine=create_engine(rutaBD)
 Base= declarative_base()
 
 """------------------------TABLAS DE RELACION---------------------------------------"""
@@ -296,6 +296,7 @@ class LineaBase(Base):
     idfase = Column(Integer,ForeignKey('fase.idfase'))
     estado = Column(String(45))
     numero = Column(Integer)
+    
     
     def __init__(self, idlineabase, idfase, estado, numero):
         self.idlineabase = idlineabase

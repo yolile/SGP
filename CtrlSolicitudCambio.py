@@ -1,7 +1,9 @@
-from Modelo import engine, SolicitudDeCambio, SolicitudPorUsuarioCC
+from Modelo import *
 from sqlalchemy import create_engine, and_, or_, func
 from sqlalchemy.orm import sessionmaker, join
 import sqlalchemy.exc
+import CtrlFase
+import CtrlLineaBase
 
 """Controlador de Solicitudes de Cambio para el modulo de Gestion de Cambios"""  
 __author__ = 'Grupo 5'
@@ -51,7 +53,50 @@ def contarVotos(idsolicituddecambio):
     if total == (aceptados + rechazados):
         solicitud = getSolicitudDeCambio(idsolicituddecambio)
         if aceptados > rechazados:
+            aplicarCambios(idsolicituddecambio)
             solicitud.estado = 'Aceptado'
         if aceptados < rechazados:
             solicitud.estado = 'Rechazado'
         session.commit()  
+      
+def revisionLineaBase(idlineabase): 
+    itemList = session.query(Item).filter(Item.idlineabase==idlineabase).all()
+    for i in itemList:
+        i.estado = 'revision'
+        session.commit()
+    lb = session.query(LineaBase).filter(LineaBase.idlineabase==idlineabase).first()
+    lb.estado = 'abierto'
+    session.commit()  
+        
+        
+def aplicarCambios(idsolicituddecambio):
+    solicitud = getSolicitudDeCambio(idsolicituddecambio)
+    item = CtrlFase.getItem(solicitud.iditem)
+    idlineabase = item.idlineabase
+    lb = CtrlLineaBase.getLB(idlineabase)
+    faseactual=lb.idfase
+    fase = session.query(Fase).filter(Fase.idfase==lb.idfase).first()
+    faseList = session.query(Fase).filter(and_(Fase.posicionfase >= fase.posicionfase,Fase.idproyecto == fase.idproyecto)).all()
+    idfaseList = []
+    for f in faseList:
+        idfaseList.append(f.idfase)
+        
+    lineabaseList = session.query(LineaBase).filter(and_(LineaBase.estado=='cerrado',LineaBase.idfase.in_(idfaseList))).all()
+        
+    for lb in lineabaseList:
+        revisionLineaBase(lb.idlineabase)
+        
+    if solicitud.tipo == 'eliminar':
+        CtrlFase.eliminarItem(solicitud.iditem)
+    elif solicitud.tipo == 'reversionar':
+        """Preguntar a Thelma"""
+        versionAnt = session.query(VersionItem).filter(VersionItem.estado=='actual').first()
+        versionAnt.estado = 'no-actual'
+        solicitud.versionitem.estado = 'actual'
+        session.commit()
+    elif solicitud.tipo == 'modificar':
+        versionAnt = session.query(VersionItem).filter(VersionItem.estado=='actual').first()
+        versionAnt.estado = 'no-actual'
+        versionNva = session.query(VersionItem).filter(VersionItem.idversionitem==solicitud.idversionitem).first()
+        versionNva.estado = 'actual'
+        session.commit()
