@@ -19,7 +19,7 @@ __credits__ = 'none'
 __text__ = 'indice principal que conmuta con las diferentes funcionalidades de SGP'
 __file__ = 'index.py' 
 
-app = Flask(__name__,template_folder='/home/divina/git/SGP/templates')
+app = Flask(__name__,template_folder='/home/juan/git/SGP/templates')
 app.debug = True
 app.secret_key = 'secreto'
 app.config.from_object(__name__)
@@ -36,6 +36,8 @@ idfase=0
 iditem=0
 tipo=''
 importar=0
+idsolicituddecambio=0
+
 
 @app.route('/')
 def index():
@@ -1437,6 +1439,46 @@ def bandejaEntrada():
                                 solicituddecambio =solicituddecambio)            
         if request.form['opcion'] == "Home":
             return redirect(url_for('menu'))   
+        
+@app.route('/bandejaEntrada', methods=['GET','POST'])
+def bandejaEntrada():                                    
+    """Funcion que muestra todas las solicitudes de cambio del usuario"""
+    if request.method == 'GET':
+        idusuario = CtrlAdmUsr.getIdByUsername(owner)
+        listsolicitudes = CtrlSolicitudCambio.getSolicitudesbyCC(idusuario)
+        listVotos = CtrlSolicitudCambio.getVotobyCC(idusuario)
+        return render_template('bandejaDeEntrada.html',
+                                listsolicitudes =listsolicitudes,
+                                listVotos=listVotos)
+    if request.method == 'POST':
+        if request.form['opcion'] == "Ver":
+            global idsolicituddecambio
+            idsolicituddecambio = int(request.form['idsolicituddecambio'])
+            return redirect(url_for('votarSolicitud')) 
+        if request.form['opcion'] == "Home":
+            return redirect(url_for('menu'))  
+
+@app.route('/votarSolicitud', methods=['GET','POST'])
+def votarSolicitud():                                    
+    """Funcion que muestra todas las solicitudes de cambio del usuario"""
+    if request.method == 'GET':
+        global idsolicituddecambio
+        solicituddecambio = CtrlSolicitudCambio.getSolicitudDeCambio(idsolicituddecambio)
+        voto = CtrlSolicitudCambio.getestadoVoto(idsolicituddecambio,CtrlAdmUsr.getIdByUsername(owner))
+        return render_template('solicitudCambio.html',
+                               voto=voto,
+                               solicituddecambio = solicituddecambio)
+                
+    if request.method == 'POST':
+        if request.form['opcion'] == "Aceptar Solicitud":
+            CtrlSolicitudCambio.votarSolicitud(idsolicituddecambio,CtrlAdmUsr.getIdByUsername(owner),'Aceptado')
+            CtrlSolicitudCambio.contarVotos(idsolicituddecambio)
+            flash('Su voto a sido registrado')
+        if request.form['opcion'] == "Rechazar Solicitud":
+            CtrlSolicitudCambio.votarSolicitud(idsolicituddecambio,CtrlAdmUsr.getIdByUsername(owner),'Rechazado')
+            CtrlSolicitudCambio.contarVotos(idsolicituddecambio)
+            flash('Su voto a sido registrado')
+        return redirect(url_for('bandejaEntrada'))  
         
 if __name__=='__main__':
     app.run()             

@@ -16,6 +16,8 @@
 	<th scope="col"> </th>	
 	<th scope="col">Estado</th>
 	<th scope="col">Tipo</th>
+	<th scope="col">Item</th>
+	<th scope="col">Voto</th>
 	</tr>
 
 	 {% for solicituddecambio in listsolicitudes %}
@@ -23,6 +25,12 @@
 				<td><input name="idsolicituddecambio" type="radio" value={{ solicituddecambio.idsolicituddecambio }} checked/></td>			
 				<td>{{ solicituddecambio.estado }}</td>
 				<td>{{ solicituddecambio.tipo }}</td>
+				<td>{{ solicituddecambio.item.nombre }}</td>
+	 			{% for voto in listVotos %}
+					{% if voto.idsolicituddecambio == solicituddecambio.idsolicituddecambio %}
+				<td>{{ voto.voto }}</td>						
+					{% endif %}
+				{% endfor %}
 			</tr>  	
   	{% endfor %}
 	  	

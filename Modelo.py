@@ -20,8 +20,8 @@ __file__ = 'Modelo.py'
 #rutaBD='postgresql+psycopg2://admin:admin@localhost/BDDEPRUEBA'
 rutaBD='postgresql+psycopg2://admin:admin@localhost/sgptest'
 
-engine = create_engine(os.environ['DATABASE_URI'])
-#engine=create_engine(rutaBD)
+#engine = create_engine(os.environ['DATABASE_URI'])
+engine=create_engine(rutaBD)
 Base= declarative_base()
 
 """------------------------TABLAS DE RELACION---------------------------------------"""
@@ -297,6 +297,7 @@ class LineaBase(Base):
     estado = Column(String(45))
     numero = Column(Integer)
     
+    
     def __init__(self, idlineabase, idfase, estado, numero):
         self.idlineabase = idlineabase
         self.idfase = idfase
@@ -361,10 +362,12 @@ class SolicitudPorUsuarioCC(Base):
     solicituddecambio = relationship("SolicitudDeCambio")
     
 
-    def __init__(self, idsolicituddecambio, idusuariocc, idproyectocc):
+    def __init__(self, idsolicituddecambio, idusuariocc, idproyectocc,voto):
         self.idsolicituddecambio = idsolicituddecambio
         self.idusuariocc = idusuariocc
         self.idproyectocc = idproyectocc
+        self.voto = voto
+
 
     def __repr__(self):
         return "<SolicitudPorUsuarioCC '%s' '%s' '%s'>" % self.idsolicituddecambio, self.idusuariocc, self.idproyectocc

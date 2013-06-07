@@ -29,7 +29,7 @@
 			<th scope="col">OK</th>
 			</tr>
             	{% for item in listItem %}
-            		{% if item.iditem != iditem %}
+            		{% if item.iditem != iditem and item.estado != 'eliminado' %}
 						<tr>
 						<td>{{ item.nombre }}</td>
 						{% if item.iditem in relacionadoList %}
