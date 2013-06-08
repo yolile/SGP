@@ -234,7 +234,7 @@ class Item(Base):
     idlineabase = Column (Integer,ForeignKey ('lineabase.idlineabase'))
     
     archivos = relationship("Archivo", secondary=ArchivoItem)
-    
+    versiones = relationship("VersionItem")
     
     def __init__(self, iditem, nombre, estado, idtipoitem,idfase,idlineabase=None):
         self.iditem = iditem
@@ -333,14 +333,15 @@ class SolicitudDeCambio(Base):
     descripcion = Column(String(200))
     estado = Column(String(45))
     tipo = Column(String(45))
-    
+    costo = Column(String(45))
+    impacto = Column(String(45))
     iditem = Column(Integer, ForeignKey('item.iditem'))
     item = relationship("Item", backref=backref("solicituddecambio", uselist=False))
     
     idversionitem = Column(Integer, ForeignKey('versionitem.idversionitem'))
     versionitem = relationship("VersionItem", backref=backref("solicituddecambio", uselist=False))
      
-    def __init__(self, idsolicituddecambio, idusuariosolicitante, descripcion,tipo,iditem,idversionitem,estado):
+    def __init__(self, idsolicituddecambio, idusuariosolicitante, descripcion,tipo,iditem,idversionitem,estado,costo,impacto):
         self.idsolicituddecambio = idsolicituddecambio
         self.idusuariosolicitante =  idusuariosolicitante
         self.descripcion = descripcion
@@ -348,6 +349,9 @@ class SolicitudDeCambio(Base):
         self.iditem = iditem
         self.idversionitem = idversionitem
         self.estado=estado
+        self.costo=costo
+        self.impacto=impacto
+        
     def __repr__(self):
         return "<SolicitudDeCambio '%s' '%s' '%s' '%s' '%s' '%s' '%s' >" % self.idsolicituddecambio, self.idusuariosolicitante, self.descripcion, self.estado, self.tipo, self.iditem, self.idversionitem
 

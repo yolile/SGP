@@ -19,7 +19,7 @@ __credits__ = 'none'
 __text__ = 'indice principal que conmuta con las diferentes funcionalidades de SGP'
 __file__ = 'index.py' 
 
-app = Flask(__name__,template_folder='/home/divina/git/SGP/templates')
+app = Flask(__name__,template_folder='/home/thelma/git/SGP/templates')
 app.debug = True
 app.secret_key = 'secreto'
 app.config.from_object(__name__)
@@ -1248,9 +1248,9 @@ def gestionarArchivos():
 """-----------------------Enviar Solicitud de Cambio---------------------------------------"""
 @app.route('/enviarSolicitud', methods=['GET','POST'])
 def enviarSolicitud():
-    """Funcion para enviar solicitud de cambio"""  
+    """Funcion para enviar solicitud de cambio""" 
+    global iditem 
     if request.method == 'GET':
-        global iditem
         item=CtrlFase.getItem(iditem)
         global versionitem
         global tipo
@@ -1265,11 +1265,16 @@ def enviarSolicitud():
                                    listaValores=listaValores,
                                    listaAtributos=listaAtributos)
     if request.method == 'POST':
+        item=CtrlFase.getItem(iditem)
         if (request.form['opcion']=="Enviar"):
+            costoeimpacto=[]
+            costoeimpacto=CtrlFase.recorridoEnProfundidad(item)
             CtrlFase.enviarSolicitud(CtrlAdmUsr.getIdByUsername(owner),
                                      tipo,
                                      iditem,
-                                     versionitem)
+                                     versionitem,
+                                     str(costoeimpacto[0]),
+                                     str(costoeimpacto[1]))
             flash('Solicitud enviada')
             return redirect(url_for('proyectoX'))
         if (request.form['opcion']=="Cancelar"):

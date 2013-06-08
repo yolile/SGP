@@ -13,6 +13,9 @@ __file__ = 'CtrlFase.py'
 #engine = create_engine('postgresql+psycopg2://admin:admin@localhost/sgptest')
 Session = sessionmaker(bind=engine)
 session = Session() 
+sumacosto=0
+sumaimpacto=0
+visitados=[]
     
 def getItemList(): 
     """Funcion que retorna la lista de todos los items de una fase."""
@@ -155,7 +158,8 @@ def busquedaItem(parametro,atributo,idfase):
 def getVersionActual(iditem):
     """Funcion para obtener la version actual de VersionItem"""
     versiones = session.query(VersionItem).filter(and_(VersionItem.iditem==iditem,
-                                                     VersionItem.estado!='pendiente')).all()
+                                                     VersionItem.estado!='pendiente',
+                                                     VersionItem.estado!='no-actual')).all()
     idversionmax = 0
     versionmax = None
     for version in versiones:
@@ -252,7 +256,7 @@ def getMaxIdSolicitudCambio():
             idsolicitudmax = solicitud.idsolicituddecambio
     return idsolicitudmax
     
-def enviarSolicitud(idusuariosolicitante,tipo,iditem,versionitem):
+def enviarSolicitud(idusuariosolicitante,tipo,iditem,versionitem,costo,impacto):
     usuario = session.query(Usuario).filter(Usuario.idusuario==idusuariosolicitante).first()
     item = session.query(Item).filter(Item.iditem==iditem).first()
     fase = session.query(Fase).filter(Fase.idfase==item.idfase).first()
@@ -274,7 +278,9 @@ def enviarSolicitud(idusuariosolicitante,tipo,iditem,versionitem):
                                   tipo,
                                   iditem,
                                   versionitem.idversionitem,
-                                  'en-proceso')
+                                  'en-proceso',
+                                  costo+' Gs.',
+                                  impacto)
     elif tipo == 'modificar':
         version = 0
         lista = getVersionItemList()
@@ -301,7 +307,9 @@ def enviarSolicitud(idusuariosolicitante,tipo,iditem,versionitem):
                                   tipo,
                                   iditem,
                                   nuevoVersion.idversionitem,
-                                  'en-proceso')
+                                  'en-proceso',
+                                  costo+' Gs',
+                                  impacto)
 
 
     elif tipo == 'eliminar':
@@ -311,7 +319,9 @@ def enviarSolicitud(idusuariosolicitante,tipo,iditem,versionitem):
                                   tipo,
                                   iditem,
                                   None,
-                                  'en-proceso')
+                                  'en-proceso',
+                                  costo+' Gs',
+                                  impacto)
     solicitudCC = []
     for u in proyecto.comitecambios:
         solicitudCC.append(SolicitudPorUsuarioCC(nuevo.idsolicituddecambio,u.idusuario,proyecto.idproyecto,'Pendiente'))
@@ -405,3 +415,48 @@ def revivirItem(iditem):
     item = session.query(Item).filter(Item.iditem==iditem).first()
     item.estado = 'desarrollo'
     session.commit()    
+    
+def recorridoEnProfundidad(item):
+    """Funcion que llama a la funcion que recorre el grafo en profundidad para hallar
+    el total de los costos y las complejidades de un item. Retorna un vector en el 
+    que el primer elemento es el costo y el segundo es el impacto"""
+    #proyecto = getItem(iditem).fase.proyecto
+    proyecto=item.fase.proyecto
+    listaitems = getItemsProyecto(proyecto.idproyecto)
+    maxiditem = getMaxIdItemEnLista(listaitems)
+    global sumacosto, sumaimpacto,visitados
+    visitados = [0]*(maxiditem+1)
+    sumacosto=0
+    sumaimpacto=0
+    recorrer(item.iditem)
+    ret = [sumacosto,sumaimpacto]
+    return ret
+
+def recorrer(iditem):
+    """Funcion recursiva que calcula sumas de los items recorriendo el grafo en profundidad"""
+    global sumacosto, sumaimpacto, visitados
+    visitados[iditem]=1
+    #print ('Visite  el item '+str(iditem))
+    version=getVersionActual(iditem)
+    sumacosto = sumacosto + version.costo
+    sumaimpacto = sumaimpacto + version.complejidad
+    relaciones = getRelaciones(iditem)
+    for relacion in relaciones:
+        if(visitados[relacion.alitem]==0):
+            recorrer(relacion.alitem)
+    
+def getItemsProyecto(idproyecto):
+    lista = []
+    proyecto=session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
+    for fase in proyecto.fases:
+        for item in fase.items:
+            if (item.estado != 'eliminado'):
+                lista.append(item)
+    return lista
+
+def getMaxIdItemEnLista(lista):   
+    max=0
+    for item in lista:
+        if item.iditem>max:
+            max=item.iditem
+    return max
