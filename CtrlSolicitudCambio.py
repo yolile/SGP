@@ -7,8 +7,8 @@ import CtrlLineaBase
 
 """Controlador de Solicitudes de Cambio para el modulo de Gestion de Cambios"""  
 __author__ = 'Grupo 5'
-__date__ = '25-05-2013'
-__version__ = '5.0'
+__date__ = '08-06-2013'
+__version__ = '6.0'
 __text__ = 'Este modulo contiene funciones que permiten el control de las Solicitudes de cambio en el modulo de Gestion de Cambios'
 __file__ = 'CtrlSolicitudCambio.py'     
 
@@ -26,21 +26,27 @@ def getSolicitudDeCambio(idsolicituddecambio):
     return solicitud
 
 def votarSolicitud(idsolicituddecambio,idintegrante,voto):
+    """Funcion que recibe una solicitud de cambio, quien fue el votante y el voto para
+    para guardarlo en el sistema"""
     solicitud=session.query(SolicitudPorUsuarioCC).filter(and_(SolicitudPorUsuarioCC.idsolicituddecambio==idsolicituddecambio,
                                                                SolicitudPorUsuarioCC.idusuariocc==idintegrante)).first()
     solicitud.voto = voto
     session.commit()
     
 def getVotobyCC(idusuario):
+    """Funcion que recibe el el id del usuario del comite de cambio
+    y retorna el objeto de la solicitud"""
     solicitud=session.query(SolicitudPorUsuarioCC).filter(SolicitudPorUsuarioCC.idusuariocc==idusuario).all()
     return solicitud
 
 def getestadoVoto(idsolicituddecambio,idintegrante):
+    """Funcion que recibe el id solicitud y el integrante y retorna cual fue su voto"""
     solicitud=session.query(SolicitudPorUsuarioCC).filter(and_(SolicitudPorUsuarioCC.idsolicituddecambio==idsolicituddecambio,
                                                                SolicitudPorUsuarioCC.idusuariocc==idintegrante)).first()
     return solicitud.voto
     
 def contarVotos(idsolicituddecambio):
+    """Funcion que se encarga de contar los votos de una solicitud"""
     votos=session.query(SolicitudPorUsuarioCC).filter(SolicitudPorUsuarioCC.idsolicituddecambio==idsolicituddecambio).all()
     total = len(votos)
     aceptados=0
@@ -59,7 +65,8 @@ def contarVotos(idsolicituddecambio):
             solicitud.estado = 'Rechazado'
         session.commit()  
       
-def revisionLineaBase(idlineabase): 
+def revisionLineaBase(idlineabase):
+    """Funcion que recibe el id de linea base y pone en estado de revision sus items""" 
     itemList = session.query(Item).filter(Item.idlineabase==idlineabase).all()
     for i in itemList:
         i.estado = 'revision'
@@ -70,6 +77,8 @@ def revisionLineaBase(idlineabase):
         
         
 def aplicarCambios(idsolicituddecambio):
+    """Funcion que aplica cambios segun el tipo de solicitud cuando ya 
+    todos los miembros han votado"""
     solicitud = getSolicitudDeCambio(idsolicituddecambio)
     item = CtrlFase.getItem(solicitud.iditem)
     idlineabase = item.idlineabase
