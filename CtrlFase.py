@@ -235,6 +235,7 @@ def busquedaArchivo(parametro,atributo):
     return result
 
 def eliminarItem(iditem):
+    """Funcion que elimina un item"""
     item = session.query(Item).filter(Item.iditem==iditem).first()
     item.estado='eliminado'
     item.idlineabase=None
@@ -244,6 +245,7 @@ def eliminarItem(iditem):
     session.commit()
 
 def getSolicitudCambioList():
+    """Funcion que retorna la lista de solicitudes de cambios"""
     result = session.query(SolicitudDeCambio).all()
     return result
 
@@ -257,6 +259,7 @@ def getMaxIdSolicitudCambio():
     return idsolicitudmax
     
 def enviarSolicitud(idusuariosolicitante,tipo,iditem,versionitem,costo,impacto):
+    """Funcion que envia una solicitud de cambio"""
     usuario = session.query(Usuario).filter(Usuario.idusuario==idusuariosolicitante).first()
     item = session.query(Item).filter(Item.iditem==iditem).first()
     fase = session.query(Fase).filter(Fase.idfase==item.idfase).first()
@@ -332,6 +335,7 @@ def enviarSolicitud(idusuariosolicitante,tipo,iditem,versionitem,costo,impacto):
     session.commit()
     
 def modificarItem(iditem,versionitem,idusuario):
+    """Funcion que modifica un item"""
     actual = getVersionActual(iditem)
     actual.estado='no-actual'
     session.commit()
@@ -355,6 +359,7 @@ def modificarItem(iditem,versionitem,idusuario):
     session.commit()
     
 def existeSolicitudPendiente(iditem):
+    """Funcion que verifica si un item tiene una solicitud de cambio pendiente"""
     listaSC = session.query(SolicitudDeCambio).filter(SolicitudDeCambio.iditem==iditem).all()
     for sc in listaSC:
         if sc.estado == 'en-proceso':
@@ -362,14 +367,17 @@ def existeSolicitudPendiente(iditem):
     return False
 
 def getListVersionbyIdItem(iditem):
+    """Funcion que retorna la lista de versiones de un item"""
     lista = session.query(VersionItem).filter(VersionItem.iditem==iditem).all()
     return lista
 
 def getVersion(idversionitem):
+    """Funcion que retorna el objeto version de un item"""
     version = session.query(VersionItem).filter(VersionItem.idversionitem==idversionitem).first()
     return version
 
 def reversionar(idversionitem,iduser):
+    """Funcion que sirve para reversionar un item"""
     oldversion = getVersion(idversionitem)
     oldversion.estado = 'no-actual'
     idnuevaversion = getMaxIdVersionItem()+1
@@ -446,6 +454,7 @@ def recorrer(iditem):
             recorrer(relacion.alitem)
     
 def getItemsProyecto(idproyecto):
+    """Funcion que retorna todos los items de un proyecto"""
     lista = []
     proyecto=session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
     for fase in proyecto.fases:
@@ -454,7 +463,8 @@ def getItemsProyecto(idproyecto):
                 lista.append(item)
     return lista
 
-def getMaxIdItemEnLista(lista):   
+def getMaxIdItemEnLista(lista): 
+    """Funcion que retorna la lista de ide max de los items"""  
     max=0
     for item in lista:
         if item.iditem>max:
@@ -462,6 +472,7 @@ def getMaxIdItemEnLista(lista):
     return max
 
 def calcularCostoTotal(idproyecto):
+    """Funcion que calcula el costo total del proyecto"""
     costototal=0
     lista = getItemsProyecto(idproyecto)
     for item in lista:
