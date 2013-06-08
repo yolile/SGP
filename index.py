@@ -259,7 +259,7 @@ def conPerm():
 """------------------------PROYECTOS---------------------------------------"""       
 @app.route('/admProy', methods=['GET','POST'])
 def admProy():
-    """Funcion que presenta el menu para administrar Proyectos."""  
+    """Funcion que presenta el menu para administrar Proyectos."""
     if request.method == 'GET':
         global owner
         if CtrlAdmUsr.havePermission(owner,202):
@@ -309,12 +309,18 @@ def admProy():
             proyecto=int(request.form['select'])
             proy = CtrlAdmProy.proy(proyecto) 
             return render_template('importarProy.html',proyecto=proy)
+        if request.form['opcion'] == "Calcular costo total":
+            proyecto=int(request.form['select'])
+            costototal=CtrlFase.calcularCostoTotal(proyecto)
+            listaProy = CtrlAdmProy.getProyectoList()
+            return render_template('admProy.html',listProy=listaProy, costototal=costototal)
+            #return render_template('costoTotal.html',costototal=costototal)
         if request.form['opcion'] == "Finalizar":
             proyecto=int(request.form['select'])
             if (CtrlAdmProy.finalizarProyecto(proyecto)):
                 flash('El proyecto ha sido finalizado exitosamente')
             else:
-                flash('El proyecto no se puede finalizar, existen fases en desarrollo')              
+                flash('El proyecto no se puede finalizar, existen fases en desarrollo')
         return redirect(url_for('admProy'))                 
 
 @app.route('/crearProy', methods=['GET','POST'])

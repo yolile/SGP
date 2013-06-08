@@ -450,7 +450,7 @@ def getItemsProyecto(idproyecto):
     proyecto=session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
     for fase in proyecto.fases:
         for item in fase.items:
-            if (item.estado != 'eliminado'):
+            if (item.estado != 'eliminado' or item.estado != 'pendiente'):
                 lista.append(item)
     return lista
 
@@ -460,3 +460,11 @@ def getMaxIdItemEnLista(lista):
         if item.iditem>max:
             max=item.iditem
     return max
+
+def calcularCostoTotal(idproyecto):
+    costototal=0
+    lista = getItemsProyecto(idproyecto)
+    for item in lista:
+        version=getVersionActual(item.iditem)
+        costototal=costototal+version.costo
+    return costototal
