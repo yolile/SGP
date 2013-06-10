@@ -986,12 +986,19 @@ def admHistorial():
                 flash('No se puede reversionar a la version actual')
                 return redirect(url_for('admHistorial'))
             global versionitem
-            versionitem = CtrlFase.getVersion(int(request.form['idversionitem']))
-            
+            versionant = CtrlFase.getVersion(int(request.form['idversionitem']))
+            versionitem = CtrlFase.instanciarVersionItem(versionant.iditem,
+                                    CtrlAdmUsr.getIdByUsername(owner),
+                                    versionant.descripcion,
+                                    versionant.complejidad,
+                                    versionant.prioridad,
+                                    versionant.costo,
+                                    CtrlFase.getVersionActual(iditem).version+1,
+                                    'no-actual')
             i = CtrlFase.getItem(iditem)
             if i.estado == 'bloqueado':
                     global tipo
-                    tipo = 'modificar'
+                    tipo = 'reversionar'
                     return redirect(url_for('enviarSolicitud')) 
             elif i.estado == 'desarrollo':
                     global owner
@@ -1020,7 +1027,7 @@ def modItem():
     if request.method == 'POST':
         if request.form['opcion'] == "Modificar":
             versionitem = CtrlFase.instanciarVersionItem(versionitem.iditem,
-                                    versionitem.idusuario,
+                                    CtrlAdmUsr.getIdByUsername(owner),
                                     request.form['descripcion'],
                                     int(request.form['complejidad']),
                                     int(request.form['prioridad']),
@@ -1033,7 +1040,7 @@ def modItem():
                     tipo = 'modificar'
                     return redirect(url_for('enviarSolicitud')) 
             elif i.estado == 'desarrollo':
-                    CtrlFase.modificarItem(iditem,versionitem,CtrlAdmUsr.getIdByUsername(owner))
+                    CtrlFase.modificarItem(iditem,versionitem)
                     flash('Item modificado')
         return redirect(url_for('proyectoX'))
 
