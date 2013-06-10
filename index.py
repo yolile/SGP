@@ -10,6 +10,7 @@ import CtrlFase
 import CtrlLineaBase
 import CtrlSolicitudCambio
 from flask.exceptions import BadRequest
+import sqlalchemy.exc
 
 """Modulo de ejecucion principal de SGP"""  
 __author__ = 'Grupo 5'
@@ -111,10 +112,15 @@ def admUsr():
             usr = CtrlAdmUsr.usr(int(request.form['select']))        
             return render_template('modUsr.html', usr=usr) 
         if request.form['opcion'] == "Eliminar":
-            CtrlAdmUsr.elimUsr(int(request.form['select']))   
-            listUser = CtrlAdmUsr.getUsuarioList()
-            flash('Usuario eliminado')
-            return render_template('admUsr.html', listUser=listUser) 
+            usr = CtrlAdmUsr.usr(int(request.form['select']))
+            if CtrlAdmUsr.usuarioBorrable(usr):
+                CtrlAdmUsr.elimUsr(int(request.form['select']))   
+                listUser = CtrlAdmUsr.getUsuarioList()
+                flash('Usuario eliminado')
+                return render_template('admUsr.html', listUser=listUser)
+            else:
+                flash('Imposible eliminar este usuario, tiene proyectos asignados')
+                return redirect(url_for('admUsr'))
         if request.form['opcion'] == "Consultar":
             usr = CtrlAdmUsr.usr(int(request.form['select'])) 
             idroles = CtrlAdmUsr.idRolList(int(usr.idusuario))  
@@ -172,7 +178,7 @@ def asigRoles():
             CtrlAdmUsr.asigRoles(int(request.form['idusuario']),
                                  request.form.getlist('roles'))
             flash('Roles asignados al usuario')
-    return redirect(url_for('admUsr'))
+    return redirect(url_for('admUsr'))           
        
 """------------------------ROLES---------------------------------------"""         
 @app.route('/admRol', methods=['GET','POST'])
@@ -1483,11 +1489,11 @@ def votarSolicitud():
         if request.form['opcion'] == "Aceptar Solicitud":
             CtrlSolicitudCambio.votarSolicitud(idsolicituddecambio,CtrlAdmUsr.getIdByUsername(owner),'Aceptado')
             CtrlSolicitudCambio.contarVotos(idsolicituddecambio)
-            flash('Su voto a sido registrado')
+            flash('Su voto ha sido registrado')
         if request.form['opcion'] == "Rechazar Solicitud":
             CtrlSolicitudCambio.votarSolicitud(idsolicituddecambio,CtrlAdmUsr.getIdByUsername(owner),'Rechazado')
             CtrlSolicitudCambio.contarVotos(idsolicituddecambio)
-            flash('Su voto a sido registrado')
+            flash('Su voto ha sido registrado')
         return redirect(url_for('bandejaEntrada'))  
         
 if __name__=='__main__':
