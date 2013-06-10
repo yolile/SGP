@@ -290,7 +290,7 @@ def importarProy(idproyectoimp,username):
                        date.today(),
                        importedproy.complejidad,
                        'no-iniciado',
-                       importedproy.usuariolider,
+                       usuariolider,
                        importedproy.presupuesto)
     session.add(newproy)
     session.commit()
@@ -336,3 +336,5 @@ def setProyFinalizado(idproyecto):
     proyecto = proy(idproyecto)
     proyecto.estado = 'finalizado'
     session.commit()     
+           
+    
