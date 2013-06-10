@@ -274,7 +274,9 @@ def enviarSolicitud(idusuariosolicitante,tipo,iditem,versionitem,costo,impacto):
     des_item='-Item: '+item.nombre
     descripcion = des_usuario+des_fecha+des_proyecto+des_fase+des_lineabase+des_item
 
-    if tipo == 'reversionar':    
+    if tipo == 'reversionar':
+        session.add(versionitem)
+        session.commit()
         nuevo = SolicitudDeCambio(getMaxIdSolicitudCambio()+1, 
                                   idusuariosolicitante, 
                                   descripcion,
@@ -285,23 +287,7 @@ def enviarSolicitud(idusuariosolicitante,tipo,iditem,versionitem,costo,impacto):
                                   costo+' Gs.',
                                   impacto)
     elif tipo == 'modificar':
-        version = 0
-        lista = getVersionItemList()
-        for v in lista:
-            if version < v.version and v.iditem==iditem:
-                version = v.version
-    
-        nuevoVersion = VersionItem(getMaxIdVersionItem()+1, 
-                                   iditem, 
-                                   usuario.idusuario,
-                                   versionitem.descripcion,
-                                   versionitem.complejidad,
-                                   versionitem.prioridad,
-                                   versionitem.costo,
-                                   version+1,
-                                   'no-actual')
-
-        session.add(nuevoVersion)
+        session.add(versionitem)
         session.commit()
         
         nuevo = SolicitudDeCambio(getMaxIdSolicitudCambio()+1, 
@@ -309,11 +295,10 @@ def enviarSolicitud(idusuariosolicitante,tipo,iditem,versionitem,costo,impacto):
                                   descripcion,
                                   tipo,
                                   iditem,
-                                  nuevoVersion.idversionitem,
+                                  versionitem.idversionitem,
                                   'en-proceso',
                                   costo+' Gs',
                                   impacto)
-
 
     elif tipo == 'eliminar':
         nuevo = SolicitudDeCambio(getMaxIdSolicitudCambio()+1, 
@@ -334,28 +319,12 @@ def enviarSolicitud(idusuariosolicitante,tipo,iditem,versionitem,costo,impacto):
     session.add_all(solicitudCC)
     session.commit()
     
-def modificarItem(iditem,versionitem,idusuario):
+def modificarItem(iditem,versionitem):
     """Funcion que modifica un item"""
     actual = getVersionActual(iditem)
-    actual.estado='no-actual'
     session.commit()
-    
-    version = 0
-    lista = getVersionItemList()
-    for v in lista:
-        if version < v.version and v.iditem==iditem:
-            version = v.version
-    
-    nuevo = instanciarVersionItem(iditem,
-                                  idusuario,
-                                  versionitem.descripcion,
-                                  versionitem.complejidad,
-                                  versionitem.prioridad,
-                                  versionitem.costo,
-                                  version+1,
-                                  'actual')
-    
-    session.add(nuevo)
+    versionitem.estado='actual'
+    session.add(versionitem)
     session.commit()
     
 def existeSolicitudPendiente(iditem):
@@ -368,7 +337,8 @@ def existeSolicitudPendiente(iditem):
 
 def getListVersionbyIdItem(iditem):
     """Funcion que retorna la lista de versiones de un item"""
-    lista = session.query(VersionItem).filter(VersionItem.iditem==iditem).all()
+    lista = session.query(VersionItem).filter((and_(VersionItem.iditem==iditem,
+                                                    VersionItem.estado!='no-actual'))).all()
     return lista
 
 def getVersion(idversionitem):

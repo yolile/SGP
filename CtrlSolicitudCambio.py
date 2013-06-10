@@ -97,15 +97,8 @@ def aplicarCambios(idsolicituddecambio):
         
     if solicitud.tipo == 'eliminar':
         CtrlFase.eliminarItem(solicitud.iditem)
-    elif solicitud.tipo == 'reversionar':
-        """Preguntar a Thelma"""
-        versionAnt = session.query(VersionItem).filter(VersionItem.estado=='actual').first()
-        versionAnt.estado = 'no-actual'
-        solicitud.versionitem.estado = 'actual'
-        session.commit()
-    elif solicitud.tipo == 'modificar':
-        versionAnt = session.query(VersionItem).filter(VersionItem.estado=='actual').first()
-        versionAnt.estado = 'no-actual'
+    elif solicitud.tipo == 'reversionar' or solicitud.tipo == 'modificar':
+        versionAnt = CtrlFase.getVersionActual(solicitud.iditem)
         versionNva = session.query(VersionItem).filter(VersionItem.idversionitem==solicitud.idversionitem).first()
         versionNva.estado = 'actual'
         session.commit()

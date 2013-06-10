@@ -16,12 +16,13 @@ session = Session()
 
 def getUsuarioList():
     """Funcion que retorna la lista de todos los usuarios en la base de datos."""
-    result = session.query(Usuario).all()
+    result = session.query(Usuario).filter(Usuario.estado==1).all()
     return result
 
 def validarUsuario(username, password):
     """Funcion que retorna verdadero si el usuario y password son correctos."""
-    usr = session.query(Usuario).filter(and_(Usuario.username==username,Usuario.passwrd==password)).first()
+    usr = session.query(Usuario).filter(and_(Usuario.username==username,Usuario.passwrd==password,
+                                             Usuario.estado==1)).first()
     return (usr!=None)
 
 def idRolList(idusuario):
@@ -45,7 +46,7 @@ def getMayorIdUsuario():
     lista = getUsuarioList()
     idusuariomax =0
     for user in lista:
-        if idusuariomax < user.idusuario:
+        if idusuariomax < user.idusuario and user.estado==1:
             idusuariomax = user.idusuario
     return idusuariomax   
 
@@ -60,7 +61,7 @@ def crearUsr(username,passwrd,nombre,apellido,telefono,ci):
 def elimUsr(iduser):
     """Funcion que recibe el Id de un Usuario y elimina de la base de datos"""
     res = session.query(Usuario).filter(Usuario.idusuario==iduser).first()
-    session.delete(res)
+    res.estado=0
     session.commit()
     
 def modUsr(iduser,username,passwrd,nombre,apellido,telefono,ci):
@@ -86,11 +87,14 @@ def asigRoles(iduser,idRolList):
 def busquedaUsr(parametro,atributo):
     """Funcion que recibe un parametro de busqueda y el atributo por el cual buscar y retorna coincidencias"""
     if atributo == 'nombre':
-        result = session.query(Usuario).filter(Usuario.nombre.like(parametro+'%')).all()
+        result = session.query(Usuario).filter((and_(Usuario.nombre.like(parametro+'%'),
+                                                     Usuario.estado==1))).all()
     if atributo == 'apellido':
-        result = session.query(Usuario).filter(Usuario.apellido.like(parametro+'%')).all()
+        result = session.query(Usuario).filter((and_(Usuario.apellido.like(parametro+'%'),
+                                                     Usuario.estado==1))).all()
     if atributo == 'username':
-        result = session.query(Usuario).filter(Usuario.username.like(parametro+'%')).all()
+        result = session.query(Usuario).filter((and_(Usuario.username.like(parametro+'%'),
+                                                     Usuario.estado==1))).all()
     return result
 
 def usr(iduser):
@@ -103,7 +107,7 @@ def havePermission(usr,permiso):
     verifica si el usuario puede tiene acceso a ese permiso"""
     lista = session.query(Usuario).join((Rol,Usuario.roles)).join((Permiso, Rol.permisos)).filter(Permiso.idpermiso==permiso).all()
     for user in lista:
-        if user.username == usr:
+        if user.username == usr and user.estado==1:
             return True
     return False
     
@@ -138,6 +142,18 @@ def tienePermisoEnFase(idfase,username,idpermiso):
                         return True
     return False
 
+def usuarioBorrable(usuario):
+    """Funcion que retorna true si un usuario no es lider ni pertenece al comite
+    de cambios en algun proyecto"""
+    proyectos = session.query(Proyecto).filter(Proyecto.estado!='eliminado').all()
+    for proyecto in proyectos:
+        if proyecto.usuariolider==usuario.idusuario:
+            return False
+        for user in proyecto.comitecambios:
+            if user.idusuario==usuario.idusuario:
+                return False
+    return True
+
 #===============================================================================
 # Funciones utilizadas en test
 #===============================================================================
@@ -162,3 +178,4 @@ def modificarUsr(iduser,username,passwrd,nombre,apellido,telefono,ci):
     usr.telefono = telefono
     usr.ci = ci
     session.commit()
+    
