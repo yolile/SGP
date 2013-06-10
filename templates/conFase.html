@@ -1,0 +1,48 @@
+{% extends "layout.html" %}
+{% block body %}
+	<body class=formato2>
+        <form class='estilos' action="{{ url_for('conProy') }}" method=get>
+            <center><h1>Consulta de Fase</h1></center>
+            <br>
+            <div><label>Proyecto:</label>{{ fase.proyecto.nombre }}</div>
+            <div><label>Numero de fase:</label>{{ fase.posicionfase }}</div>
+            <div><label>Nombre:</label>{{ fase.nombre }}</div>
+            <div><label>Descripcion:</label>{{ fase.descripcion }}</div>
+            <div><label>Estado:</label>{{ fase.estado }}</div>
+            <center><div style="height:150px;width:90%;overflow:auto">
+            <table width="100%" border="0">
+	            <th scope="col" width="50%">Tipos de Item</th>
+	            <th scope="col" width="50%">Roles</th>
+            <tr>
+            	<td align="left" valign="top">
+					<table width="100%" border="1">
+					<tr>
+					<th scope="col" align="center">Nombre</th>
+					</tr>
+		            	{% for tipoitem in fase.tipositems %}
+								<tr>
+								<td>{{ tipoitem.nombre }}</td>
+								</tr>  	
+		  				{% endfor %}
+					</table>
+				</td>
+            	<td align="left" valign="top">
+					<table width="100%" border="1">
+					<tr>
+					<th scope="col" align="center">Nombre</th>
+					</tr>
+		            	{% for rol in fase.roles %}
+								<tr>
+								<td>{{ rol.nombre }}</td>
+								</tr>  	
+		  				{% endfor %}
+					</table>
+				</td>			
+			</tr>
+			</table>
+			</div></center>
+		    <div><center><input type='submit' value='Aceptar'>
+            </div>
+        </form>
+    </body>
+{% endblock %}

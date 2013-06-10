@@ -19,7 +19,7 @@ __credits__ = 'none'
 __text__ = 'indice principal que conmuta con las diferentes funcionalidades de SGP'
 __file__ = 'index.py' 
 
-app = Flask(__name__,template_folder='/home/divina/git/SGP/templates')
+app = Flask(__name__,template_folder='/home/thelma/git/SGP/templates')
 app.debug = True
 app.secret_key = 'secreto'
 app.config.from_object(__name__)
@@ -358,17 +358,10 @@ def conProy():
     if request.method == 'POST':
         if (request.form['opcion']=='Atras'):
             return redirect(url_for('admProy'))
-        if(request.form['opcion'] == "Consultar Tipos de Item"):
+        if(request.form['opcion'] == "Consultar Fase"):
             try:
                 fase=CtrlAdmProy.getFase(int(request.form['select']))
-                return render_template("conTipoItemFase.html",fase=fase)
-            except BadRequest:
-                flash('Ninguna fase seleccionada')
-                return redirect(url_for('conProy'))
-        if(request.form['opcion'] == "Consultar Roles"):
-            try:
-                fase=CtrlAdmProy.getFase(int(request.form['select']))
-                return render_template("conRolFase.html",fase=fase)
+                return render_template("conFase.html",fase=fase)
             except BadRequest:
                 flash('Ninguna fase seleccionada')
                 return redirect(url_for('conProy'))
