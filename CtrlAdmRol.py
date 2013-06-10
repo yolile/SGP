@@ -1,4 +1,4 @@
-from Modelo import Permiso, Rol, engine
+from Modelo import Permiso, Rol, engine, Fase, Usuario
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
    
@@ -104,6 +104,20 @@ def busquedaRol(parametro,atributo):
         result = session.query(Rol).filter(Rol.nombre.like(parametro+'%')).all()
     return result
 
+def rolBorrable(idrol):
+    """Funcion que recibe un idrol y retorna true si el mismo no esta asignado
+    a ninguna fase, False en caso contrario"""
+    listafases = session.query(Fase).all()
+    for fase in listafases:
+        for rol in fase.roles:
+            if (rol.idrol==idrol):
+                return False
+    listausuarios = session.query(Usuario).all()
+    for usuario in listausuarios:
+        for rol in usuario.roles:
+            if (rol.idrol==idrol):
+                return False
+    return True
     
 #===============================================================================
 # Funciones utilizadas en tests
