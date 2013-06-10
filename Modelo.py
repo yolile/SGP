@@ -64,6 +64,7 @@ class Usuario(Base):
     nombre = Column(String(45))
     apellido = Column(String(45))
     telefono = Column(String(45))
+    estado = Column(Integer)
     ci = Column(Integer)
     roles = relationship("Rol",secondary=RolUsuario)   
      
@@ -75,6 +76,7 @@ class Usuario(Base):
         self.apellido = apellido
         self.telefono = telefono
         self.ci = ci
+        self.estado=1
  
     def __repr__(self):
         return "<Usuario '%s' '%s' '%s' '%s' '%s' '%s' '%s'>" % self.idusuario, self.username, self.passwrd, self.nombre, self.apellido, self.telefono, self.ci 
