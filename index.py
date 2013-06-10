@@ -56,6 +56,10 @@ def login():
             global owner
             owner = request.form['username']
             session['logged_in'] = True
+            existe=CtrlSolicitudCambio.existeSolicitudPendienteUsuario(CtrlAdmUsr.getIdByUsername(owner))
+            if (existe):
+                flash('Estas logueado. Posees solicitud(es) de cambio pendiente(s)')
+                return redirect(url_for('menu'))
             flash('Estas logueado')
             return redirect(url_for('menu'))
         return render_template('login.html', error='Username invalido o Password invalido')
@@ -204,10 +208,14 @@ def admRol():
                                                  idpermisos=idpermisos,
                                                  listPermiso=listPermiso) 
         if request.form['opcion'] == "Eliminar":
-            CtrlAdmRol.elimRol(int(request.form['select']))   
-            listRol = CtrlAdmRol.getRolList()
-            flash('Rol eliminado')
-            return render_template('admRol.html', listRol=listRol)
+            if CtrlAdmRol.rolBorrable(int(request.form['select'])):
+                CtrlAdmRol.elimRol(int(request.form['select']))   
+                listRol = CtrlAdmRol.getRolList()
+                flash('Rol eliminado')
+                return render_template('admRol.html', listRol=listRol)
+            else:
+                flash('Imposible eliminar. Rol asignado a fase(s) o usuario(s)')
+                return redirect(url_for('admRol'))
         if request.form['opcion'] == "Consultar":
             rol = CtrlAdmRol.rol(int(request.form['select']))        
             idpermisos = CtrlAdmRol.idPermisoList(int(rol.idrol))   

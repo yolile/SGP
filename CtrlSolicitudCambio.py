@@ -20,6 +20,13 @@ def getSolicitudesbyCC(idusuario):
     lista = session.query(SolicitudDeCambio).join((SolicitudPorUsuarioCC.solicituddecambio,SolicitudDeCambio)).filter(SolicitudPorUsuarioCC.idusuariocc==idusuario).all()
     return lista
 
+def existeSolicitudPendienteUsuario(idusuario):
+    lista=getSolicitudesbyCC(idusuario)
+    for solicitud in lista:
+        if (solicitud.estado=='en-proceso'):
+            return True
+    return False
+      
 def getSolicitudDeCambio(idsolicituddecambio):
     """Funcion que obtiene una solicitud de cambio"""
     solicitud = session.query(SolicitudDeCambio).filter(SolicitudDeCambio.idsolicituddecambio==idsolicituddecambio).first()
