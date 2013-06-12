@@ -2,6 +2,8 @@ from Modelo import *
 from sqlalchemy import create_engine, and_, or_, func
 from sqlalchemy.orm import sessionmaker, join
 from datetime import *
+import CtrlAdmProy
+from operator import itemgetter, attrgetter
 
 """Controlador de Fases en el modulo de desarrollo"""  
 __author__ = 'Grupo 5'
@@ -449,3 +451,43 @@ def calcularCostoTotal(idproyecto):
         version=getVersionActual(item.iditem)
         costototal=costototal+version.costo
     return costototal
+
+"""Para dibujar un proyecto"""
+
+# import pydot
+# from PIL import Image
+# def dibujarProyecto(proyecto):
+#     #inicializar estructuras
+#     grafo = pydot.Dot(graph_type='digraph',fontname="Verdana",rankdir="LR",quadtree="true")
+#     fases = CtrlAdmProy.getFasesListByProy(proyecto.idproyecto)
+#     fases=sorted(fases, key=attrgetter('idfase'))
+#     clusters = []
+#     clusters.append(None)
+#     for fase in fases:
+#         cluster = pydot.Cluster(str(fase.posicionfase),
+#                                 label=str(fase.posicionfase)+") "+fase.nombre)
+#         clusters.append(cluster)
+#     
+#     for cluster in clusters:
+#         if(cluster!=None):
+#             grafo.add_subgraph(cluster)
+#             
+#     items=getItemsProyecto(proyecto.idproyecto)
+#     #agregar nodos
+#     for item in items:
+#         if(item.idlineabase==None):
+#             clusters[item.fase.posicionfase].add_node(pydot.Node(str(item.iditem)))
+#         else:
+#             clusters[item.fase.posicionfase].add_node(pydot.Node(str(item.iditem),
+#                                                                  color="blue"))
+#     #agregar arcos
+#     for item in items:
+#         relaciones = getRelaciones(item.iditem)
+#         for relacion in relaciones:
+#             grafo.add_edge(pydot.Edge(str(item.iditem),str(relacion.alitem)))
+#     grafo.write_png('/home/thelma/git/SGP/grafico.png')
+#     print('done')
+
+# #Para probar
+# proyecto=CtrlAdmProy.proy(1)
+# dibujarProyecto(proyecto)
