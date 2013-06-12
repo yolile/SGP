@@ -20,7 +20,8 @@ __credits__ = 'none'
 __text__ = 'indice principal que conmuta con las diferentes funcionalidades de SGP'
 __file__ = 'index.py' 
 
-app = Flask(__name__,template_folder='/home/thelma/git/SGP/templates')
+ruta = '/home/thelma/git/SGP/templates'
+app = Flask(__name__,template_folder=ruta)
 app.debug = True
 app.secret_key = 'secreto'
 app.config.from_object(__name__)
@@ -952,10 +953,15 @@ def proyectoX():
                                        listFases=listaFases,
                                        faseSeleccionada=faseSeleccionada,
                                        error='Fase finalizada no se pueden revivir items')
-            
-            
-            
+        
+        if request.form['opcion'] == "Actualizar grafo":
+            global proyecto
+            nombre=CtrlFase.dibujarProyecto(CtrlAdmProy.proy(proyecto))
+            listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+            return render_template('proyectoX.html',listFases=listaFases,
+                                   name=nombre)      
         if request.form['opcion'] == "Cerrar Proyecto":
+            #Hacer algo para que se borren los graficos generados
             return redirect(url_for('abrirProyecto')) 
 
 
