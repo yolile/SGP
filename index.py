@@ -1442,6 +1442,12 @@ def proyectoXenGC():
                                    listFases=listaFases,
                                    listLB = listLB,
                                    faseSeleccionada=faseSeleccionada)
+        if request.form['opcion'] == "Actualizar grafo":
+            global proyecto
+            nombre=CtrlFase.dibujarProyecto(CtrlAdmProy.proy(proyecto))
+            listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+            return render_template('proyectoXenGC.html',listFases=listaFases,
+                                   name=nombre) 
         if request.form['opcion'] == "Cerrar Proyecto":
             return redirect(url_for('abrirProyectoEnGC')) 
 

@@ -463,8 +463,14 @@ def dibujarProyecto(proyecto):
     clusters = []
     clusters.append(None)
     for fase in fases:
-        cluster = pydot.Cluster(str(fase.posicionfase),
-                                label=str(fase.posicionfase)+") "+fase.nombre)
+        if(fase.estado=='finalizado'):
+            cluster = pydot.Cluster(str(fase.posicionfase),
+                                    label=str(fase.posicionfase)+") "+fase.nombre,
+                                    style="filled",
+                                    fillcolor="gray")
+        else:
+            cluster = pydot.Cluster(str(fase.posicionfase),
+                                    label=str(fase.posicionfase)+") "+fase.nombre)            
         clusters.append(cluster)
      
     for cluster in clusters:
@@ -475,10 +481,14 @@ def dibujarProyecto(proyecto):
     #agregar nodos
     for item in items:
         if(item.idlineabase==None):
-            clusters[item.fase.posicionfase].add_node(pydot.Node(str(item.iditem)))
+            clusters[item.fase.posicionfase].add_node(pydot.Node(str(item.iditem),
+                                                                 label=item.nombre))
         else:
             clusters[item.fase.posicionfase].add_node(pydot.Node(str(item.iditem),
-                                                                 color="blue"))
+                                                                 label=item.nombre,
+                                                                 style="filled",
+                                                                 fillcolor="blue",
+                                                                 fontcolor="white"))
     #agregar arcos
     for item in items:
         relaciones = getRelaciones(item.iditem)
