@@ -4,6 +4,8 @@ from sqlalchemy.orm import sessionmaker, join
 from datetime import *
 import CtrlAdmProy
 from operator import itemgetter, attrgetter
+from datetime import datetime
+import pydot
 
 """Controlador de Fases en el modulo de desarrollo"""  
 __author__ = 'Grupo 5'
@@ -453,9 +455,6 @@ def calcularCostoTotal(idproyecto):
     return costototal
 
 """Para dibujar un proyecto"""
-
-import pydot
-from PIL import Image
 def dibujarProyecto(proyecto):
     #inicializar estructuras
     grafo = pydot.Dot(graph_type='digraph',fontname="Verdana",rankdir="LR")
@@ -464,8 +463,14 @@ def dibujarProyecto(proyecto):
     clusters = []
     clusters.append(None)
     for fase in fases:
-        cluster = pydot.Cluster(str(fase.posicionfase),
-                                label=str(fase.posicionfase)+") "+fase.nombre)
+        if(fase.estado=='finalizado'):
+            cluster = pydot.Cluster(str(fase.posicionfase),
+                                    label=str(fase.posicionfase)+") "+fase.nombre,
+                                    style="filled",
+                                    fillcolor="gray")
+        else:
+            cluster = pydot.Cluster(str(fase.posicionfase),
+                                    label=str(fase.posicionfase)+") "+fase.nombre)            
         clusters.append(cluster)
      
     for cluster in clusters:
@@ -476,17 +481,20 @@ def dibujarProyecto(proyecto):
     #agregar nodos
     for item in items:
         if(item.idlineabase==None):
-            clusters[item.fase.posicionfase].add_node(pydot.Node(str(item.iditem)))
+            clusters[item.fase.posicionfase].add_node(pydot.Node(str(item.iditem),
+                                                                 label=item.nombre))
         else:
             clusters[item.fase.posicionfase].add_node(pydot.Node(str(item.iditem),
-                                                                 color="blue"))
+                                                                 label=item.nombre,
+                                                                 style="filled",
+                                                                 fillcolor="blue",
+                                                                 fontcolor="white"))
     #agregar arcos
     for item in items:
         relaciones = getRelaciones(item.iditem)
         for relacion in relaciones:
             grafo.add_edge(pydot.Edge(str(item.iditem),str(relacion.alitem)))
     
-    from datetime import datetime
     date=datetime.now()
     name='grafico'+str(date)+'.jpg'
     grafo.write_jpg('/home/thelma/git/SGP/static/img/tmp/'+name)

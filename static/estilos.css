@@ -29,6 +29,13 @@
     background-color: #E2ECEE;    
 }
 
+.formato5 {
+    width: 80%;
+    height: 100%;
+    margin: auto;
+    background-color: #E2ECEE;    
+}
+
 .flash { 
 	background: #CEE5F5; padding: 0.5em;
     border: 1px solid #AACBE2; 
