@@ -4,6 +4,8 @@ from sqlalchemy.orm import sessionmaker, join
 from datetime import *
 import CtrlAdmProy
 from operator import itemgetter, attrgetter
+from datetime import datetime
+import pydot
 
 """Controlador de Fases en el modulo de desarrollo"""  
 __author__ = 'Grupo 5'
@@ -453,9 +455,6 @@ def calcularCostoTotal(idproyecto):
     return costototal
 
 """Para dibujar un proyecto"""
-
-import pydot
-from PIL import Image
 def dibujarProyecto(proyecto):
     #inicializar estructuras
     grafo = pydot.Dot(graph_type='digraph',fontname="Verdana",rankdir="LR")
@@ -486,7 +485,6 @@ def dibujarProyecto(proyecto):
         for relacion in relaciones:
             grafo.add_edge(pydot.Edge(str(item.iditem),str(relacion.alitem)))
     
-    from datetime import datetime
     date=datetime.now()
     name='grafico'+str(date)+'.jpg'
     grafo.write_jpg('/home/thelma/git/SGP/static/img/tmp/'+name)

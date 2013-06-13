@@ -1,8 +1,15 @@
 {% extends "layout.html" %}
 {% block body %}
-<body class=formato1>
+<body class=formato5>
         <form class='estilos' action="{{ url_for('proyectoX') }}" method=post>
              <br>
+             <center><label>Visualizacion del Proyecto</label>
+             {% if name is defined %}
+             <img src="{{ url_for('static', filename= 'img/tmp/'+name) }}" width = 40%>
+             {% endif %}
+             </center>
+             <div><input type='submit' name="opcion" value='Actualizar grafo'></div>
+             <form class='estilos' action="{{ url_for('proyectoX') }}" method=post>
             <div><label>Seleccionar Fase</label>
 					<div><br>	
 							<select name="fase">						
