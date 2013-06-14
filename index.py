@@ -21,7 +21,7 @@ __text__ = 'indice principal que conmuta con las diferentes funcionalidades de S
 __file__ = 'index.py' 
 
 ruta = '/home/thelma/git/SGP/templates'
-app = Flask(__name__,template_folder=ruta)
+app = Flask(__name__,template_folder='/home/thelma/git/SGP/templates')
 app.debug = True
 app.secret_key = 'secreto'
 app.config.from_object(__name__)
@@ -114,30 +114,42 @@ def admUsr():
         if request.form['opcion'] == "Crear":
             return render_template('crearUsr.html')
         if request.form['opcion'] == "Modificar":
-            usr = CtrlAdmUsr.usr(int(request.form['select']))        
-            return render_template('modUsr.html', usr=usr) 
+            try:
+                usr = CtrlAdmUsr.usr(int(request.form['select']))        
+                return render_template('modUsr.html', usr=usr)
+            except BadRequest:
+                return redirect(url_for('admUsr'))
         if request.form['opcion'] == "Eliminar":
-            usr = CtrlAdmUsr.usr(int(request.form['select']))
-            if CtrlAdmUsr.usuarioBorrable(usr):
-                CtrlAdmUsr.elimUsr(int(request.form['select']))   
-                listUser = CtrlAdmUsr.getUsuarioList()
-                flash('Usuario eliminado')
-                return render_template('admUsr.html', listUser=listUser)
-            else:
-                flash('Imposible eliminar este usuario, tiene proyectos asignados')
+            try:
+                usr = CtrlAdmUsr.usr(int(request.form['select']))
+                if CtrlAdmUsr.usuarioBorrable(usr):
+                    CtrlAdmUsr.elimUsr(int(request.form['select']))   
+                    listUser = CtrlAdmUsr.getUsuarioList()
+                    flash('Usuario eliminado')
+                    return render_template('admUsr.html', listUser=listUser)
+                else:
+                    flash('Imposible eliminar este usuario, tiene proyectos asignados')
+                    return redirect(url_for('admUsr'))
+            except BadRequest:
                 return redirect(url_for('admUsr'))
         if request.form['opcion'] == "Consultar":
-            usr = CtrlAdmUsr.usr(int(request.form['select'])) 
-            idroles = CtrlAdmUsr.idRolList(int(usr.idusuario))  
-            listRol = CtrlAdmRol.getRolList()     
-            return render_template('conUsr.html',usr=usr,
-                                                idroles=idroles,
-                                                listRol=listRol)
+            try:
+                usr = CtrlAdmUsr.usr(int(request.form['select'])) 
+                idroles = CtrlAdmUsr.idRolList(int(usr.idusuario))  
+                listRol = CtrlAdmRol.getRolList()     
+                return render_template('conUsr.html',usr=usr,
+                                                    idroles=idroles,
+                                                    listRol=listRol)
+            except BadRequest:
+                return redirect(url_for('admUsr'))
         if request.form['opcion'] == "AsignarRoles":
-            usr = CtrlAdmUsr.usr(int(request.form['select']))    
-            listRol = CtrlAdmRol.getRolList()     
-            idroles = CtrlAdmUsr.idRolList(int(request.form['select']))
-            return render_template('asigRoles.html',usr=usr,listRol = listRol, idroles=idroles)                  
+            try:
+                usr = CtrlAdmUsr.usr(int(request.form['select']))    
+                listRol = CtrlAdmRol.getRolList()     
+                idroles = CtrlAdmUsr.idRolList(int(request.form['select']))
+                return render_template('asigRoles.html',usr=usr,listRol = listRol, idroles=idroles)                  
+            except BadRequest:
+                return redirect(url_for('admUsr'))
         if request.form['opcion'] == "Buscar":
             listUser = CtrlAdmUsr.busquedaUsr(request.form['buscar'],
                                          request.form['atributo'])
@@ -202,28 +214,37 @@ def admRol():
             listPermiso = CtrlAdmRol.getPermisoList()   
             return render_template('crearRol.html',listPermiso = listPermiso)
         if request.form['opcion'] == "Modificar":
-            rol = CtrlAdmRol.rol(int(request.form['select']))        
-            idpermisos = CtrlAdmRol.idPermisoList(int(rol.idrol))   
-            listPermiso = CtrlAdmRol.getPermisoList()               
-            return render_template('modRol.html', rol=rol,
-                                                 idpermisos=idpermisos,
-                                                 listPermiso=listPermiso) 
+            try:
+                rol = CtrlAdmRol.rol(int(request.form['select']))        
+                idpermisos = CtrlAdmRol.idPermisoList(int(rol.idrol))   
+                listPermiso = CtrlAdmRol.getPermisoList()               
+                return render_template('modRol.html', rol=rol,
+                                                     idpermisos=idpermisos,
+                                                     listPermiso=listPermiso)
+            except BadRequest:
+                return redirect(url_for('admRol'))
         if request.form['opcion'] == "Eliminar":
-            if CtrlAdmRol.rolBorrable(int(request.form['select'])):
-                CtrlAdmRol.elimRol(int(request.form['select']))   
-                listRol = CtrlAdmRol.getRolList()
-                flash('Rol eliminado')
-                return render_template('admRol.html', listRol=listRol)
-            else:
-                flash('Imposible eliminar. Rol asignado a fase(s) o usuario(s)')
+            try:
+                if CtrlAdmRol.rolBorrable(int(request.form['select'])):
+                    CtrlAdmRol.elimRol(int(request.form['select']))   
+                    listRol = CtrlAdmRol.getRolList()
+                    flash('Rol eliminado')
+                    return render_template('admRol.html', listRol=listRol)
+                else:
+                    flash('Imposible eliminar. Rol asignado a fase(s) o usuario(s)')
+                    return redirect(url_for('admRol'))
+            except BadRequest:
                 return redirect(url_for('admRol'))
         if request.form['opcion'] == "Consultar":
-            rol = CtrlAdmRol.rol(int(request.form['select']))        
-            idpermisos = CtrlAdmRol.idPermisoList(int(rol.idrol))   
-            listPermiso = CtrlAdmRol.getPermisoList()               
-            return render_template('conRol.html', rol=rol,
-                                                    idpermisos=idpermisos,
-                                                    listPermiso=listPermiso)
+            try:
+                rol = CtrlAdmRol.rol(int(request.form['select']))        
+                idpermisos = CtrlAdmRol.idPermisoList(int(rol.idrol))   
+                listPermiso = CtrlAdmRol.getPermisoList()               
+                return render_template('conRol.html', rol=rol,
+                                                        idpermisos=idpermisos,
+                                                        listPermiso=listPermiso)
+            except BadRequest:
+                return redirect(url_for('admRol'))
         if request.form['opcion'] == "Buscar":
             listRol = CtrlAdmRol.busquedaRol(request.form['buscar'],
                                          request.form['atributo'])
@@ -288,54 +309,77 @@ def admProy():
         if request.form['opcion'] == "Crear":
             return render_template('crearProy.html')
         if request.form['opcion'] == "Definicion de Fases":
-            proyecto=int(request.form['select'])
-            proy = CtrlAdmProy.proy(proyecto)  
-            if proy.estado == 'iniciado':
-                flash("Proyecto iniciado, imposible definir mas fases")
+            try:
+                proyecto=int(request.form['select'])
+                proy = CtrlAdmProy.proy(proyecto)  
+                if proy.estado == 'iniciado':
+                    flash("Proyecto iniciado, imposible definir mas fases")
+                    return redirect(url_for('admProy'))
+                return redirect(url_for('defFases'))
+            except BadRequest:
                 return redirect(url_for('admProy'))
-            return redirect(url_for('defFases'))
         if request.form['opcion'] == "Comite de Cambios":
-            proyecto = int(request.form['select'])
-            return redirect(url_for('admCC'))            
-#             listMiembros = CtrlAdmProy.getMiembrosList(int(request.form['select']))
-#             return render_template('admCC.html', 
-#                                    listUser=listMiembros, 
-#                                    idproyecto=request.form['select'])
+            try:
+                proyecto = int(request.form['select'])
+                return redirect(url_for('admCC'))            
+    #             listMiembros = CtrlAdmProy.getMiembrosList(int(request.form['select']))
+    #             return render_template('admCC.html', 
+    #                                    listUser=listMiembros, 
+    #                                    idproyecto=request.form['select'])
+            except BadRequest:
+                return redirect(url_for('admProy'))
         if request.form['opcion'] == "Buscar":
             listProy = CtrlAdmProy.busquedaProy(request.form['buscar'],
                                          request.form['atributo'])            
             flash('Resultado de la busqueda')
             return render_template('admProy.html',listProy=listProy)
         if request.form['opcion'] == "Eliminar":
-            CtrlAdmProy.elimProy(int(request.form['select']))   
-            listaProy = CtrlAdmProy.getProyectoList()
-            flash('Proyecto eliminado')
-            return render_template('admProy.html',listProy=listaProy)
+            try:
+                CtrlAdmProy.elimProy(int(request.form['select']))   
+                listaProy = CtrlAdmProy.getProyectoList()
+                flash('Proyecto eliminado')
+                return render_template('admProy.html',listProy=listaProy)
+            except BadRequest:
+                return redirect(url_for('admProy'))
         if request.form['opcion'] == "Modificar":
-            proyecto=int(request.form['select'])
-            proy = CtrlAdmProy.proy(proyecto)  
-            return render_template('modProy.html', proyecto=proy) 
+            try:
+                proyecto=int(request.form['select'])
+                proy = CtrlAdmProy.proy(proyecto)  
+                return render_template('modProy.html', proyecto=proy) 
+            except BadRequest:
+                return redirect(url_for('admProy'))
         if request.form['opcion'] == "Home":
             return render_template('main.html')
         if request.form['opcion'] == "Consultar":
-            proyecto=int(request.form['select'])
-            return redirect(url_for('conProy'))
+            try:
+                proyecto=int(request.form['select'])
+                return redirect(url_for('conProy'))
+            except BadRequest:
+                return redirect(url_for('admProy'))
         if request.form['opcion'] == "Importar":
-            proyecto=int(request.form['select'])
-            proy = CtrlAdmProy.proy(proyecto) 
-            return render_template('importarProy.html',proyecto=proy)
+            try:
+                proyecto=int(request.form['select'])
+                proy = CtrlAdmProy.proy(proyecto) 
+                return render_template('importarProy.html',proyecto=proy)
+            except BadRequest:
+                return redirect(url_for('admProy'))
         if request.form['opcion'] == "Calcular costo total":
-            proyecto=int(request.form['select'])
-            costototal=CtrlFase.calcularCostoTotal(proyecto)
-            listaProy = CtrlAdmProy.getProyectoList()
-            return render_template('admProy.html',listProy=listaProy, costototal=costototal)
-            #return render_template('costoTotal.html',costototal=costototal)
+            try:
+                proyecto=int(request.form['select'])
+                costototal=CtrlFase.calcularCostoTotal(proyecto)
+                listaProy = CtrlAdmProy.getProyectoList()
+                return render_template('admProy.html',listProy=listaProy, costototal=costototal)
+            except BadRequest:
+                return redirect(url_for('admProy'))
         if request.form['opcion'] == "Finalizar":
-            proyecto=int(request.form['select'])
-            if (CtrlAdmProy.finalizarProyecto(proyecto)):
-                flash('El proyecto ha sido finalizado exitosamente')
-            else:
-                flash('El proyecto no se puede finalizar, existen fases en desarrollo')
+            try:
+                proyecto=int(request.form['select'])
+                if (CtrlAdmProy.finalizarProyecto(proyecto)):
+                    flash('El proyecto ha sido finalizado exitosamente')
+                else:
+                    flash('El proyecto no se puede finalizar, existen fases en desarrollo')
+            except BadRequest:
+                return redirect(url_for('admProy'))
         return redirect(url_for('admProy'))                 
 
 @app.route('/crearProy', methods=['GET','POST'])
@@ -405,14 +449,15 @@ def defFases():
         return render_template('defFases.html',listFases=listaFases,proyecto=proyecto)
     if request.method == 'POST':
         global owner
-        proy=request.form['proyecto']
         if (request.form['opcion']=="Nueva Fase"):
+            proy=request.form['proyecto']
             if(CtrlAdmProy.getProyEstado(proy)=='no-iniciado'):
                return render_template('crearFase.html',idproyecto=proy)
             else:
                  flash('Proyecto Iniciado, imposible definir mas fases')
                  return redirect(url_for('defFases'))
-        if (request.form['opcion']=="Iniciar Proyecto"):
+        if request.form['opcion']=="Iniciar Proyecto":
+            proy=request.form['proyecto']
             listadefases=CtrlAdmProy.getFasesListByProy(proyecto)
             if(len(listadefases)==0):
                 flash('Debe definirse al menos una fase para iniciar un proyecto')
@@ -423,55 +468,70 @@ def defFases():
             CtrlAdmProy.setProyIniciado(proy)
             flash('Proyecto iniciado')
             return redirect(url_for('admProy'))
-        if (request.form['opcion']=="Atras"):
+        if request.form['opcion']=="Atras":
             return redirect(url_for('admProy'))
-        idfase=int(request.form['select'])
-        if (request.form['opcion']=="Asignar Roles"):
-            if(CtrlAdmUsr.tienePermisoEnFase(idfase,owner,205)==False):
-                flash('No tiene permisos para realizar esta operacion')
+        if request.form['opcion']=="Asignar Roles":
+            try:
+                idfase=int(request.form['select'])
+                if(CtrlAdmUsr.tienePermisoEnFase(idfase,owner,205)==False):
+                    flash('No tiene permisos para realizar esta operacion')
+                    return redirect(url_for('defFases'))
+                if(CtrlAdmProy.getFase(idfase).estado !='no-iniciada'):
+                    flash('No se permite asignar roles a una fase que ha iniciado')
+                    return redirect(url_for('defFases'))
+                listaRoles=CtrlAdmRol.getRolList()
+                idRolesEnFase=[]
+                rolesEnFase=CtrlAdmProy.getFase(idfase).roles
+                for rol in rolesEnFase:
+                    idRolesEnFase.append(rol.idrol)
+                return render_template('asigRolesFase.html',
+                                       listRol=listaRoles,
+                                       idroles=idRolesEnFase,
+                                       idfase=idfase)
+            except BadRequest:
                 return redirect(url_for('defFases'))
-            if(CtrlAdmProy.getFase(idfase).estado !='no-iniciada'):
-                flash('No se permite asignar roles a una fase que ha iniciado')
-                return redirect(url_for('defFases'))
-            listaRoles=CtrlAdmRol.getRolList()
-            idRolesEnFase=[]
-            rolesEnFase=CtrlAdmProy.getFase(idfase).roles
-            for rol in rolesEnFase:
-                idRolesEnFase.append(rol.idrol)
-            return render_template('asigRolesFase.html',
-                                   listRol=listaRoles,
-                                   idroles=idRolesEnFase,
-                                   idfase=idfase)
         if (request.form['opcion']=="Asignar Tipo de Item"):
-            if(CtrlAdmUsr.tienePermisoEnFase(idfase,owner,204)==False):
-                flash('No tiene permisos para realizar esta operacion')
+            try:
+                idfase=int(request.form['select'])
+                if(CtrlAdmUsr.tienePermisoEnFase(idfase,owner,204)==False):
+                    flash('No tiene permisos para realizar esta operacion')
+                    return redirect(url_for('defFases'))
+                if(CtrlAdmProy.getFase(idfase).estado !='no-iniciada'):
+                    flash('No se permite asignar tipos de item a una fase que ha iniciado')
+                    return redirect(url_for('defFases'))
+                listaTipos=CtrlAdmTipoItem.getTipoItemList()
+                idTiposEnFase=[]
+                tiposEnFase=CtrlAdmProy.getFase(idfase).tipositems
+                for tipo in tiposEnFase:
+                    idTiposEnFase.append(tipo.idtipoitem)
+                return render_template('asigTipoItem.html',
+                                       listTipoItem=listaTipos,
+                                       idtipos=idTiposEnFase,
+                                       idfase=idfase)
+            except BadRequest:
                 return redirect(url_for('defFases'))
-            if(CtrlAdmProy.getFase(idfase).estado !='no-iniciada'):
-                flash('No se permite asignar tipos de item a una fase que ha iniciado')
-                return redirect(url_for('defFases'))
-            listaTipos=CtrlAdmTipoItem.getTipoItemList()
-            idTiposEnFase=[]
-            tiposEnFase=CtrlAdmProy.getFase(idfase).tipositems
-            for tipo in tiposEnFase:
-                idTiposEnFase.append(tipo.idtipoitem)
-            return render_template('asigTipoItem.html',
-                                   listTipoItem=listaTipos,
-                                   idtipos=idTiposEnFase,
-                                   idfase=idfase)
         if (request.form['opcion']=="Eliminar"):
-            fase=CtrlAdmProy.getFase(idfase)
-            if(fase.estado=='desarrollo'):
-                flash('Imposible eliminar. Fase en desarrollo')
+            try:
+                idfase=int(request.form['select'])
+                fase=CtrlAdmProy.getFase(idfase)
+                if(fase.estado=='desarrollo'):
+                    flash('Imposible eliminar. Fase en desarrollo')
+                    return redirect(url_for('defFases'))
+                CtrlAdmProy.elimFase(idfase)
+                flash('Fase eliminada')
                 return redirect(url_for('defFases'))
-            CtrlAdmProy.elimFase(idfase)
-            flash('Fase eliminada')
-            return redirect(url_for('defFases'))
+            except BadRequest:
+                return redirect(url_for('defFases'))
         if (request.form['opcion']=='Modificar'):
-            fase=CtrlAdmProy.getFase(idfase)
-            if(fase.estado=='desarrollo'):
-                flash('Imposible modificar. Fase en desarrollo')
+            try:
+                idfase=int(request.form['select'])
+                fase=CtrlAdmProy.getFase(idfase)
+                if(fase.estado=='desarrollo'):
+                    flash('Imposible modificar. Fase en desarrollo')
+                    return redirect(url_for('defFases'))
+                return render_template('modFase.html',fase=fase)
+            except BadRequest:
                 return redirect(url_for('defFases'))
-            return render_template('modFase.html',fase=fase)
         return redirect(url_for('defFases'))
            
 @app.route('/crearFase', methods=['GET','POST'])
@@ -497,21 +557,27 @@ def admCC():
                                    listUser=listMiembros)
     if request.method == 'POST':
         if request.form['opcion'] == "Consultar Miembros":
-            usr = CtrlAdmUsr.usr(int(request.form['select'])) 
-            idroles = CtrlAdmUsr.idRolList(int(usr.idusuario))  
-            listRol = CtrlAdmRol.getRolList()     
-            return render_template('conMiembro.html',
-                                   usr=usr,
-                                   idroles=idroles,
-                                   listRol=listRol)
+            try:
+                usr = CtrlAdmUsr.usr(int(request.form['select'])) 
+                idroles = CtrlAdmUsr.idRolList(int(usr.idusuario))  
+                listRol = CtrlAdmRol.getRolList()     
+                return render_template('conMiembro.html',
+                                       usr=usr,
+                                       idroles=idroles,
+                                       listRol=listRol)
+            except BadRequest:
+                return redirect(url_for('admCC'))
         if request.form['opcion'] == "Modificar Comite de Cambios":
-            listUser = CtrlAdmUsr.getUsuarioList()
-            listidMiembros = CtrlAdmProy.getidMiembrosList(proyecto)
-            usuariolider = CtrlAdmProy.getliderProyecto(proyecto)
-            return render_template('modCC.html', 
-                                   listUser=listUser, 
-                                   listidMiembros=listidMiembros,
-                                   usuariolider=usuariolider) 
+            try:
+                listUser = CtrlAdmUsr.getUsuarioList()
+                listidMiembros = CtrlAdmProy.getidMiembrosList(proyecto)
+                usuariolider = CtrlAdmProy.getliderProyecto(proyecto)
+                return render_template('modCC.html', 
+                                       listUser=listUser, 
+                                       listidMiembros=listidMiembros,
+                                       usuariolider=usuariolider) 
+            except BadRequest:
+                return redirect(url_for('admCC'))
         if request.form['opcion'] == "Administracion de Proyectos":
             return redirect(url_for('admProy')) 
         if request.form['opcion'] == "Home":
@@ -602,24 +668,30 @@ def admTipoItem():
             idtipoitem=CtrlAdmTipoItem.crearTipoItem('','')
             return render_template('crearTipoItem.html',idtipoitemtemp=idtipoitem)
         if request.form['opcion'] == "Consultar":
-            idtipo=int(request.form['select'])
-            listaAtributosTipo=CtrlAdmTipoItem.getAtributosTipo(idtipo)
-            nombre=CtrlAdmTipoItem.getNombre(idtipo)
-            descripcion=CtrlAdmTipoItem.getDescripcion(idtipo)
-            return render_template('conTipoItem.html',idtipoitem=idtipo,
-                                   listAtribTipoItem=listaAtributosTipo,
-                                   nombre=nombre, descripcion=descripcion)
-        if request.form['opcion']=="Redefinir":
-            idtipoitem=int(request.form['select'])
-            if(CtrlAdmTipoItem.tipoDeItemNoInstanciado(idtipoitem)==False):
-                flash('Tipo de Item instanciado, imposible redefinir')
+            try:
+                idtipo=int(request.form['select'])
+                listaAtributosTipo=CtrlAdmTipoItem.getAtributosTipo(idtipo)
+                nombre=CtrlAdmTipoItem.getNombre(idtipo)
+                descripcion=CtrlAdmTipoItem.getDescripcion(idtipo)
+                return render_template('conTipoItem.html',idtipoitem=idtipo,
+                                       listAtribTipoItem=listaAtributosTipo,
+                                       nombre=nombre, descripcion=descripcion)
+            except BadRequest:
                 return redirect(url_for('admTipoItem'))
-            listaAtributosTipo=CtrlAdmTipoItem.getAtributosTipo(idtipoitem)
-            nombre=CtrlAdmTipoItem.getNombre(idtipoitem)
-            descripcion=CtrlAdmTipoItem.getDescripcion(idtipoitem)
-            return render_template('modTipoItem.html',idtipoitem=idtipoitem,
-                                   listAtribTipoItem=listaAtributosTipo,
-                                   nombre=nombre,descripcion=descripcion)
+        if request.form['opcion']=="Redefinir":
+            try:
+                idtipoitem=int(request.form['select'])
+                if(CtrlAdmTipoItem.tipoDeItemNoInstanciado(idtipoitem)==False):
+                    flash('Tipo de Item instanciado, imposible redefinir')
+                    return redirect(url_for('admTipoItem'))
+                listaAtributosTipo=CtrlAdmTipoItem.getAtributosTipo(idtipoitem)
+                nombre=CtrlAdmTipoItem.getNombre(idtipoitem)
+                descripcion=CtrlAdmTipoItem.getDescripcion(idtipoitem)
+                return render_template('modTipoItem.html',idtipoitem=idtipoitem,
+                                       listAtribTipoItem=listaAtributosTipo,
+                                       nombre=nombre,descripcion=descripcion)
+            except BadRequest:
+                return redirect(url_for('admTipoItem'))
         if request.form['opcion'] == "Home":
             return redirect(url_for('menu'))
         
@@ -735,9 +807,12 @@ def abrirProyecto():
             return redirect(url_for('menu')) 
     if request.method == 'POST':
         if request.form['opcion'] == "Abrir":
-            global proyecto
-            proyecto = int(request.form['select'])
-            return redirect(url_for('proyectoX'))
+            try:
+                global proyecto
+                proyecto = int(request.form['select'])
+                return redirect(url_for('proyectoX'))
+            except BadRequest:
+                return redirect(url_for('abrirProyecto'))
         if request.form['opcion'] == "Buscar":
             listProy = CtrlAdmProy.busquedaProy(request.form['buscar'],
                                          request.form['atributo'])
@@ -758,51 +833,57 @@ def proyectoX():
         return render_template('proyectoX.html',listFases=listaFases)
     if request.method == 'POST':
         if (request.form['opcion']=="Crear Item"):
-            idfase = int(request.form['fase'])
-            if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
-                global item
-                global versionitem
-                item = CtrlFase.instanciarItem("","desarrollo",0,idfase)
-                versionitem = CtrlFase.instanciarVersionItem(item.iditem,
-                                                            CtrlAdmUsr.getIdByUsername(owner),
-                                                            "", 
-                                                            0,
-                                                            0,
-                                                            0,
-                                                            1,
-                                                            'actual')
-                global listaAtributoItemPorTipo
-                listaAtributoItemPorTipo = []
-                return redirect(url_for('crearItem'))
-            else:
-                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
-                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
-                return render_template('proyectoX.html',
-                                       listFases=listaFases,
-                                       faseSeleccionada=faseSeleccionada,
-                                       error='Fase finalizada no se pueden agregar items')
-        if (request.form['opcion']=="Relacionar"):
-            idfase = int(request.form['fase'])
-            if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
-                global iditem
-                iditem = int(request.form['iditem'])
-                i = CtrlFase.getItem(iditem)
-                if i.estado == 'bloqueado':
+            try:
+                idfase = int(request.form['fase'])
+                if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
+                    global item
+                    global versionitem
+                    item = CtrlFase.instanciarItem("","desarrollo",0,idfase)
+                    versionitem = CtrlFase.instanciarVersionItem(item.iditem,
+                                                                CtrlAdmUsr.getIdByUsername(owner),
+                                                                "", 
+                                                                0,
+                                                                0,
+                                                                0,
+                                                                1,
+                                                                'actual')
+                    global listaAtributoItemPorTipo
+                    listaAtributoItemPorTipo = []
+                    return redirect(url_for('crearItem'))
+                else:
                     faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
                     listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
                     return render_template('proyectoX.html',
                                            listFases=listaFases,
                                            faseSeleccionada=faseSeleccionada,
-                                           error='El item que escogio se encuentra bloqueado y no se pueden relacionar con otros items')                    
+                                           error='Fase finalizada no se pueden agregar items')
+            except BadRequest:
+                return redirect(url_for('proyectoX'))
+        if (request.form['opcion']=="Relacionar"):
+            try:
+                idfase = int(request.form['fase'])
+                if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
+                    global iditem
+                    iditem = int(request.form['iditem'])
+                    i = CtrlFase.getItem(iditem)
+                    if i.estado == 'bloqueado':
+                        faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                        listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                        return render_template('proyectoX.html',
+                                               listFases=listaFases,
+                                               faseSeleccionada=faseSeleccionada,
+                                               error='El item que escogio se encuentra bloqueado y no se pueden relacionar con otros items')                    
+                    else:
+                        return redirect(url_for('relacion'))
                 else:
-                    return redirect(url_for('relacion'))
-            else:
-                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
-                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
-                return render_template('proyectoX.html',
-                                       listFases=listaFases,
-                                       faseSeleccionada=faseSeleccionada,
-                                       error='Fase finalizada no se pueden relacionar items')
+                    faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                    listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                    return render_template('proyectoX.html',
+                                           listFases=listaFases,
+                                           faseSeleccionada=faseSeleccionada,
+                                           error='Fase finalizada no se pueden relacionar items')
+            except BadRequest:
+                return redirect(url_for('proyectoX'))
         if (request.form['opcion']=="Mostrar Items"):
             listItem = CtrlFase.getItemsFase(int(request.form['fase']))
             faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
@@ -822,138 +903,157 @@ def proyectoX():
                                    listItem = listItem,
                                    faseSeleccionada=faseSeleccionada)
         if request.form['opcion'] == "Consultar Item":
-            iditem=int(request.form['iditem'])
-            item=CtrlFase.getItem(iditem)
-            versionitem=CtrlFase.getVersionActual(item.iditem)
-            listaValores=item.atributos
-            listaAtributos = CtrlAdmTipoItem.getAtributosTipo(item.idtipoitem)            
-            return render_template('conItem.html',
-                                   item=item,
-                                   versionitem=versionitem,
-                                   listaValores=listaValores,
-                                   listaAtributos=listaAtributos)
-        if request.form['opcion'] == "Finalizar Fase":
-            if(CtrlFase.finalizarFase(int(request.form['fase']))):
-                flash('Fase finalizada')
+            try:
+                iditem=int(request.form['iditem'])
+                item=CtrlFase.getItem(iditem)
+                versionitem=CtrlFase.getVersionActual(item.iditem)
+                listaValores=item.atributos
+                listaAtributos = CtrlAdmTipoItem.getAtributosTipo(item.idtipoitem)            
+                return render_template('conItem.html',
+                                       item=item,
+                                       versionitem=versionitem,
+                                       listaValores=listaValores,
+                                       listaAtributos=listaAtributos)
+            except BadRequest:
                 return redirect(url_for('proyectoX'))
-            else:
-                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
-                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
-                return render_template('proyectoX.html',
-                                       listaFases,
-                                       listFases=listaFases,
-                                       faseSeleccionada=faseSeleccionada,
-                                       error='Imposible finalizar la fase. Existe items que no estan en lineas bases cerradas')
+        if request.form['opcion'] == "Finalizar Fase":
+            try:
+                if(CtrlFase.finalizarFase(int(request.form['fase']))):
+                    flash('Fase finalizada')
+                    return redirect(url_for('proyectoX'))
+                else:
+                    faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                    listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                    return render_template('proyectoX.html',
+                                           listaFases,
+                                           listFases=listaFases,
+                                           faseSeleccionada=faseSeleccionada,
+                                           error='Imposible finalizar la fase. Existe items que no estan en lineas bases cerradas')
+            except BadRequest:
+                return redirect(url_for('proyectoX'))
         if (request.form['opcion']=="Adjuntar Archivo"):
-            idfase = int(request.form['fase'])
-            if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
-                iditem = int(request.form['iditem'])
-                i = CtrlFase.getItem(iditem)
-                if i.estado == 'bloqueado':
+            try:
+                idfase = int(request.form['fase'])
+                if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
+                    iditem = int(request.form['iditem'])
+                    i = CtrlFase.getItem(iditem)
+                    if i.estado == 'bloqueado':
+                        faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                        listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                        return render_template('proyectoX.html',
+                                               listFases=listaFases,
+                                               faseSeleccionada=faseSeleccionada,
+                                               error='El item que escogio se encuentra bloqueado y no se le puede adjuntar archivos')                    
+                    else:
+                        return redirect(url_for('gestionarArchivos'))
+                else:
                     faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
                     listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
                     return render_template('proyectoX.html',
                                            listFases=listaFases,
                                            faseSeleccionada=faseSeleccionada,
-                                           error='El item que escogio se encuentra bloqueado y no se le puede adjuntar archivos')                    
-                else:
-                    return redirect(url_for('gestionarArchivos'))
-            else:
-                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
-                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
-                return render_template('proyectoX.html',
-                                       listFases=listaFases,
-                                       faseSeleccionada=faseSeleccionada,
-                                       error='Fase finalizada no se le puede adjuntar archivos al item')
+                                           error='Fase finalizada no se le puede adjuntar archivos al item')
+            except BadRequest:
+                return redirect(url_for('proyectoX'))
         if (request.form['opcion']=="Eliminar"):
-            idfase = int(request.form['fase'])
-            if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
-                iditem = int(request.form['iditem'])
-                i = CtrlFase.getItem(iditem)
-                if i.estado == 'bloqueado':
+            try:
+                idfase = int(request.form['fase'])
+                if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
+                    iditem = int(request.form['iditem'])
+                    i = CtrlFase.getItem(iditem)
+                    if i.estado == 'bloqueado':
+                        if not CtrlFase.existeSolicitudPendiente(iditem):
+                            versionitem = None
+                            global tipo
+                            tipo = 'eliminar'
+                            return redirect(url_for('enviarSolicitud'))
+                        else:
+                            faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                            listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                            return render_template('proyectoX.html',
+                                           listFases=listaFases,
+                                           faseSeleccionada=faseSeleccionada,
+                                           error='Existe una solicitud pendiente sobre este item')
+                    elif i.estado == 'desarrollo':
+                        iditem = int(request.form['iditem'])
+                        CtrlFase.eliminarItem(iditem)
+                        
+                        faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                        listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                        flash('Item eliminado')
+                        return render_template('proyectoX.html',
+                                           listFases=listaFases,
+                                           faseSeleccionada=faseSeleccionada)
+                else:
+                    faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                    listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                    return render_template('proyectoX.html',
+                                           listFases=listaFases,
+                                           faseSeleccionada=faseSeleccionada,
+                                           error='Fase finalizada no se pueden eliminar items')
+            except BadRequest:
+                return redirect(url_for('proyectoX'))
+        if request.form['opcion'] == "Modificar Item":
+            try:
+                idfase = int(request.form['fase'])
+                if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
+                    iditem = int(request.form['iditem'])
                     if not CtrlFase.existeSolicitudPendiente(iditem):
-                        versionitem = None
-                        global tipo
-                        tipo = 'eliminar'
-                        return redirect(url_for('enviarSolicitud'))
+                        return redirect(url_for('modItem')) 
                     else:
                         faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
                         listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
                         return render_template('proyectoX.html',
-                                       listFases=listaFases,
-                                       faseSeleccionada=faseSeleccionada,
-                                       error='Existe una solicitud pendiente sobre este item')
-                elif i.estado == 'desarrollo':
-                    iditem = int(request.form['iditem'])
-                    CtrlFase.eliminarItem(iditem)
-                    
-                    faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
-                    listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
-                    flash('Item eliminado')
-                    return render_template('proyectoX.html',
-                                       listFases=listaFases,
-                                       faseSeleccionada=faseSeleccionada)
-            else:
-                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
-                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
-                return render_template('proyectoX.html',
-                                       listFases=listaFases,
-                                       faseSeleccionada=faseSeleccionada,
-                                       error='Fase finalizada no se pueden eliminar items')
-        if request.form['opcion'] == "Modificar Item":
-            idfase = int(request.form['fase'])
-            if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
-                iditem = int(request.form['iditem'])
-                if not CtrlFase.existeSolicitudPendiente(iditem):
-                    return redirect(url_for('modItem')) 
+                                               listFases=listaFases,
+                                               faseSeleccionada=faseSeleccionada,
+                                               error='Existe una solicitud pendiente sobre este item')
                 else:
                     faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
                     listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
                     return render_template('proyectoX.html',
                                            listFases=listaFases,
                                            faseSeleccionada=faseSeleccionada,
-                                           error='Existe una solicitud pendiente sobre este item')
-            else:
-                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
-                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
-                return render_template('proyectoX.html',
-                                       listFases=listaFases,
-                                       faseSeleccionada=faseSeleccionada,
-                                       error='Fase finalizada no se pueden modificar items')
+                                           error='Fase finalizada no se pueden modificar items')
+            except BadRequest:
+                return redirect(url_for('proyectoX'))
         if request.form['opcion'] == "Administrar Historial":
-            idfase = int(request.form['fase'])
-            if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
-                iditem = int(request.form['iditem'])
-                if not CtrlFase.existeSolicitudPendiente(iditem):
-                    return redirect(url_for('admHistorial')) 
+            try:
+                idfase = int(request.form['fase'])
+                if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
+                    iditem = int(request.form['iditem'])
+                    if not CtrlFase.existeSolicitudPendiente(iditem):
+                        return redirect(url_for('admHistorial')) 
+                    else:
+                        faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                        listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                        return render_template('proyectoX.html',
+                                               listFases=listaFases,
+                                               faseSeleccionada=faseSeleccionada,
+                                               error='Existe una solicitud pendiente sobre este item')
                 else:
                     faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
                     listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
                     return render_template('proyectoX.html',
                                            listFases=listaFases,
                                            faseSeleccionada=faseSeleccionada,
-                                           error='Existe una solicitud pendiente sobre este item')
-            else:
-                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
-                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
-                return render_template('proyectoX.html',
-                                       listFases=listaFases,
-                                       faseSeleccionada=faseSeleccionada,
-                                       error='Fase finalizada no se puede reversionar items')
-
+                                           error='Fase finalizada no se puede reversionar items')
+            except BadRequest:
+                return redirect(url_for('proyectoX'))
         if request.form['opcion'] == "Revivir":
-            global idfase
-            idfase = int(request.form['fase'])
-            if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
-                    return redirect(url_for('revivirItem')) 
-            else:
-                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
-                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
-                return render_template('proyectoX.html',
-                                       listFases=listaFases,
-                                       faseSeleccionada=faseSeleccionada,
-                                       error='Fase finalizada no se pueden revivir items')
-        
+            try:
+                global idfase
+                idfase = int(request.form['fase'])
+                if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
+                        return redirect(url_for('revivirItem')) 
+                else:
+                    faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                    listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                    return render_template('proyectoX.html',
+                                           listFases=listaFases,
+                                           faseSeleccionada=faseSeleccionada,
+                                           error='Fase finalizada no se pueden revivir items')
+            except BadRequest:
+                return redirect(url_for('proyectoX'))
         if request.form['opcion'] == "Actualizar grafo":
             global proyecto
             nombre=CtrlFase.dibujarProyecto(CtrlAdmProy.proy(proyecto))
@@ -978,9 +1078,12 @@ def revivirItem():
                                 listItem=listItem)
     if request.method == 'POST':
         if request.form['opcion'] == "Revivir":
-            iditem = int(request.form['iditem'])
-            CtrlFase.revivirItem(iditem)
-            flash('El item fue revivido satisfactoriamente')
+            try:
+                iditem = int(request.form['iditem'])
+                CtrlFase.revivirItem(iditem)
+                flash('El item fue revivido satisfactoriamente')
+            except BadRequest:
+                pass
         return redirect(url_for('proyectoX'))
 
 
@@ -1246,10 +1349,13 @@ def gestionarArchivos():
                                idarchivos=idarchivos)
     if request.method == 'POST':
         if (request.form['opcion']=="Subir"):
-            archivo = request.files['file']
-            CtrlFase.subir(archivo)
-            flash("Archivo Subido")
-            return redirect(url_for('gestionarArchivos'))
+            try:
+                archivo = request.files['file']
+                CtrlFase.subir(archivo)
+                flash("Archivo Subido")
+                return redirect(url_for('gestionarArchivos'))
+            except BadRequest:
+                return redirect(url_for('gestionarArchivos'))
         if (request.form['opcion']=="Adjuntar"):
             idarchivos = request.form.getlist('idarchivos')
             CtrlFase.adjuntar(iditem,idarchivos)
@@ -1324,9 +1430,12 @@ def abrirProyectoEnGC():
             return redirect(url_for('menu')) 
     if request.method == 'POST':
         if request.form['opcion'] == "Abrir":
-            global proyecto
-            proyecto = int(request.form['select'])
-            return redirect(url_for('proyectoXenGC'))
+            try:
+                global proyecto
+                proyecto = int(request.form['select'])
+                return redirect(url_for('proyectoXenGC'))
+            except BadRequest:
+                pass
         if request.form['opcion'] == "Buscar":
             listProy = CtrlAdmProy.busquedaProy(request.form['buscar'],
                                          request.form['atributo'])
@@ -1377,61 +1486,72 @@ def proyectoXenGC():
                                         listFases=listaFases,
                                         error='Fase finalizada imposible crear linea base')        
         if request.form['opcion'] == "Eliminar Linea Base":
-            idfase = int(request.form['fase'])
-            global idlineabase
-            idlineabase = int(request.form['idlineabase'])
-            if((CtrlLineaBase.getLB(idlineabase)).estado=='cerrado'):
-                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
-                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
-                listLB = CtrlLineaBase.getLBFase(int(request.form['fase']))
-                return render_template('proyectoXenGC.html',
-                                       listLB=listLB,
-                                       faseSeleccionada=faseSeleccionada,
-                                       listFases=listaFases,
-                                       error='Linea Base cerrada imposible eliminar Linea Base')
-            else:
-                CtrlLineaBase.eliminarLB(idlineabase)
-                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
-                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
-                listLB = CtrlLineaBase.getLBFase(int(request.form['fase']))
-                flash('Linea Base Eliminada')
-                return render_template('proyectoXenGC.html',
-                                       listLB=listLB,
-                                       faseSeleccionada=faseSeleccionada,
-                                       listFases=listaFases)
-                                         
-        if request.form['opcion'] == "Add/Quitar Items":
-            idfase = int(request.form['fase'])
-            idlineabase = int(request.form['idlineabase'])
-            if((CtrlLineaBase.getLB(idlineabase)).estado=='cerrado'):
-                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
-                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
-                listLB = CtrlLineaBase.getLBFase(int(request.form['fase']))
-                return render_template('proyectoXenGC.html',
-                                       listLB=listLB,
-                                       faseSeleccionada=faseSeleccionada,
-                                       listFases=listaFases,
-                                       error='Linea Base cerrada imposible agregar items')
-            else:
-                return redirect(url_for('asigItemsEnLB'))
-        if request.form['opcion'] == "Consultar":
-            idlineabase = int(request.form['idlineabase'])
-            listItem = CtrlLineaBase.getListItemsEnLB(idlineabase) #lista de los items que estan en la linea base             
-            return render_template('conLB.html',listItem=listItem) 
-        if request.form['opcion'] == "Cerrar Linea Base":
-            idlineabase = int(request.form['idlineabase'])
-            if(CtrlLineaBase.cerrarLB(idlineabase)):
-                flash('Linea Base Cerrada')
+            try:
+                idfase = int(request.form['fase'])
+                global idlineabase
+                idlineabase = int(request.form['idlineabase'])
+                if((CtrlLineaBase.getLB(idlineabase)).estado=='cerrado'):
+                    listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                    faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                    listLB = CtrlLineaBase.getLBFase(int(request.form['fase']))
+                    return render_template('proyectoXenGC.html',
+                                           listLB=listLB,
+                                           faseSeleccionada=faseSeleccionada,
+                                           listFases=listaFases,
+                                           error='Linea Base cerrada imposible eliminar Linea Base')
+                else:
+                    CtrlLineaBase.eliminarLB(idlineabase)
+                    listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                    faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                    listLB = CtrlLineaBase.getLBFase(int(request.form['fase']))
+                    flash('Linea Base Eliminada')
+                    return render_template('proyectoXenGC.html',
+                                           listLB=listLB,
+                                           faseSeleccionada=faseSeleccionada,
+                                           listFases=listaFases)
+            except BadRequest:
                 return redirect(url_for('proyectoXenGC'))
-            else:                
-                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
-                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
-                listLB = CtrlLineaBase.getLBFase(int(request.form['fase']))
-                return render_template('proyectoXenGC.html',
-                                       listLB=listLB,
-                                       faseSeleccionada=faseSeleccionada,
-                                       listFases=listaFases,
-                                       error='Imposible cerrar Linea Base, hay Items sin relaciones')
+        if request.form['opcion'] == "Add/Quitar Items":
+            try:
+                idfase = int(request.form['fase'])
+                idlineabase = int(request.form['idlineabase'])
+                if((CtrlLineaBase.getLB(idlineabase)).estado=='cerrado'):
+                    listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                    faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                    listLB = CtrlLineaBase.getLBFase(int(request.form['fase']))
+                    return render_template('proyectoXenGC.html',
+                                           listLB=listLB,
+                                           faseSeleccionada=faseSeleccionada,
+                                           listFases=listaFases,
+                                           error='Linea Base cerrada imposible agregar items')
+                else:
+                    return redirect(url_for('asigItemsEnLB'))
+            except BadRequest:
+                return redirect(url_for('proyectoXenGC'))
+        if request.form['opcion'] == "Consultar":
+            try:
+                idlineabase = int(request.form['idlineabase'])
+                listItem = CtrlLineaBase.getListItemsEnLB(idlineabase) #lista de los items que estan en la linea base             
+                return render_template('conLB.html',listItem=listItem) 
+            except BadRequest:
+                return redirect(url_for('proyectoXenGC'))
+        if request.form['opcion'] == "Cerrar Linea Base":
+            try:
+                idlineabase = int(request.form['idlineabase'])
+                if(CtrlLineaBase.cerrarLB(idlineabase)):
+                    flash('Linea Base Cerrada')
+                    return redirect(url_for('proyectoXenGC'))
+                else:                
+                    listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                    faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                    listLB = CtrlLineaBase.getLBFase(int(request.form['fase']))
+                    return render_template('proyectoXenGC.html',
+                                           listLB=listLB,
+                                           faseSeleccionada=faseSeleccionada,
+                                           listFases=listaFases,
+                                           error='Imposible cerrar Linea Base, hay Items sin relaciones')
+            except BadRequest:
+                return redirect(url_for('proyectoXenGC'))
         if request.form['opcion'] == "Buscar":
             faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
             listLB = CtrlLineaBase.busquedaLineaBase(request.form['buscar'],
@@ -1476,10 +1596,13 @@ def bandejaEntrada():
                                 listsolicitudes =listsolicitudes)
     if request.method == 'POST':
         if request.form['opcion'] == "Ver":
-            idsolicituddecambio = int(request.form['idsolicituddecambio'])
-            solicituddecambio = CtrlSolicitudCambio.getSolicitudDeCambio(idsolicituddecambio)
-            return render_template('solicitudCambio.html',
-                                solicituddecambio =solicituddecambio)            
+            try:
+                idsolicituddecambio = int(request.form['idsolicituddecambio'])
+                solicituddecambio = CtrlSolicitudCambio.getSolicitudDeCambio(idsolicituddecambio)
+                return render_template('solicitudCambio.html',
+                                    solicituddecambio =solicituddecambio) 
+            except BadRequest:
+                return redirect(url_for('bandejaEntrada'))           
         if request.form['opcion'] == "Home":
             return redirect(url_for('menu'))   
         
@@ -1495,9 +1618,12 @@ def bandejaEntrada():
                                 listVotos=listVotos)
     if request.method == 'POST':
         if request.form['opcion'] == "Ver":
-            global idsolicituddecambio
-            idsolicituddecambio = int(request.form['idsolicituddecambio'])
-            return redirect(url_for('votarSolicitud')) 
+            try:
+                global idsolicituddecambio
+                idsolicituddecambio = int(request.form['idsolicituddecambio'])
+                return redirect(url_for('votarSolicitud')) 
+            except BadRequest:
+                return redirect(url_for('bandejaEntrada'))
         if request.form['opcion'] == "Home":
             return redirect(url_for('menu'))  
 
