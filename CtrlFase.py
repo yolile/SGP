@@ -497,6 +497,6 @@ def dibujarProyecto(proyecto):
     
     date=datetime.now()
     name='grafico'+str(date)+'.jpg'
-    grafo.write_jpg('/home/thelma/git/SGP/static/img/tmp/'+name)
+    grafo.write_jpg('/home/juan/git/SGP/static/img/tmp/'+name)
     return name
     

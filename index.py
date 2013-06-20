@@ -20,8 +20,7 @@ __credits__ = 'none'
 __text__ = 'indice principal que conmuta con las diferentes funcionalidades de SGP'
 __file__ = 'index.py' 
 
-ruta = '/home/thelma/git/SGP/templates'
-app = Flask(__name__,template_folder='/home/thelma/git/SGP/templates')
+app = Flask(__name__,template_folder='/home/juan/git/SGP/templates')
 app.debug = True
 app.secret_key = 'secreto'
 app.config.from_object(__name__)
@@ -1063,7 +1062,23 @@ def proyectoX():
         if request.form['opcion'] == "Cerrar Proyecto":
             #Hacer algo para que se borren los graficos generados
             return redirect(url_for('abrirProyecto')) 
-
+        
+        if request.form['opcion'] == "Generar reporte de Solicitudes de cambio":#Agrege esto<<<<<<<<<<<<<<<<<<<<<<
+            idusuario = CtrlAdmUsr.getIdByUsername(owner)
+            if CtrlAdmProy.eslider(idusuario,proyecto):
+                reporte = CtrlSolicitudCambio.genReport(proyecto)
+                return send_file(reporte,
+                                 attachment_filename=os.path.basename(reporte),
+                                 as_attachment=True)
+                os.remove(reporte)
+            else:
+                faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
+                listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
+                return render_template('proyectoX.html',
+                                        listFases=listaFases,
+                                        faseSeleccionada=faseSeleccionada,
+                                        error='Usted debe ser lider del proyecto para efectuar esta operacion')
+            return redirect(url_for('proyectoX'))
 
 """-----------------------Revivir Items---------------------------------------"""
 @app.route('/revivirItem', methods=['GET','POST'])
