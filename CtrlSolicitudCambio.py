@@ -5,6 +5,12 @@ import sqlalchemy.exc
 import CtrlFase
 import CtrlLineaBase
 
+import time
+from reportlab.lib.enums import TA_JUSTIFY
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+
 """Controlador de Solicitudes de Cambio para el modulo de Gestion de Cambios"""  
 __author__ = 'Grupo 5'
 __date__ = '08-06-2013'
@@ -109,3 +115,39 @@ def aplicarCambios(idsolicituddecambio):
         versionNva = session.query(VersionItem).filter(VersionItem.idversionitem==solicitud.idversionitem).first()
         versionNva.estado = 'actual'
         session.commit()
+        
+def genReport(idproyecto):
+    solicitudes = session.query(SolicitudDeCambio).join((Item,SolicitudDeCambio.item)).join((Fase, Item.fase)).join((Proyecto, Fase.proyecto)).filter(Proyecto.idproyecto==idproyecto).all()
+    proyecto = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
+    doc = SimpleDocTemplate("/home/juan/git/SGP/reporte_"+proyecto.nombre+".pdf",pagesize=letter,
+                        rightMargin=72,leftMargin=72,
+                        topMargin=72,bottomMargin=18)
+        
+    Story=[]
+    logo = "/home/juan/git/SGP/static/img/sgplogo.jpg"
+ 
+    formatted_time = time.ctime()
+
+    im = Image(logo, width=250,height=169)
+    Story.append(im)
+ 
+    styles=getSampleStyleSheet()
+
+    styles.add(ParagraphStyle(name='Justify', alignment=TA_JUSTIFY))
+    ptext = '<font size=12>%s</font>' % formatted_time 
+    Story.append(Paragraph(ptext, styles["Normal"]))
+    Story.append(Spacer(1, 12))
+
+    
+    for s in solicitudes:
+        voto = session.query(SolicitudPorUsuarioCC).filter(and_(s.idsolicituddecambio==SolicitudPorUsuarioCC.idsolicituddecambio,s.idusuariosolicitante==proyecto.usuariolider)).first()
+         
+        ptext = s.descripcion
+        ptext = ptext+"\n-Estado de la solicitud: "+s.estado
+        ptext = ptext+"\n-Voto del usuariolider: "+voto.voto
+
+        Story.append(Paragraph(ptext, styles["Justify"]))
+        Story.append(Spacer(1, 12))
+
+    doc.build(Story)
+    return "/home/juan/git/SGP/reporte_"+proyecto.nombre+".pdf"

@@ -337,4 +337,6 @@ def setProyFinalizado(idproyecto):
     proyecto.estado = 'finalizado'
     session.commit()     
            
-    
+def eslider(idusuario,idproyecto):
+    result = session.query(Proyecto).filter(and_(Proyecto.idproyecto==idproyecto,Proyecto.usuariolider==idusuario)).first()
+    return not result == None

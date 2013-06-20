@@ -237,6 +237,8 @@ class Item(Base):
     
     archivos = relationship("Archivo", secondary=ArchivoItem)
     versiones = relationship("VersionItem")
+    lineabase = relationship("LineaBase", backref=backref("item", uselist=False))
+    
     
     def __init__(self, iditem, nombre, estado, idtipoitem,idfase,idlineabase=None):
         self.iditem = iditem
