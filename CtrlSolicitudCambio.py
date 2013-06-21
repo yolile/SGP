@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker, join
 import sqlalchemy.exc
 import CtrlFase
 import CtrlLineaBase
-
+from Modelo import path
 import time
 from reportlab.lib.enums import TA_JUSTIFY
 from reportlab.lib.pagesizes import letter
@@ -119,12 +119,12 @@ def aplicarCambios(idsolicituddecambio):
 def genReport(idproyecto):
     solicitudes = session.query(SolicitudDeCambio).join((Item,SolicitudDeCambio.item)).join((Fase, Item.fase)).join((Proyecto, Fase.proyecto)).filter(Proyecto.idproyecto==idproyecto).all()
     proyecto = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
-    doc = SimpleDocTemplate("/home/juan/git/SGP/reporte_"+proyecto.nombre+".pdf",pagesize=letter,
+    doc = SimpleDocTemplate(path+"/reporte_"+proyecto.nombre+".pdf",pagesize=letter,
                         rightMargin=72,leftMargin=72,
                         topMargin=72,bottomMargin=18)
         
     Story=[]
-    logo = "/home/juan/git/SGP/static/img/sgplogo.jpg"
+    logo = path+"/static/img/sgplogo.jpg"
  
     formatted_time = time.ctime()
 
@@ -150,4 +150,4 @@ def genReport(idproyecto):
         Story.append(Spacer(1, 12))
 
     doc.build(Story)
-    return "/home/juan/git/SGP/reporte_"+proyecto.nombre+".pdf"
+    return path+"/reporte_"+proyecto.nombre+".pdf"

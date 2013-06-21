@@ -5,7 +5,7 @@
              <br>
              <center><label>Visualizacion del Proyecto</label>
              {% if name is defined %}
-             <img src="{{ url_for('static', filename= 'img/tmp/'+name) }}" width = 40%>
+             <img src="{{ url_for('static', filename= 'img/'+name) }}" width = 40%>
              {% endif %}
              </center>
              <div><input type='submit' name="opcion" value='Actualizar grafo'></div>
@@ -69,6 +69,7 @@
             <input type='submit' name="opcion" value='Administrar Historial'>
             <input type='submit' name="opcion" value='Revivir'>
             <input type='submit' name="opcion" value='Generar reporte de Solicitudes de cambio'>
+            <input type='submit' name="opcion" value='Generar reporte de Lista de Items'>
             </center>
             </div>  
             <input type="text" name="buscar"/>

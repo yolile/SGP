@@ -5,7 +5,7 @@
              <br>
              <center><label>Visualizacion del Proyecto</label>
              {% if name is defined %}
-             <img src="{{ url_for('static', filename= 'img/tmp/'+name) }}" width = 40%>
+             <img src="{{ url_for('static', filename= 'img/'+name) }}" width = 40%>
              {% endif %}
              </center>
              <div><input type='submit' name="opcion" value='Actualizar grafo'></div>

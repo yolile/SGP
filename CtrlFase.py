@@ -6,6 +6,12 @@ import CtrlAdmProy
 from operator import itemgetter, attrgetter
 from datetime import datetime
 import pydot
+import time
+from reportlab.lib.enums import TA_JUSTIFY
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from Modelo import path
 
 """Controlador de Fases en el modulo de desarrollo"""  
 __author__ = 'Grupo 5'
@@ -100,7 +106,10 @@ def getItemsFaseAnterior(idfase):
     fase_actual = session.query(Fase).filter(Fase.idfase==idfase).first()
     fase_anterior = session.query(Fase).filter(and_(Fase.posicionfase==fase_actual.posicionfase-1,
                                                 Fase.idproyecto==fase_actual.idproyecto)).first()
-    return getItemsFase(fase_anterior.idfase)
+    if fase_anterior != None:
+        return getItemsFase(fase_anterior.idfase)
+    else:
+        return []
 
 def relacionar(idItem, idItemList, tipo):
     """Funcion que guarda la relacion en la Base de datos"""
@@ -353,7 +362,6 @@ def getVersion(idversionitem):
 def reversionar(idversionitem,iduser):
     """Funcion que sirve para reversionar un item"""
     oldversion = getVersion(idversionitem)
-    oldversion.estado = 'no-actual'
     idnuevaversion = getMaxIdVersionItem()+1
     nuevonroversion = getVersionActual(oldversion.iditem).version+1
     newversion = VersionItem(idnuevaversion, 
@@ -373,7 +381,7 @@ def copiarDatosItem(itemorigen,item,versionitem):
     con su ultima version a un item destino tambien en la ultima version. No se copian 
     las claves primarias"""
     item.nombre=itemorigen.nombre+'-copia'
-    item.estado=itemorigen.estado
+    item.estado='desarrollo'
     item.idtipoitem=itemorigen.idtipoitem
     for atributo in itemorigen.atributos:
         newatributo=AtributoItemPorTipo(item.iditem,
@@ -433,7 +441,7 @@ def getItemsProyecto(idproyecto):
     proyecto=session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
     for fase in proyecto.fases:
         for item in fase.items:
-            if (item.estado != 'eliminado' or item.estado != 'pendiente'):
+            if not(item.estado == 'eliminado' or item.estado == 'pendiente'):
                 lista.append(item)
     return lista
 
@@ -454,7 +462,7 @@ def calcularCostoTotal(idproyecto):
         costototal=costototal+version.costo
     return costototal
 
-"""Para dibujar un proyecto"""
+
 def dibujarProyecto(proyecto):
     #inicializar estructuras
     grafo = pydot.Dot(graph_type='digraph',fontname="Verdana",rankdir="LR")
@@ -483,11 +491,23 @@ def dibujarProyecto(proyecto):
         if(item.idlineabase==None):
             clusters[item.fase.posicionfase].add_node(pydot.Node(str(item.iditem),
                                                                  label=item.nombre))
-        else:
+        elif item.estado=="desarrollo":
             clusters[item.fase.posicionfase].add_node(pydot.Node(str(item.iditem),
                                                                  label=item.nombre,
                                                                  style="filled",
                                                                  fillcolor="blue",
+                                                                 fontcolor="white"))
+        elif item.estado=="bloqueado":
+            clusters[item.fase.posicionfase].add_node(pydot.Node(str(item.iditem),
+                                                                 label=item.nombre,
+                                                                 style="filled",
+                                                                 fillcolor="red",
+                                                                 fontcolor="white"))
+        elif item.estado=="revision":
+            clusters[item.fase.posicionfase].add_node(pydot.Node(str(item.iditem),
+                                                                 label=item.nombre,
+                                                                 style="filled",
+                                                                 fillcolor="violet",
                                                                  fontcolor="white"))
     #agregar arcos
     for item in items:
@@ -497,6 +517,96 @@ def dibujarProyecto(proyecto):
     
     date=datetime.now()
     name='grafico'+str(date)+'.jpg'
-    grafo.write_jpg('/home/juan/git/SGP/static/img/tmp/'+name)
+    grafo.write_jpg(path+'/static/img/'+name)
     return name
     
+def genReportHistorial(item):
+    versiones=getListVersionbyIdItem(item.iditem)   
+    doc = SimpleDocTemplate(path+"/reporte_historial_"+item.nombre+".pdf",pagesize=letter,
+                        rightMargin=72,leftMargin=72,
+                        topMargin=72,bottomMargin=18)
+        
+    Story=[]
+    logo = path+"/static/img/sgplogo.jpg"
+ 
+    formatted_time = time.ctime()
+    styles=getSampleStyleSheet()
+    styles.add(ParagraphStyle(name='Principal',alignment=1,spaceAfter=10, fontSize=16))
+    styles.add(ParagraphStyle(name='Justify', alignment=TA_JUSTIFY))
+    styles.add(ParagraphStyle(name='Titulo', fontName='Helvetica', fontSize=14, alignment=0, spaceAfter=10, spaceBefore=15))
+    styles.add(ParagraphStyle(name='Header',fontName='Helvetica',fontSize=14))
+    
+    titulo="<b>Reporte de Historial de Item</b>"
+    Story.append(Paragraph(titulo,styles['Principal']))
+    
+    im = Image(logo, width=250,height=169)
+    Story.append(im)
+
+    ptext = '<font size=12>Fecha y hora: %s</font>' % formatted_time 
+    Story.append(Paragraph("<br/><br/>"+ptext, styles["Normal"]))
+        
+    cabecera = "<br/><b>Nombre del item:</b> "+item.nombre+"<br/><br/>"
+    cabecera = cabecera + "<b>Proyecto:</b> "+item.fase.proyecto.nombre+"<br/><br/>"
+    cabecera = cabecera + "<b>Fase:</b> "+str(item.fase.posicionfase)+" ("+item.fase.nombre+")"+"<br/><br/>"
+    cabecera = cabecera + "<b>Tipo:</b> "+item.tipoitem.nombre
+    Story.append(Paragraph(cabecera, styles["Header"]))
+    Story.append(Spacer(1, 12))
+
+    for version in versiones:
+        titulo = Paragraph('<b>Version ' + str(version.version) + '<\b>', styles['Titulo'])
+        Story.append(titulo)
+        usuario=usr = session.query(Usuario).filter(Usuario.idusuario==version.idusuario).first()
+        ptext = "<b>Usuario:</b> "+ usuario.nombre+"<br/>"
+        ptext = ptext+"<b>Descripcion:</b> "+version.descripcion+"<br/>"
+        ptext = ptext+"<b>Complejidad:</b> "+str(version.complejidad)+"<br/>"
+        ptext = ptext+"<b>Prioridad:</b> "+str(version.prioridad)+"<br/>"
+        ptext = ptext+"<b>Costo:</b> "+str(version.costo)
+        
+        Story.append(Paragraph(ptext, styles["Justify"]))
+        Story.append(Spacer(1, 12))
+    
+    doc.build(Story)
+    return path+"/reporte_historial_"+item.nombre+".pdf"
+
+def genReport(idproyecto):
+    listFases = session.query(Fase).filter(and_(Fase.idproyecto==idproyecto,Fase.estado != 'eliminada')).all()
+    proyecto = session.query(Proyecto).filter(Proyecto.idproyecto==idproyecto).first()
+    doc = SimpleDocTemplate(path+"/reporte_"+proyecto.nombre+".pdf",pagesize=letter,
+                            rightMargin=72,leftMargin=72,
+                            topMargin=72,bottomMargin=18)
+        
+    Story=[]
+    logo = path+"/static/img/sgplogo.jpg"
+ 
+    formatted_time = time.ctime()
+
+    im = Image(logo, width=250,height=169)
+    Story.append(im)
+ 
+    styles=getSampleStyleSheet()
+
+    styles.add(ParagraphStyle(name='Justify', alignment=TA_JUSTIFY))
+    ptext = '<font size=12>%s</font>' % formatted_time 
+    Story.append(Paragraph(ptext, styles["Normal"]))
+    Story.append(Spacer(1, 10))
+    for f in listFases:
+        Story.append(Spacer(1, 10))
+        Story.append(Paragraph(f.nombre, styles["Justify"]))
+        Story.append(Spacer(1, 10))
+        listItems = session.query(Item).filter(Item.idfase==f.idfase).all()
+        for i in listItems:
+            v = session.query(VersionItem).filter(and_(VersionItem.iditem==i.iditem,VersionItem.estado=='actual')).first()
+            
+            Story.append(Paragraph("-Id: "+str(i.iditem), styles["Justify"]))
+            Story.append(Spacer(1, 1))
+            Story.append(Paragraph("-Descripcion: "+v.descripcion, styles["Justify"]))
+            Story.append(Spacer(1, 1))
+            Story.append(Paragraph("-Version: "+str(v.version), styles["Justify"]))
+            Story.append(Spacer(1, 1))
+            Story.append(Paragraph("-Prioridad: "+str(v.prioridad), styles["Justify"]))
+            
+            Story.append(Spacer(1, 5))
+
+        
+    doc.build(Story)
+    return path+"/reporte_"+proyecto.nombre+".pdf"
