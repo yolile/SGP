@@ -485,7 +485,12 @@ def dibujarProyecto(proyecto):
         if(cluster!=None):
             grafo.add_subgraph(cluster)
              
-    items=getItemsProyecto(proyecto.idproyecto)
+    #items=getItemsProyecto(proyecto.idproyecto)
+    lista=session.query(Item).join((Fase, Item.fase)).join((Proyecto, Fase.proyecto)).filter(Proyecto.idproyecto==proyecto.idproyecto).all()
+    items=[]
+    for item in lista:
+        if item.estado!="eliminado":
+            items.append(item)
     #agregar nodos
     for item in items:
         if(item.idlineabase==None):
