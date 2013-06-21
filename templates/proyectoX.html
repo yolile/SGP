@@ -3,7 +3,9 @@
 <body class=formato5>
         <form class='estilos' action="{{ url_for('proyectoX') }}" method=post>
              <br>
-             <center><label>Visualizacion del Proyecto</label>
+             <center><label>VISUALIZACION DEL PROYECTO</label>
+             <br>
+             <br>
              {% if name is defined %}
              <img src="{{ url_for('static', filename= 'img/'+name) }}" width = 40%>
              {% endif %}
@@ -58,16 +60,27 @@
             </div>
             <div>
             <center>
-            <input type='submit' name="opcion" value='Finalizar Fase' 
-            onclick="return confirmar('¿Está seguro que desea finalizar la fase? No podra agregar ni quitar items despues de finalizar la fase')">
-            <input type='submit' name="opcion" value='Consultar Item'>
-            <input type='submit' name="opcion" value='Crear Item'>
+            <input type='submit' name="opcion" value='Crear'>
             <input type='submit' name="opcion" value='Relacionar'>
-            <input type='submit' name="opcion" value='Adjuntar Archivo'>
+            <input type='submit' name="opcion" value='Consultar'>            
+            <input type='submit' name="opcion" value='Modificar'>
             <input type='submit' name="opcion" value='Eliminar'>
-            <input type='submit' name="opcion" value='Modificar Item'>
+             </div>
+            </center>
+            
+            <div>
+            <center>                     
+            <input type='submit' name="opcion" value='Adjuntar Archivo'>            
             <input type='submit' name="opcion" value='Administrar Historial'>
             <input type='submit' name="opcion" value='Revivir'>
+            </div>
+            </center>
+            
+            <div>
+            <center>                        
+            <input type='submit' name="opcion" value='Finalizar Fase' 
+            onclick="return confirmar('¿Está seguro que desea finalizar la fase? No podra agregar ni quitar items despues de finalizar la fase')">
+            
             <input type='submit' name="opcion" value='Generar reporte de Solicitudes de cambio'>
             <input type='submit' name="opcion" value='Generar reporte de Lista de Items'>
             </center>

@@ -596,19 +596,19 @@ def genReport(idproyecto):
     Story.append(Spacer(1, 10))
     for f in listFases:
         Story.append(Spacer(1, 10))
-        Story.append(Paragraph(f.nombre, styles["Justify"]))
+        Story.append(Paragraph('<b>FASE: ' + str(f.nombre) + '<\b>',  styles["Justify"]))
         Story.append(Spacer(1, 10))
         listItems = session.query(Item).filter(Item.idfase==f.idfase).all()
         for i in listItems:
             v = session.query(VersionItem).filter(and_(VersionItem.iditem==i.iditem,VersionItem.estado=='actual')).first()
             
-            Story.append(Paragraph("-Id: "+str(i.iditem), styles["Justify"]))
+            Story.append(Paragraph("<b>-Id: </b>"+str(i.iditem), styles["Justify"]))
             Story.append(Spacer(1, 1))
-            Story.append(Paragraph("-Descripcion: "+v.descripcion, styles["Justify"]))
+            Story.append(Paragraph("<b>-Descripcion:</b> "+v.descripcion, styles["Justify"]))
             Story.append(Spacer(1, 1))
-            Story.append(Paragraph("-Version: "+str(v.version), styles["Justify"]))
+            Story.append(Paragraph("<b>-Version: </b>"+str(v.version), styles["Justify"]))
             Story.append(Spacer(1, 1))
-            Story.append(Paragraph("-Prioridad: "+str(v.prioridad), styles["Justify"]))
+            Story.append(Paragraph("<b>-Prioridad:</b> "+str(v.prioridad), styles["Justify"]))
             
             Story.append(Spacer(1, 5))
 

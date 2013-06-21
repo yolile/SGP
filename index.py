@@ -832,7 +832,7 @@ def proyectoX():
         listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
         return render_template('proyectoX.html',listFases=listaFases)
     if request.method == 'POST':
-        if (request.form['opcion']=="Crear Item"):
+        if (request.form['opcion']=="Crear"):
             try:
                 idfase = int(request.form['fase'])
                 if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
@@ -902,7 +902,7 @@ def proyectoX():
                                    listFases=listaFases,
                                    listItem = listItem,
                                    faseSeleccionada=faseSeleccionada)
-        if request.form['opcion'] == "Consultar Item":
+        if request.form['opcion'] == "Consultar":
             try:
                 iditem=int(request.form['iditem'])
                 item=CtrlFase.getItem(iditem)
@@ -993,7 +993,7 @@ def proyectoX():
                                            error='Fase finalizada no se pueden eliminar items')
             except BadRequest:
                 return redirect(url_for('proyectoX'))
-        if request.form['opcion'] == "Modificar Item":
+        if request.form['opcion'] == "Modificar":
             try:
                 idfase = int(request.form['fase'])
                 if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
