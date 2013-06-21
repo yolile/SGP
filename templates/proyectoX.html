@@ -8,10 +8,21 @@
              <br>
              {% if name is defined %}
              <img src="{{ url_for('static', filename= 'img/'+name) }}" width = 40%>
+             
+             <img src="{{ url_for('static', filename='img/obs.jpg') }}" width = 400px, ALIGN=RIGHT>
+             
              {% endif %}
              </center>
-             <div><input type='submit' name="opcion" value='Actualizar grafo'></div>
+             <center><div><input type='submit' name="opcion" value='Actualizar grafo'></div>
+             <HR WIDTH=90% SIZE=6>
+             </center>
+             
+             <br>
+             <br>
+   
+
              <form class='estilos' action="{{ url_for('proyectoX') }}" method=post>
+            
             <div><label>Seleccionar Fase</label>
 					<div><br>	
 							<select name="fase">						
@@ -35,6 +46,7 @@
 							</select>
 				    </div>
             		<br>
+
 					<input type='submit' name="opcion" value='Mostrar Items'>
 	        </div>
 	            <div><label>Items de fase seleccionada:</label>
@@ -58,6 +70,9 @@
 					</table>
 				    <br>        
             </div>
+
+
+           
             <div>
             <center>
             <input type='submit' name="opcion" value='Crear'>
@@ -91,7 +106,9 @@
 			</select>
 			<input type="submit" name="opcion" value="Buscar" />          
             <div><center><input type='submit' name="opcion" value='Cerrar Proyecto'></center></div>
-
+ 
         </form>
+     
+        
     </body>
 {% endblock %}

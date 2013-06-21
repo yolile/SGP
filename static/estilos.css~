@@ -21,7 +21,20 @@
     height: 1000px;
     margin: auto;
     background-color: #E2ECEE;
-    
+}
+
+.formato4 {
+    width: 600px;
+    margin: auto;
+    background-color: #E2ECEE;    
+}
+
+.formato5 {
+    width: 80%;
+    height: 100%;
+    margin: auto;
+    background-color: #E2ECEE;    
+}
 
 .flash { 
 	background: #CEE5F5; padding: 0.5em;
@@ -52,6 +65,8 @@
 .estilos div{
     margin-bottom: 20px;
 }
+
+    
 .estilos input[type='text'], .estilos textarea{
     padding: 7px 6px;
     width: 294px;
@@ -79,6 +94,7 @@
     box-shadow:0 0 0 3px #dde9ec;
 }
 
+
 .estilos input[type='submit']{
     border: 1px solid #CED5D7;
     box-shadow:0 0 0 3px #EEF5F7;
@@ -101,6 +117,27 @@
     background: -moz-linear-gradient(top, #cfe6ef 0%, #edfcff 100%);
     background: -webkit-linear-gradient(top, #cfe6ef 0%,#edfcff 100%);
 }
+
+/*Esto hace que los botones se vean como links*/
+.formato4 button, button:focus, button:active {
+    border: none;
+    display: inline;
+    margin: 0em;
+    padding: 0em;
+    outline: none;
+    outline-offset: 0em;
+    background: none;
+    color: #798e94;
+    cursor: pointer;
+    font: inherit;
+    text-decoration: underline;
+}
+/* Sacar los espacios extra de los botones en Firefox */
+.formato4 button::-moz-focus-inner {
+    border: none;
+    padding: 0em;
+}
+
 
 
  /*Para el formato del menu*/
@@ -144,3 +181,60 @@ position:relative;
 right:-140px;
 top:0;
 }
+
+
+.formato6 {
+    width: 80%;
+    height: 100%;
+    margin: auto;
+    background-color: #E2ECEE;
+   margin: 0 auto;
+   min-width: 40em;
+   max-width: 56em;   
+ 
+}
+}
+#sidebar {
+   width: 13em;
+   padding: 0 0.5em;
+   background-color: #ff6;
+}
+#nav {
+   float: left;
+   width: 11em;
+   padding: 0 0.5em;
+   background-color: #ddd;
+   margin-left: -100%;
+   position: relative;
+   right: 13em;
+}
+#footer {
+   clear: left;
+   border-top: 1px solid #369;
+}
+#main {
+   float: left;
+   width: 100%;
+   background-color: lime;
+}
+#sidebar {
+   float: left;
+   width: 13em;
+   padding: 0 0.5em;
+   background-color: #ff6;
+   margin-left: -14em;
+   position: relative;
+   left: 15em;
+}
+#nav {
+   float: left;
+   width: 11em;
+   padding: 0 0.5em;
+   background-color: #ddd;
+}
+#wrapper {
+   margin: 0 14em 0 12em;
+   padding: 0 1em;
+}
+
+
