@@ -340,3 +340,9 @@ def setProyFinalizado(idproyecto):
 def eslider(idusuario,idproyecto):
     result = session.query(Proyecto).filter(and_(Proyecto.idproyecto==idproyecto,Proyecto.usuariolider==idusuario)).first()
     return not result == None
+
+def restaurar(idproyecto):
+    """Funcion que establece el estado de un proyecto como 'iniciado' de un proyecto que ha sido eliminado"""
+    proyecto = proy(idproyecto)
+    proyecto.estado = 'iniciado'
+    session.commit() 

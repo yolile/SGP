@@ -20,7 +20,7 @@ rutaBD='postgresql+psycopg2://admin:admin@localhost/sgptest'
 #engine = create_engine(os.environ['DATABASE_URI'])
 engine=create_engine(rutaBD)
 Base= declarative_base()
-path="/home/thelma/git/SGP/"
+path="/home/divina/git/SGP/"
 
 """------------------------TABLAS DE RELACION---------------------------------------"""
 RolPermiso = Table('rolpermiso', Base.metadata,

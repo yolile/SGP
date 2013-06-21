@@ -3,12 +3,21 @@
 <body class=formato5>
         <form class='estilos' action="{{ url_for('proyectoXenGC') }}" method=post>
              <br>
-             <center><label>Visualizacion del Proyecto</label>
+             <center><label>VISUALIZACION DEL PROYECTO</label>
+             <br>
+             <br>
              {% if name is defined %}
              <img src="{{ url_for('static', filename= 'img/'+name) }}" width = 40%>
+             
+             <img src="{{ url_for('static', filename='img/obs.jpg') }}" width = 400px, ALIGN=RIGHT>
+             
              {% endif %}
              </center>
-             <div><input type='submit' name="opcion" value='Actualizar grafo'></div>
+             <center><div><input type='submit' name="opcion" value='Actualizar grafo'></div>
+             <HR WIDTH=90% SIZE=6>
+             </center>
+             <br>
+             <br>             
              <form class='estilos' action="{{ url_for('proyectoXenGC') }}" method=post>
             <div><label>Seleccionar Fase</label>
 					<div><br>	

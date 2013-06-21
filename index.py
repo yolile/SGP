@@ -832,7 +832,7 @@ def proyectoX():
         listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
         return render_template('proyectoX.html',listFases=listaFases)
     if request.method == 'POST':
-        if (request.form['opcion']=="Crear Item"):
+        if (request.form['opcion']=="Crear"):
             try:
                 idfase = int(request.form['fase'])
                 if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
@@ -902,7 +902,7 @@ def proyectoX():
                                    listFases=listaFases,
                                    listItem = listItem,
                                    faseSeleccionada=faseSeleccionada)
-        if request.form['opcion'] == "Consultar Item":
+        if request.form['opcion'] == "Consultar":
             try:
                 iditem=int(request.form['iditem'])
                 item=CtrlFase.getItem(iditem)
@@ -993,7 +993,7 @@ def proyectoX():
                                            error='Fase finalizada no se pueden eliminar items')
             except BadRequest:
                 return redirect(url_for('proyectoX'))
-        if request.form['opcion'] == "Modificar Item":
+        if request.form['opcion'] == "Modificar":
             try:
                 idfase = int(request.form['fase'])
                 if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
@@ -1668,7 +1668,38 @@ def votarSolicitud():
             CtrlSolicitudCambio.votarSolicitud(idsolicituddecambio,CtrlAdmUsr.getIdByUsername(owner),'Rechazado')
             CtrlSolicitudCambio.contarVotos(idsolicituddecambio)
             flash('Su voto ha sido registrado')
-        return redirect(url_for('bandejaEntrada'))  
+        return redirect(url_for('bandejaEntrada'))
+    
+"""---------------------Restaurar Proyectos Eliminados--------------------------------"""
+@app.route('/restaurar', methods=['GET','POST'])
+def restaurar():
+    """Funcion que presenta la opcion de restaurar un proyecto seleccionado"""  
+    if request.method == 'GET':
+        global owner
+        if CtrlAdmUsr.havePermission(owner,206):
+            listaProy = CtrlAdmProy.getProyectoList()
+            return render_template('restaurar.html',listProy=listaProy)
+        else:
+            flash('No tiene permisos para realizar esta operacion ')
+            return redirect(url_for('menu')) 
+    if request.method == 'POST':
+        if request.form['opcion'] == "Restaurar":
+            try:
+                global proyecto
+                proyecto = int(request.form['select'])
+                CtrlAdmProy.restaurar(proyecto)
+                return redirect(url_for('restaurar'))                           
+                flash('El proyecto ha sido restaurado.')
+            except BadRequest:
+                return redirect(url_for('restaurar'))
+        if request.form['opcion'] == "Buscar":
+            listProy = CtrlAdmProy.busquedaProy(request.form['buscar'],
+                                         request.form['atributo'])
+            
+            flash('Resultado de la busqueda')
+            return render_template('restaurar.html',listProy=listProy)        
+        if request.form['opcion'] == "Home":
+            return redirect(url_for('menu'))         
         
 if __name__=='__main__':
     app.run()             
