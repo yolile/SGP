@@ -128,23 +128,28 @@ def genReport(idproyecto):
  
     formatted_time = time.ctime()
 
+    styles=getSampleStyleSheet()
+    styles.add(ParagraphStyle(name='Principal',alignment=1,spaceAfter=10, fontSize=16))
+    styles.add(ParagraphStyle(name='Justify', alignment=TA_JUSTIFY))
+    styles.add(ParagraphStyle(name='Titulo', fontName='Helvetica', fontSize=14, alignment=0, spaceAfter=10, spaceBefore=15))
+    styles.add(ParagraphStyle(name='Header',fontName='Helvetica',fontSize=14))
+    
+    titulo="<b>Reporte de Solicitudes de cambio</b>"
+    Story.append(Paragraph(titulo,styles['Principal']))
+    
     im = Image(logo, width=250,height=169)
     Story.append(im)
- 
-    styles=getSampleStyleSheet()
 
-    styles.add(ParagraphStyle(name='Justify', alignment=TA_JUSTIFY))
-    ptext = '<font size=12>%s</font>' % formatted_time 
-    Story.append(Paragraph(ptext, styles["Normal"]))
+    ptext = '<font size=12>Fecha y hora: %s</font>' % formatted_time 
+    Story.append(Paragraph("<br/><br/>"+ptext, styles["Normal"]))
     Story.append(Spacer(1, 12))
-
     
     for s in solicitudes:
         voto = session.query(SolicitudPorUsuarioCC).filter(and_(s.idsolicituddecambio==SolicitudPorUsuarioCC.idsolicituddecambio,s.idusuariosolicitante==proyecto.usuariolider)).first()
          
         ptext = s.descripcion
         ptext = ptext+"\n-Estado de la solicitud: "+s.estado
-        ptext = ptext+"\n-Voto del usuariolider: "+voto.voto
+        ptext = ptext+"\n-Voto del usuario lider: "+voto.voto
 
         Story.append(Paragraph(ptext, styles["Justify"]))
         Story.append(Spacer(1, 12))

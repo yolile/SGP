@@ -585,33 +585,41 @@ def genReport(idproyecto):
  
     formatted_time = time.ctime()
 
+    styles=getSampleStyleSheet()
+    styles.add(ParagraphStyle(name='Principal',alignment=1,spaceAfter=10, fontSize=16))
+    styles.add(ParagraphStyle(name='Justify', alignment=TA_JUSTIFY))
+    styles.add(ParagraphStyle(name='Titulo', fontName='Helvetica', fontSize=14, alignment=0, spaceAfter=10, spaceBefore=15))
+    styles.add(ParagraphStyle(name='Header',fontName='Helvetica',fontSize=14))
+    
+    titulo="<b>Reporte de Lista de items</b>"
+    Story.append(Paragraph(titulo,styles['Principal']))
+    
     im = Image(logo, width=250,height=169)
     Story.append(im)
- 
-    styles=getSampleStyleSheet()
 
-    styles.add(ParagraphStyle(name='Justify', alignment=TA_JUSTIFY))
-    ptext = '<font size=12>%s</font>' % formatted_time 
-    Story.append(Paragraph(ptext, styles["Normal"]))
-    Story.append(Spacer(1, 10))
+    ptext = '<font size=12>Fecha y hora: %s</font>' % formatted_time 
+    Story.append(Paragraph("<br/><br/>"+ptext, styles["Normal"]))
+    
+    cabecera = "<b>Proyecto:</b> "+proyecto.nombre+"<br/><br/>"
+    Story.append(Paragraph(cabecera, styles["Header"]))
+    Story.append(Spacer(1, 12))
+    
     for f in listFases:
         Story.append(Spacer(1, 10))
-        Story.append(Paragraph('<b>FASE: ' + str(f.nombre) + '<\b>',  styles["Justify"]))
+        titulo = Paragraph('<b>' + f.nombre + '<\b>', styles['Titulo'])
+        Story.append(titulo)
         Story.append(Spacer(1, 10))
         listItems = session.query(Item).filter(Item.idfase==f.idfase).all()
         for i in listItems:
             v = session.query(VersionItem).filter(and_(VersionItem.iditem==i.iditem,VersionItem.estado=='actual')).first()
             
-            Story.append(Paragraph("<b>-Id: </b>"+str(i.iditem), styles["Justify"]))
-            Story.append(Spacer(1, 1))
-            Story.append(Paragraph("<b>-Descripcion:</b> "+v.descripcion, styles["Justify"]))
-            Story.append(Spacer(1, 1))
-            Story.append(Paragraph("<b>-Version: </b>"+str(v.version), styles["Justify"]))
-            Story.append(Spacer(1, 1))
-            Story.append(Paragraph("<b>-Prioridad:</b> "+str(v.prioridad), styles["Justify"]))
+            ptext = "<b>ID:</b> "+ str(i.iditem)+"<br/>"
+            ptext = ptext+"<b>Descripcion:</b> "+version.descripcion+"<br/>"
+            ptext = ptext+"<b>Version:</b> "+str(v.version)+"<br/>"
+            ptext = ptext+"<b>Prioridad:</b> "+str(v.prioridad)+"<br/>"
             
-            Story.append(Spacer(1, 5))
-
+            Story.append(Paragraph(ptext, styles["Justify"]))
+            Story.append(Spacer(1, 12))
         
     doc.build(Story)
     return path+"/reporte_"+proyecto.nombre+".pdf"
