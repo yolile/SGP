@@ -14,15 +14,13 @@ __credits__ = 'none'
 __text__ = 'Modulo con las clases y las tablas relacionadas entre si'
 __file__ = 'Modelo.py' 
 
-#---------------------Atencion!!!!!!!-----------------------------------
-#Para usar la base de datos de prueba descomentar la linea 19 y comentar la linea 20
 
-#rutaBD='postgresql+psycopg2://admin:admin@localhost/BDDEPRUEBA'
 rutaBD='postgresql+psycopg2://admin:admin@localhost/sgptest'
 
 #engine = create_engine(os.environ['DATABASE_URI'])
 engine=create_engine(rutaBD)
 Base= declarative_base()
+path="/home/thelma/git/SGP/"
 
 """------------------------TABLAS DE RELACION---------------------------------------"""
 RolPermiso = Table('rolpermiso', Base.metadata,
@@ -234,7 +232,7 @@ class Item(Base):
     fase = relationship("Fase")
     atributos = relationship("AtributoItemPorTipo")
     idlineabase = Column (Integer,ForeignKey ('lineabase.idlineabase'))
-    
+    tipoitem = relationship("TipoItem")
     archivos = relationship("Archivo", secondary=ArchivoItem)
     versiones = relationship("VersionItem")
     lineabase = relationship("LineaBase", backref=backref("item", uselist=False))

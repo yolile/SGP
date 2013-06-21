@@ -11,6 +11,7 @@ import CtrlLineaBase
 import CtrlSolicitudCambio
 from flask.exceptions import BadRequest
 import sqlalchemy.exc
+from Modelo import path
 
 """Modulo de ejecucion principal de SGP"""  
 __author__ = 'Grupo 5'
@@ -20,7 +21,7 @@ __credits__ = 'none'
 __text__ = 'indice principal que conmuta con las diferentes funcionalidades de SGP'
 __file__ = 'index.py' 
 
-app = Flask(__name__,template_folder='/home/juan/git/SGP/templates')
+app = Flask(__name__,template_folder=path+'/templates')
 app.debug = True
 app.secret_key = 'secreto'
 app.config.from_object(__name__)
@@ -1018,24 +1019,8 @@ def proyectoX():
         if request.form['opcion'] == "Administrar Historial":
             try:
                 idfase = int(request.form['fase'])
-                if(CtrlAdmProy.getFase(idfase).estado!='finalizado'):
-                    iditem = int(request.form['iditem'])
-                    if not CtrlFase.existeSolicitudPendiente(iditem):
-                        return redirect(url_for('admHistorial')) 
-                    else:
-                        faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
-                        listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
-                        return render_template('proyectoX.html',
-                                               listFases=listaFases,
-                                               faseSeleccionada=faseSeleccionada,
-                                               error='Existe una solicitud pendiente sobre este item')
-                else:
-                    faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
-                    listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
-                    return render_template('proyectoX.html',
-                                           listFases=listaFases,
-                                           faseSeleccionada=faseSeleccionada,
-                                           error='Fase finalizada no se puede reversionar items')
+                iditem = int(request.form['iditem'])
+                return redirect(url_for('admHistorial')) 
             except BadRequest:
                 return redirect(url_for('proyectoX'))
         if request.form['opcion'] == "Revivir":
@@ -1060,10 +1045,9 @@ def proyectoX():
             return render_template('proyectoX.html',listFases=listaFases,
                                    name=nombre)      
         if request.form['opcion'] == "Cerrar Proyecto":
-            #Hacer algo para que se borren los graficos generados
             return redirect(url_for('abrirProyecto')) 
         
-        if request.form['opcion'] == "Generar reporte de Solicitudes de cambio":#Agrege esto<<<<<<<<<<<<<<<<<<<<<<
+        if request.form['opcion'] == "Generar reporte de Solicitudes de cambio":
             idusuario = CtrlAdmUsr.getIdByUsername(owner)
             if CtrlAdmProy.eslider(idusuario,proyecto):
                 reporte = CtrlSolicitudCambio.genReport(proyecto)
@@ -1078,6 +1062,13 @@ def proyectoX():
                                         listFases=listaFases,
                                         faseSeleccionada=faseSeleccionada,
                                         error='Usted debe ser lider del proyecto para efectuar esta operacion')
+        
+        if request.form['opcion'] == "Generar reporte de Lista de Items":
+            reporte = CtrlFase.genReport(proyecto)
+            return send_file(reporte,
+                                 attachment_filename=os.path.basename(reporte),
+                                 as_attachment=True)
+            os.remove(reporte)
             return redirect(url_for('proyectoX'))
 
 """-----------------------Revivir Items---------------------------------------"""
@@ -1117,6 +1108,13 @@ def admHistorial():
             if int(request.form['idversionitem'])==CtrlFase.getVersionActual(iditem).idversionitem:
                 flash('No se puede reversionar a la version actual')
                 return redirect(url_for('admHistorial'))
+            objitem=CtrlFase.getItem(iditem)
+            if objitem.fase.estado == "finalizado":
+                flash('No se puede realizar la accion. Fase finalizada')
+                return redirect(url_for('admHistorial'))
+            if objitem.estado == "revision":
+                flash('No se puede realizar la accion. Item bloqueado o en revision')
+                return redirect(url_for('admHistorial'))
             global versionitem
             versionant = CtrlFase.getVersion(int(request.form['idversionitem']))
             versionitem = CtrlFase.instanciarVersionItem(versionant.iditem,
@@ -1138,6 +1136,14 @@ def admHistorial():
                     CtrlFase.reversionar(int(request.form['idversionitem']),iduser)
                     flash('Item reversionado')
                     return redirect(url_for('admHistorial'))
+        if request.form['opcion'] == "Generar Reporte":
+            i=CtrlFase.getItem(iditem)
+            reporte = CtrlFase.genReportHistorial(i)
+            return send_file(reporte,
+                             attachment_filename=os.path.basename(reporte),
+                             as_attachment=True)
+            os.remove(reporte)
+
         return redirect(url_for('proyectoX'))
 
 """-----------------------Modificar Items---------------------------------------"""
@@ -1554,8 +1560,8 @@ def proyectoXenGC():
             try:
                 idlineabase = int(request.form['idlineabase'])
                 if(CtrlLineaBase.cerrarLB(idlineabase)):
-                    flash('Linea Base Cerrada')
-                    return redirect(url_for('proyectoXenGC'))
+                     flash('Linea Base Cerrada')
+                     return redirect(url_for('proyectoXenGC'))
                 else:                
                     listaFases = CtrlAdmProy.getFasesListByProyAndUser(proyecto,owner)
                     faseSeleccionada = CtrlAdmProy.getFase(int(request.form['fase']))
