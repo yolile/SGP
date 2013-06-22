@@ -313,7 +313,7 @@ class SGPTestCase(unittest.TestCase):
         CtrlAdmProy.setProyIniciado(idproyecto)
         rv=self.login('username', 'password')
         rv=self.app.post('/abrirProyecto',data=dict(opcion='Abrir',select=idproyecto))
-        rv=self.app.post('/proyectoX',data=dict(opcion='Crear Item',fase=idfase))
+        rv=self.app.post('/proyectoX',data=dict(opcion='Crear',fase=idfase))
         rv=self.app.post('/crearItem',data=dict(opcion='Cargar Atributos',
                                                 nombre='nombre',
                                                 descripcion='descripcion',
@@ -350,7 +350,7 @@ class SGPTestCase(unittest.TestCase):
         CtrlAdmProy.setProyIniciado(idproyecto)
         rv=self.login('username', 'password')
         rv=self.app.post('/abrirProyecto',data=dict(opcion='Abrir',select=idproyecto))
-        rv=self.app.post('/proyectoX',data=dict(opcion='Crear Item',fase=idfase))
+        rv=self.app.post('/proyectoX',data=dict(opcion='Crear',fase=idfase))
         rv=self.app.post('/crearItem',data=dict(opcion='Cargar Atributos',
                                                 nombre='nombre',
                                                 descripcion='descripcion',
@@ -480,14 +480,22 @@ class SGPTestCase(unittest.TestCase):
                                                     1,
                                                     'actual')
         CtrlFase.crearItem(item,versionitem,[])
-        versionitem.descripcion=versionitem.descripcion+'-mod'
-        idusuario=CtrlAdmUsr.getIdByUsername('username')
-        CtrlFase.modificarItem(item.iditem,versionitem,idusuario)
+        versionitem = CtrlFase.instanciarVersionItem(item.iditem,
+                                                    CtrlAdmUsr.getIdByUsername('username'),
+                                                    "modified", 
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    2,
+                                                    'no-actual')
+        CtrlFase.modificarItem(item.iditem,versionitem)
         #prueba
         rv=self.login('username', 'password')
         rv=self.reversionarItem('Reversionar', 1)
         assert 'Item reversionado' in rv.data
-        
+        drop_db()
+        init_db()
+               
     def test_importarItem(self):
         #escenario
         idusuario=CtrlAdmUsr.insertarUsr('username',
@@ -523,11 +531,10 @@ class SGPTestCase(unittest.TestCase):
         #prueba
         rv=self.login('username', 'password')
         rv=self.app.post('/abrirProyecto',data=dict(opcion='Abrir',select=idproyecto2))
-        rv=self.app.post('/proyectoX',data=dict(opcion='Crear Item',fase=idfase2))
+        rv=self.app.post('/proyectoX',data=dict(opcion='Crear',fase=idfase2))
         rv=self.app.post('/crearItem',data=dict(opcion='Importar'))
         rv=self.importarItem('Aceptar', item.iditem)
         assert 'Item importado para crearse' in rv.data
                 
 if __name__ == '__main__':
     unittest.main()
-

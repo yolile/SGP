@@ -15,10 +15,10 @@ __text__ = 'Modulo con las clases y las tablas relacionadas entre si'
 __file__ = 'Modelo.py' 
 
 
-rutaBD='postgresql+psycopg2://admin:admin@localhost/sgptest'
+#rutaBD='postgresql+psycopg2://admin:admin@localhost/sgptest'
 
-#engine = create_engine(os.environ['DATABASE_URI'])
-engine=create_engine(rutaBD)
+engine = create_engine(os.environ['DATABASE_URI'])
+#engine=create_engine(rutaBD)
 Base= declarative_base()
 path="/home/divina/git/SGP/"
 
