@@ -149,8 +149,8 @@ def genReport(idproyecto):
          
         ptext = s.descripcion
         ptext = ptext+"\n-Estado de la solicitud: "+s.estado
-        ptext = ptext+"\n-Voto del usuario lider: "+voto.voto
-
+        if voto != None:
+            ptext = ptext+"\n-Voto del usuario lider: "+voto.voto
         Story.append(Paragraph(ptext, styles["Justify"]))
         Story.append(Spacer(1, 12))
 

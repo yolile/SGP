@@ -614,7 +614,7 @@ def genReport(idproyecto):
             v = session.query(VersionItem).filter(and_(VersionItem.iditem==i.iditem,VersionItem.estado=='actual')).first()
             
             ptext = "<b>ID:</b> "+ str(i.iditem)+"<br/>"
-            ptext = ptext+"<b>Descripcion:</b> "+version.descripcion+"<br/>"
+            ptext = ptext+"<b>Descripcion:</b> "+v.descripcion+"<br/>"
             ptext = ptext+"<b>Version:</b> "+str(v.version)+"<br/>"
             ptext = ptext+"<b>Prioridad:</b> "+str(v.prioridad)+"<br/>"
             
